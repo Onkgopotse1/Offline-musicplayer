@@ -1,0 +1,111 @@
+.music-main{
+    width: 100%; 
+    height: 80%;
+    overflow-wrap: break-word;
+    overflow-y: auto;          
+    overflow-x: hidden;
+    display: grid;
+    grid-template-columns: 1fr; 
+    grid-auto-rows: 60px;      
+    gap: 8px;                  
+    border: none;  
+    background-color: rgba(61, 34, 34, 0.397);
+    
+}
+
+.cart-div {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.text {
+    border: none;
+    width: 99%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    text-align: center;
+   /*  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; /*
+}
+
+.video,
+.audio {
+    border: 1px solid #000;
+    width: 100%;
+    flex: 0 0 70%;
+    box-sizing: border-box;
+    overflow: hidden; /* or auto if you need scrolling */
+}
+
+.horizontal-divs{
+    background-color: #413939;
+    width: 95%;
+    height: 60px;                      
+    border-radius: 10px;
+    display: grid;
+    align-items: center;               
+    grid-template-columns: 2% 4% 21% 21% 21% 20% 9%;
+    gap: 4px;
+    box-sizing: border-box;
+    margin-left: 2%;
+}
+
+.horizontal-divs > * { min-width: 0; }
+
+.play,
+.song-name,
+.artist-name,
+.album-name,
+.genre,
+.time,
+.check-box{
+ display: grid;
+ place-items: center;
+ height: 100%;
+ width: 100%;
+}
+
+.check-box{
+display: grid;
+place-items: center;
+/*border: solid greenyellow; */
+border-radius: 10px 0px 0px 10px;
+}
+
+.checkbox{
+    width: 70%;
+    height: 70%;
+}
+
+.play{
+/*border: solid rgb(137, 194, 52); */
+display: grid;
+place-items: center;
+}
+
+.song-name{
+/*border: solid greenyellow; */
+
+}
+
+.artist-name{
+/*border: solid greenyellow; */
+}
+
+.album-name{
+/*border: solid greenyellow; */
+}
+
+.genre{
+/*border: solid greenyellow; */
+}
+
+.time{
+/* border: solid greenyellow; */
+border-radius: 0px 10px 10px 0px;
+display: grid;
+place-items: center;
+}

@@ -1,0 +1,52 @@
+.main{
+    width: 100%; 
+    height: 80%;
+    overflow-wrap: break-word;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    row-gap: 0px;
+    column-gap: 0px;
+    gap: 0px;
+    border: none;  
+    background-color: rgb(167, 142, 93);
+    bottom: 0%;
+
+    
+}
+
+.cart-div {
+    box-sizing: border-box;
+
+    /* new: layout children vertically and let them fill the container */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.text {
+    border: solid green;
+    width: 95%;
+    flex: 0 0 30%;
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    display: -webkit-box; 
+    -webkit-line-clamp: 2; 
+    -webkit-box-orient: vertical;
+    line-height: 1.2em;
+    max-height: calc(1.2em * 2); 
+    padding: 0px;
+    margin: 0px;
+    font-size: 14px;
+    margin-top: 0px;
+}
+
+.video,
+.audio {
+    border: 1px solid #000;
+    width: 100%;
+    flex: 0 0 70%;
+    box-sizing: border-box;
+    overflow: hidden; 
