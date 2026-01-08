@@ -127,7 +127,6 @@ const [files, setFiles] = useState([]);
         {files.map((file, index) => {
           const fileURL = URL.createObjectURL(file);
 
-
           if (file.type.startsWith("audio/")) {
             return (
               <div key={index} className="cart-div">

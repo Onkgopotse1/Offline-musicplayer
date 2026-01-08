@@ -11,19 +11,18 @@
     column-gap: 0px;
     gap: 0px;
     border: none;  
-    background-color: rgb(167, 142, 93);
+    background-color: rgba(36, 30, 30, 0.397);
     bottom: 0%;
-
-    
 }
 
 .cart-div {
     box-sizing: border-box;
-
+    height: 167.05px;
     /* new: layout children vertically and let them fill the container */
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    
 }
 
 .text {
@@ -46,9 +45,15 @@
 
 .video,
 .audio {
-    border: 1px solid #000;
+    
     width: 100%;
     flex: 0 0 70%;
     box-sizing: border-box;
     overflow: hidden; /* or auto if you need scrolling */
+}
+
+.audio {
+ border: 1px solid #000;
+ display: grid;
+ place-items: center;
 }

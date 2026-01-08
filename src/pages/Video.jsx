@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import './Home.css';
+import "./video.css"
 
 function Video() {
   const [files, setFiles] = useState([]);
@@ -117,7 +117,7 @@ function Video() {
 
         </div>
 
-     <div className="main">{/*openning*/}
+     <div className="video-main">{/*openning*/}
 
               {files.length === 0 && (
           <p className="text-gray-500">No files chosen yet</p>

@@ -1,17 +1,25 @@
 import {  Link, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faCirclePlay } from '@fortawesome/free-solid-svg-icons';
+import { faHouse } from '@fortawesome/free-solid-svg-icons';
+import { faMusic } from '@fortawesome/free-solid-svg-icons';
+import { faVideo } from '@fortawesome/free-solid-svg-icons';
+import { faList } from '@fortawesome/free-solid-svg-icons';
+import { faCompactDisc } from '@fortawesome/free-solid-svg-icons';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
 
 export default function Sidebar() {
 
-  
-        const navigate = useNavigate();
-        
+   const navigate = useNavigate();
+   
           return (
           <div className="sidebar">
             <div className="top-div">
               <button className="back-button" >
-                <i className="fa-solid fa-arrow-left"></i>
+                <FontAwesomeIcon icon={faArrowLeft} />
               </button>
-              <i className="fa-solid fa-circle-play" id="play-button"></i>
+              <FontAwesomeIcon icon={faCirclePlay} />
               <p className="media-player">Media Player</p>
             </div>
 
@@ -22,21 +30,21 @@ export default function Sidebar() {
 
                 <div className="home-div">
                   <button className="home-button" id="home-buttoon" onClick={() => navigate("/")}>
-                    <i className="fa-solid fa-house" id="home-icon"></i>
+                    <FontAwesomeIcon icon={faHouse} />
                     <p className="home-text">Home</p>
                   </button>
                 </div>
 
                 <div className="music-div">
                   <button className="music-button" id="music-button" onClick={() => navigate("/music")}>
-                    <i className="fa-solid fa-music" id="music-icon"></i>
+                    <FontAwesomeIcon icon={faMusic} />
                     <p className="music-text">Music</p>
                   </button>
                 </div>
 
                 <div className="video-div">
                   <button className="video-button" onClick={() => navigate("/video")}>
-                    <i className="fa-solid fa-film" id="video-icon"></i>
+                    <FontAwesomeIcon icon={faVideo} />
                     <p className="video-text">Video</p>
                   </button>
                 </div>
@@ -45,23 +53,23 @@ export default function Sidebar() {
 
                 <div className="play-queue-div">
                   <button className="play-queue-button" onClick={() => navigate("/playqueue")}>
-                    <i className="fa-solid fa-list" id="play-queue-icon"></i>
+                    <FontAwesomeIcon icon={faList} />
                     <p className="play-queue-text">play-queue</p>
                   </button>
                 </div>
 
                 <div className="playlist-div">
                   <button className="playlist-button" onClick={() => navigate("/playlist")}>
-                    <i className="fa-solid fa-compact-disc" id="playlist-icon"></i>
+                    <FontAwesomeIcon icon={faCompactDisc} />
                     <p className="playlist-text">playlist</p>
                   </button>
                 </div>
 
-                <button className="settings" onClick={() => navigate("/settings")}>
-                    <i className="fa-solid fa-gear fa-lg" id="settings-icone"></i>
+                <button className="settings-button" onClick={() => navigate("/settings")}>
+                    <FontAwesomeIcon icon={faGear} />
                     <p className="settings-text">Settings</p>
                 </button>
-                <Link to="*">lll</Link>
+                
           </div>
           </div>
           )  

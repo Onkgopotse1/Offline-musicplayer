@@ -1,8 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, } from "react";
 import './Music.css';
+import ErrorBoundry from "../Error boundry/Error Boundry";
 
 function MyMusicUi(){
 const [files, setFiles] = useState([]);
+
+////////🛠️ Helper Function/////////////////
+const parseFileName = (file) => {
+  // Split on the first dash
+  const parts = file.name.split("-");
+  if (parts.length < 2) {
+    // No dash found → fallback
+    return { artist: "Unknown Artist", song: file.name };
+  }
+
+  const firstPart = parts[0].trim();
+  const secondPart = parts[1].replace(/\.[^/.]+$/, "").trim(); // remove extension
+
+  // Logic: if first part looks like a word/letters, treat as artist
+  // if first part looks like numbers, treat as song
+  if (/^[A-Za-z]/.test(firstPart)) {
+    return { artist: firstPart, song: secondPart };
+  } else {
+    return { song: firstPart, artist: secondPart };
+  }
+};
+////////🛠️ END Helper Function/////////////////
 
  // ============ Database Setup ============
   useEffect(() => {
@@ -66,6 +89,8 @@ const [files, setFiles] = useState([]);
           data: event.target.result, // This is the file content as ArrayBuffer
           uploadedAt: new Date().toISOString()
         };
+      
+        
         //at this moment this is NOT a File anymore, It’s just plain data (which IndexedDB loves)//
 
         // Open the same database and save the data
@@ -79,7 +104,6 @@ const [files, setFiles] = useState([]);
           // Store the file data
           store.add(fileData);  
           
-          console.log('Saved to database:', file.name);
         };
       };
       
@@ -91,8 +115,11 @@ const [files, setFiles] = useState([]);
 
     //existing code unchanged
     setFiles(prevFiles => [...prevFiles, ...selectedFiles]);
-  };
 
+
+
+  };
+      
     return (
       <div className="right-main">
 
@@ -113,15 +140,16 @@ const [files, setFiles] = useState([]);
         </div>
 
      <div className="music-main">{/*openning*/}
-
+       {/*///////it checks if no file have been uploaded. if no then it display a text/////////////////*/}
               {files.length === 0 && (
           <p className="text-gray-500">No files chosen yet</p>
         )}
-
+        
         {files.map((file, index) => {
           const fileURL = URL.createObjectURL(file);
+          const { artist, song } = parseFileName(file); //Parse artist and song from filename//
 
- 
+
 
           if (file.type.startsWith("audio/")) {
             return (
@@ -131,13 +159,14 @@ const [files, setFiles] = useState([]);
                 <input type="checkbox" className="checkbox" />
                 </div>
                 <div className="play">
-                <p className="text"><button></button></p>
+                  <audio controls src={fileURL} className="audio-play-button"  />
+                <button className="play-button">▶</button>
                 </div>
                 <div className="song-name">
-                <p className="text">{file.name}</p>
+                <p className="text">{song}</p>
                 </div>
                 <div className="artist-name">
-                <p className="text">artist name</p>
+                <p className="text">{artist}</p>
                 </div>
                 <div className="album-name">
                 <p className="text">album's name</p>
@@ -146,7 +175,7 @@ const [files, setFiles] = useState([]);
                 <p className="text">genre name</p>
                 </div>
                 <div className="time">
-                <p className="text">hellow world</p>
+                <p className="text">time</p>
                 </div>
               </div>
             );
