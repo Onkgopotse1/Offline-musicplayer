@@ -1,16 +1,16 @@
 import './App.css';
 import { Routes, Route } from "react-router-dom";
-import Home  from "./pages/Home";
-import MyMusic from './pages/Music';
-import Notfound from './pages/NotFound';
-import Playlist from './pages/Playlist';
-import Settings from './pages/Settings';
-import Video from "./pages/Video";
-import Playqueue from './pages/Playqueue';
+import Home  from "./pages/Home.js";
+import MyMusic from './pages/Music.js';
+import Notfound from './pages/NotFound.js';
+import Playlist from './pages/Playlist.js';
+import Settings from './pages/Settings.js';
+import Video from "./pages/Video.js";
+import Playqueue from './pages/Playqueue.js';
 
-import Sidebar  from './Homee/Sidebar';
-import RightMain  from './Homee/Rightmain';
-import Bottom  from './Homee/Bottom';
+import Sidebar  from './Homee/Sidebar.js';
+import RightMain  from './Homee/Rightmain.js';
+import Bottom  from './Homee/Bottom.js';
 
 
 function App() {
