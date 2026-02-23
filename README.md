@@ -1,12 +1,44 @@
-# React + Vite
+🎧 Offline Music Player (React + TypeScript)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern offline media player web app that allows users to import, store, and play audio and video files locally using IndexedDB. Built with React and TypeScript.
 
-Currently, two official plugins are available:
+---
+Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Offline media storage using IndexedDB**
+- Import and persist audio and video files locally
+- Automatic media restoration after page reload
+- Audio, video, and image preview player
+- Dynamic media type detection and rendering
+- Modular React component architecture
+- Sidebar navigation and multi-page layout (Music, Video, Playlist, PlayQueue Settings)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+🧠 Tech Stack
+
+- React  
+- TypeScript  
+- IndexedDB  
+- Vite  
+- HTML5 Media APIs  
+- CSS  
+
+---
+
+ 🛠 How It Works
+
+1. User imports media files  
+2. Files are stored as ArrayBuffers in IndexedDB  
+3. On reload, files are restored and converted back to Blob/File  
+4. Media is rendered dynamically based on file type  
+
+---
+
+Getting Started:
+
+```bash
+git clone https://github.com/Onkgopotse1/Offline-musicplayer.git
+cd Offline-musicplayer
+npm install
+npm run dev
