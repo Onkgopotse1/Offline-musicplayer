@@ -11,7 +11,7 @@ interface StoredFile {
   size: number;
   data: ArrayBuffer;
   uploadedAt: string;
-}
+};
 
 export default function Home() {
   // State holds actual File objects for rendering
@@ -111,7 +111,7 @@ export default function Home() {
     <div className="right-main">
       <div className="topbar">
         <h1>Home Page</h1>
-
+  
         <div className="upload-section">
           <h2 className="text-xl font-bold mb-2">Upload Media</h2>
           <input

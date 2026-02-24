@@ -24,6 +24,23 @@
     align-items: stretch;
 }
 
+.video-play-btn {
+    background-color: #000;
+    display: grid;
+    place-items: center;
+    position: relative;
+    top: -41%;
+    left: 45%;
+    width: 0%;
+    height: 0%;
+    border: none;
+    padding: 0%;
+    border-radius: 50%;
+    cursor: pointer;
+    /* hide by default */
+    transition: opacity 0.3s ease;
+}
+
 .text {
     width: 95%;
     flex: 0 0 30%;
@@ -31,7 +48,7 @@
     overflow: hidden; /* hide overflowing lines */
     text-overflow: ellipsis;
     display: -webkit-box; /* needed for -webkit-line-clamp */
-    -webkit-line-clamp: 2; /* show only two lines */
+    /*-webkit-line-clamp: 2; /* show only two lines */ 
     -webkit-box-orient: vertical;
     line-height: 1.2em;
     max-height: calc(1.2em * 2); /* prevent taller than two lines */

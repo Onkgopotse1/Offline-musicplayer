@@ -79,29 +79,30 @@ border-radius: 10px 0px 0px 10px;
     width: 70%;
     height: 70%;
 }
-
+/*
 .play{
-/*border: solid rgb(137, 194, 52); */
+border: solid rgb(137, 194, 52); 
 
 
 }
 
 .song-name{
-/*border: solid greenyellow; */
+border: solid greenyellow; 
 
 }
 
 .artist-name{
-/*border: solid greenyellow; */
+border: solid greenyellow; 
 }
 
 .album-name{
-/*border: solid greenyellow; */
+border: solid greenyellow; 
 }
 
 .genre{
-/*border: solid greenyellow; */
+border: solid greenyellow; 
 }
+*/
 
 .time{
 /* border: solid greenyellow; */
@@ -122,6 +123,7 @@ place-items: center;
     background-color: rgb(31, 32, 32);
 }
 
+/*
 .audio-play-button{
     
-}
+} */

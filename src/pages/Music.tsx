@@ -1,47 +1,51 @@
 import React, { useEffect, useState, } from "react";
 import './Music.css';
-import ErrorBoundry from "../Error boundry/Error Boundry.js";
+import type { StoredFile } from "../type/media.ts";
 
- // Define the shape of what we store in IndexedDB
- interface StoredFile {
-   id?: number; // autoIncrement key
-   name: string;
-   type: string;
-   lastModified: number;
-   size: number;
-   data: ArrayBuffer;
-   uploadedAt: string;
- };
+interface MusicProps {
+  files: StoredFile[];
+  setFiles: React.Dispatch<React.SetStateAction<StoredFile[]>>;
+  currentMediaId: string | null;
+  setCurrentMediaId: React.Dispatch<React.SetStateAction<string | null>>;
+  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurrentMediaType: React.Dispatch<
+  React.SetStateAction<"audio" | "video" | null>>;
+}
+
+function MyMusic({
+  //All of this props are been passed by down App.tsx
+  files,           
+  setFiles,
+  currentMediaId,
+  setCurrentMediaId,
+  setIsPlaying,
+  setCurrentMediaType
+}: MusicProps){
  
-     function MyMusicUi(){
-   // State holds actual File objects for rendering
-   const [files, setFiles] = useState<File[]>([]);
- 
-  ////////🛠️ Helper Function/////////////////
-  const parseFileName = (file: any) => {
-  // Split on the first dash
-  const parts = file.name.split("-");
-  if (parts.length < 2) {
-    // No dash found → fallback
-    return { artist: "Unknown Artist", song: file.name };
-  }
+ ////////🛠️ Helper Function/////////////////
+    const parseFileName = (file: any) => {
+    // Split on the first dash
+    const parts = file.name.split("-");
+    if (parts.length < 2) {
+      // No dash found → fallback
+      return { artist: "Unknown Artist", song: file.name };
+    }
 
-  const firstPart = parts[0].trim();
-  const secondPart = parts[1].replace(/\.[^/.]+$/, "").trim(); // remove extension
+    const firstPart = parts[0].trim();
+    const secondPart = parts[1].replace(/\.[^/.]+$/, "").trim(); // remove extension
 
-  // Logic: if first part looks like a word/letters, treat as artist
-  // if first part looks like numbers, treat as song
-  if (/^[A-Za-z]/.test(firstPart)) {
-    return { artist: firstPart, song: secondPart };
-  } else {
-    return { song: firstPart, artist: secondPart };
-  }
-};
-////////🛠️ END Helper Function/////////////////
-
+    // Logic: if first part looks like a word/letters, treat as artist
+    // if first part looks like numbers, treat as song
+    if (/^[A-Za-z]/.test(firstPart)) {
+      return { artist: firstPart, song: secondPart };
+    } else {
+      return { song: firstPart, artist: secondPart };
+    }
+  };
+ ///////🛠️ END Helper Function/////////////////
 
    // ============ Database Setup ============
-   useEffect(() => {
+   useEffect(() => { console.log("useEffect - Load from IndexedDB");
      // Initialize IndexedDB when component loads
      const request: IDBOpenDBRequest = indexedDB.open("MediaDB", 1);
  
@@ -49,11 +53,11 @@ import ErrorBoundry from "../Error boundry/Error Boundry.js";
        const db = (event.target as IDBOpenDBRequest).result as IDBDatabase;
        // Create storage for files if it doesn't exist
        if (!db.objectStoreNames.contains("media")) {
-         db.createObjectStore("media", { keyPath: "id", autoIncrement: true });
+         db.createObjectStore("media", { keyPath: "id"});
        }
      };
  
-     request.onsuccess = () => {
+     request.onsuccess = () => {console.log("📂 Database opened successfully");
        const db = request.result;
  
         // Load existing files from database when page loads
@@ -76,9 +80,9 @@ import ErrorBoundry from "../Error boundry/Error Boundry.js";
            });
          });
           
-         // Add to your existing files state
+         // Add that fileObject to your existing files state
          if (fileObjects.length > 0) {
-           setFiles((prevFiles) => [...prevFiles, ...fileObjects]);
+           setFiles(storedFiles);
          }
        };
      };
@@ -96,16 +100,18 @@ import ErrorBoundry from "../Error boundry/Error Boundry.js";
  
        reader.onload = (event: ProgressEvent<FileReader>) => {        //FileReader reads file into memory//
          const fileData: StoredFile = {                                //Prepare file object for database//
- 
+           id: crypto.randomUUID(),
            name: file.name,
            type: file.type,
            lastModified: file.lastModified,
            size: file.size,
            data: event.target?.result as ArrayBuffer,  // This is the file content as ArrayBuffer
            uploadedAt: new Date().toISOString(),
-         };
+         }; // gets saved to indexedDB
           // at this moment this is NOT a File anymore, It’s just plain data (which IndexedDB loves)//
  
+        
+
           // Open the same database and save the data
          const dbRequest: IDBOpenDBRequest = indexedDB.open("MediaDB", 1);
  
@@ -116,28 +122,31 @@ import ErrorBoundry from "../Error boundry/Error Boundry.js";
            
            // Store the file data
            store.add(fileData);
-           console.log("Saved to database:", file.name);
+           //SAVE TO STATE HERE
+           setFiles(prev => [...prev, fileData]);
+           
          };
        };
- 
+
        // Read file as ArrayBuffer
        reader.readAsArrayBuffer(file);
+       
      });
      // ============ END SAVE TO DATABASE ============
- 
-     // Update state to render selected files immediately
-     setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
    };
 
-
+    const handleplay = (id: string) => {
+      setCurrentMediaId(id);
+      setCurrentMediaType("audio");
+      setIsPlaying(true)
+    };
       
     return (
-      <div className="right-main">
+    <div className="right-main">
+      <div className="topbar">
+       <h1>Music Page</h1>
 
-        <div className="topbar">
-        <h1>Music Page</h1>
-
-      <div className="upload-section">
+       <div className="upload-section">
         <h2 className="text-xl font-bold mb-2">Upload Media</h2>
         <input
           type="file"
@@ -145,36 +154,38 @@ import ErrorBoundry from "../Error boundry/Error Boundry.js";
           accept="audio/*"
           onChange={handleFileChange}
           className="border p-2 rounded"
-        />
+         />
+        </div>
       </div>
 
-        </div>
-
-     <div className="music-main">{/*openning*/}
+      <div className="music-main">{/*openning*/}
        {/*///////it checks if no file have been uploaded. if no then it display a text/////////////////*/}
               {files.length === 0 && (
           <p className="text-gray-500">No files chosen yet</p>
         )}
         
-        {files.map((file, index) => {
-          const fileURL = URL.createObjectURL(file);
-          const { artist, song } = parseFileName(file); //Parse artist and song from filename//
+        {files.map((item) => {
+         const blob = new Blob([item.data], { type: item.type });
+         const fileURL = URL.createObjectURL(blob);
+         const { artist, song } = parseFileName(item); //Parse artist and song from filename//
 
+         const currentfile = files.find(f => f.id === currentMediaId);
 
-
-          if (file.type.startsWith("audio/")) {
+          if (item.type.startsWith("audio/")) {
             return (
             
-              <div key={`${file.name}-${file.lastModified ?? index}`} className="horizontal-divs">
+              <div key={`${item.id}`} className="horizontal-divs">
                 <div className="check-box">
                 <input type="checkbox" className="checkbox" />
                 </div>
                 <div className="play">
-                  <audio controls src={fileURL} className="audio-play-button"  />
-                <button className="play-button">▶</button>
-                </div>
+                  
+                <button onClick={() => handleplay(item.id)} className="play-button">
+                  ▶
+                </button> 
+                </div> 
                 <div className="song-name">
-                <p className="text">{song}</p>
+                <p className="text">{song}</p> 
                 </div>
                 <div className="artist-name">
                 <p className="text">{artist}</p>
@@ -197,16 +208,8 @@ import ErrorBoundry from "../Error boundry/Error Boundry.js";
       </div>{/*closing*/}
      </div>
 
-
     );
   };
-
-
-function MyMusic() {
-  return (
-  <MyMusicUi />
-  );
-
-};
+  
 
 export default MyMusic;
