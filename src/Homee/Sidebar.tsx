@@ -17,9 +17,9 @@ export default function Sidebar() {
           <div className="sidebar">
             <div className="top-div">
               <button className="back-button" >
-                <FontAwesomeIcon icon={faArrowLeft} />
+                <FontAwesomeIcon icon={faArrowLeft}  />
               </button>
-              <FontAwesomeIcon icon={faCirclePlay} />
+              <FontAwesomeIcon icon={faCirclePlay} className="top-play-icon" />
               <p className="media-player">Media Player</p>
             </div>
 
@@ -30,21 +30,21 @@ export default function Sidebar() {
 
                 <div className="home-div">
                   <button className="home-button" id="home-buttoon" onClick={() => navigate("/")}>
-                    <FontAwesomeIcon icon={faHouse} />
+                    <FontAwesomeIcon icon={faHouse} className="home-icon" />
                     <p className="home-text">Home</p>
                   </button>
                 </div>
 
                 <div className="music-div">
                   <button className="music-button" id="music-button" onClick={() => navigate("/music")}>
-                    <FontAwesomeIcon icon={faMusic} />
+                    <FontAwesomeIcon icon={faMusic} className="music-icon" />
                     <p className="music-text">Music</p>
                   </button>
                 </div>
 
                 <div className="video-div">
                   <button className="video-button" onClick={() => navigate("/video")}>
-                    <FontAwesomeIcon icon={faVideo} />
+                    <FontAwesomeIcon icon={faVideo} className="video-icon" />
                     <p className="video-text">Video</p>
                   </button>
                 </div>
@@ -53,20 +53,20 @@ export default function Sidebar() {
 
                 <div className="play-queue-div">
                   <button className="play-queue-button" onClick={() => navigate("/playqueue")}>
-                    <FontAwesomeIcon icon={faList} />
+                    <FontAwesomeIcon icon={faList} className="play-queue-icon" />
                     <p className="play-queue-text">play-queue</p>
                   </button>
                 </div>
 
                 <div className="playlist-div">
                   <button className="playlist-button" onClick={() => navigate("/playlist")}>
-                    <FontAwesomeIcon icon={faCompactDisc} />
+                    <FontAwesomeIcon icon={faCompactDisc} className="playlist-icon" />
                     <p className="playlist-text">playlist</p>
                   </button>
                 </div>
 
                 <button className="settings-button" onClick={() => navigate("/settings")}>
-                    <FontAwesomeIcon icon={faGear} />
+                    <FontAwesomeIcon icon={faGear} className="settings-icon" />
                     <p className="settings-text">Settings</p>
                 </button>
                 

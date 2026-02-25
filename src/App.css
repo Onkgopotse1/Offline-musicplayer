@@ -1,4 +1,3 @@
-/* HOME PAGE */
 .layout {
   display: grid;
   height: 100vh;
@@ -12,12 +11,11 @@
 }
 
 .topbar {
- /* grid-area: topbar;  <-- remove/comment when nested */
  height: 20%;
- min-height: 56px;       /* adjust as needed */
+ min-height: 56px;       
  display: flex;
  align-items: center;
- justify-content: space-between; /* or flex-start */
+ justify-content: space-between; 
  gap: 12px;
  padding: 0 16px;
  box-sizing: border-box;
@@ -28,23 +26,30 @@
   grid-area: sidebar;
 }
 
-
-
 .bottom {
   grid-area: bottom;
-  
 }
 
 .top-div {
-  border: solid rgba(68, 64, 64, 0.397); 
+  border-bottom: 1px solid rgba(68, 64, 64, 0.397); 
   width: 100%;
-  height: 5%;
+  height: 50px; 
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  box-sizing: border-box;
+  gap: 12px;
 }
 
 .last-div-left {
   background-color: rgba(34, 34, 34, 0.397);
   width: 100%;
-  height: 95%;
+  height: calc(100% - 50px); 
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 10px;
+  box-sizing: border-box; 
+  overflow: hidden; 
 }
 
 .search-div{
@@ -52,24 +57,40 @@
   width: 100%;
 }
 
-    .search {
-      margin-left: 0%;
-      width: 95%;
-      height: 31px;
-      border-radius: 0px 0px 5px 5px;
-      border: none;
-      background-color: rgb(54, 52, 52);
-      margin-bottom: 4%;
-    }
+.search {
+  margin-left: 0%;
+  width: 95%45rv;
+  height: 31px;
+  border-radius: 0px 0px 5px 5px;
+  border: none;
+  background-color: rgb(54, 52, 52);
+  margin-bottom: 4%;
+  text-align: left;       
+  padding-left: 12px;       
+  box-sizing: border-box;   
+  color: azure;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-    .back-button {
-      margin-top: 4%;
-      margin-left: 5%;
-      background-color: transparent;
-      padding: 1px;
-      border: none;
-    }
+.search::placeholder {
+  text-align: left;
+}
 
+  .back-button {
+  background-color: transparent;
+  padding: 5px;
+  border: none;
+  color: azure;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  }
+
+  .top-play-icon {
+    color: azure;
+    font-size: 1.1rem;
+  }
     #play-button {
       margin-left: 9%;
       background-color: rgb(214, 209, 209);
@@ -77,72 +98,79 @@
     }
 
     .media-player {
-      text-align: right;
-      margin-top: -6%;
-      margin-right: 36%;
+      margin: 0; 
       color: beige;
-      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 0.7vw;
-      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 0.85rem; 
+      font-weight: 500;
+      white-space: nowrap;
     }
 
-    .music-div,
-    .home-div,
-    .video-div,
-    .play-queue-div,
-    .playlist-div {
-      width: 95%;
-      height: 5.7%;
-      margin-left: 2%;
-      margin-top: 2%;
-      background-color: rgb(54, 52, 52);
-      border-radius: 5px;
-    }
+.home-div,
+.music-div,
+.video-div,
+.play-queue-div,
+.playlist-div {
+  width: 95%;
+  height: 40px; 
+  margin-left: 2%;
+  margin-top: 4px; 
+  background-color: rgb(54, 52, 52);
+  border-radius: 5px;
+}
 
-    .home-div {
-      background-color: rgba(54, 52, 52, 0.575);
-    }
 
-    .home-button,
-    .music-button,
-    .video-button,
-    .play-queue-button,
-    .playlist-button {
-      width: 100%;
-      height: 100%;
-      background-color: rgb(54, 52, 52);
-      border: none;
-    }
-    
-    #home-icon,
-    #music-icon,
-    #video-icon,
-    #play-queue-icon,
-    #playlist-icon {
-      margin-top: 5px;
-      margin-left: -276px;
-      color: azure;
-    }
+
+.home-icon,
+.music-icon,
+.video-icon,
+.play-queue-icon,
+.playlist-icon,
+.settings-icon {
+  color: azure;
+  width: 18px;  
+  height: 18px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-button,
+.music-button,
+.video-button,
+.play-queue-button,
+.playlist-button,
+.settings-button {
+  width: 100%;
+  height: 40px; 
+  background-color: transparent;
+  border: none;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  align-items: center;
+  padding-left: 10px;
+}
    
-    .home-text,
-    .music-text,
-    .video-text,
-    .play-queue-text,
-    .playlist-text {
-      color: azure;
-      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 80%;
-      text-align: end;
-      margin-top: -23px;
-      margin-right: 217px;
-      display: grid;
-      text-align: left;
-    }
+.home-text,
+.music-text,
+.video-text,
+.play-queue-text,
+.playlist-text,
+.settings-text {
+  color: azure;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+  position: static; 
+  width: auto;
+  height: auto;
+}
 
-
-    .play-queue-text {
-      width: 100%;
-    }
+  .play-queue-text {
+     width: 100%;
+  }
 
     .div-line {
       width: 100%;
@@ -151,29 +179,95 @@
       margin-top: 1px;
     }
 
-  .settings-button {
-    background-color: rgb(54, 52, 52);
-    left: 2%;
-    width: 100%;
-    height: 6%;
-    border: none;
-    position: relative;
-    top: 55%;
-  }
-
- .settings-text{
-    color: azure;
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 80%;
-    position: relative;
-    bottom: 10px; 
-    text-align: left;
- }
+.settings-button {
+  width: 95%;
+  height: 40px; 
+  margin-left: 2%;
+  margin-top: auto; 
+  margin-bottom: -6px; 
+  background-color: rgb(54, 52, 52);
+  border-radius: 5px;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  align-items: center;
+  padding-left: 10px;
+  border: none;
+}
 
 .right-main{
   grid-area: right-main;
-  
 }
 
+/* ---RESPONSIVE SIDEBAR COLLAPSE --- */
+@media (max-width: 970px) {
+  .layout {
+    grid-template-columns: 70px 1fr; 
+  }
 
+  .media-player,
+  .search-div,
+  .home-text,
+  .music-text,
+  .video-text,
+  .play-queue-text,
+  .playlist-text,
+  .settings-text {
+    display: none;
+  }
 
+  .top-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .back-button {
+    margin: 0;
+  }
+
+  .top-play-icon {
+    display: none;
+  }
+
+  .home-button,
+  .music-button,
+  .video-button,
+  .play-queue-button,
+  .playlist-button {
+    grid-template-columns: 100%;
+    place-items: center;
+    gap: 0;
+  }
+
+  .home-icon,
+  .music-icon,
+  .video-icon,
+  .play-queue-icon,
+  .playlist-icon {
+    width: auto;
+    font-size: 1.2rem; 
+  }
+
+  .settings-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 0;
+    width: 100%;
+  }
+  
+  .settings-icon {
+    font-size: 1.2rem;
+  }
+
+  .top-div {
+    justify-content: center; 
+    gap: 0;
+  }
+  
+  .top-play-icon, 
+  .media-player {
+    display: none; 
+  }
+
+}
