@@ -1,18 +1,31 @@
 import './App.css';
+import './index.css';
+import './pages/Home.css';
+import './pages/Video.css';
+import './pages/Music.css';
+import './pages/Playlist.css';
+import './pages/Settings.css';
+import './pages/PlayQueue.css';
+import './Homee/Bottom.css';
 import { Routes, Route } from "react-router-dom";
-import { useState, useRef } from "react";
-import Home  from "./pages/Home.tsx";
-import MyMusic from './pages/Music.tsx';
-import Notfound from './pages/NotFound.tsx';
-import Playlist from './pages/Playlist.tsx';
-import Settings from './pages/Settings.tsx';
-import Video from "./pages/Video.tsx";
-import Playqueue from './pages/Playqueue.tsx';
+import { useState, useRef, lazy, Suspense } from "react";
+
+const Home = lazy(() => import('./pages/Home.tsx'));
+const Video = lazy(() => import('./pages/Video.tsx'));
+const MyMusic = lazy(() => import('./pages/Music.tsx'));
+const Notfound = lazy(() => import('./pages/NotFound.tsx'));
+const Playlist = lazy(() => import('./pages/Playlist.tsx'));
+const Settings = lazy(() => import('./pages/Settings.tsx'));
+const Playqueue = lazy(() => import('./pages/Playqueue.tsx'));
 
 import Sidebar  from './Homee/Sidebar.tsx';
 import RightMain  from './Homee/Rightmain.tsx';
 import Bottom  from './Homee/Bottom.tsx';
 import type { StoredFile } from "./type/media.ts";
+
+//const Home = lazy(() => import("./pages/Home.tsx"));
+//const Video = lazy(() => import("./pages/Video.tsx"));
+//const MyMusic = lazy(() => import("./pages/Music.tsx"));
 
 
 function App() {
@@ -36,9 +49,12 @@ function App() {
  return (
   <div className="layout">
      <Sidebar />
-      <Routes>
-        <Route path="/" element={<Home />} />
+ 
+        <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
         
+         <Route path="/" element={<Home />} />
+
         <Route path="music" element={<MyMusic
          files={files}
          setFiles={setFiles}
@@ -63,6 +79,8 @@ function App() {
         <Route path="settings" element={<Settings />} />
         <Route path="notfound" element={<Notfound />} />
       </Routes>
+      </Suspense>
+
 
        <Bottom
         files={files}

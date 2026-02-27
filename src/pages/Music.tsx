@@ -179,8 +179,7 @@ function MyMusic({
                 <input type="checkbox" className="checkbox" />
                 </div>
                 <div className="play">
-                  
-                <button onClick={() => handleplay(item.id)} className="play-button">
+                <button onClick={() => handleplay(item.id)} className="play-buttons">
                   ▶
                 </button> 
                 </div> 

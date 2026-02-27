@@ -221,15 +221,10 @@ useEffect(() => {
 };
 
 
-
-
 return(
     <div className="bottom">
       <div className="bottom-mother-container">
-        <div className="playing-box">
           {currentMediaType === "audio" && <audio ref={audioRef} />}
-          
-        </div>
 {/* ================Progress Bar==============*/}
         <progress
           ref={progressRef}
