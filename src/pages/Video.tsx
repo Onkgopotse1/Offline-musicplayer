@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./video.css"
 import type { StoredFile } from "../type/media.ts";
 
@@ -26,8 +26,19 @@ function Video({
   
 }: VideoProps) {
 
-  // State holds actual File objects for rendering
+  // Add thumbnail state to store generated thumbnails for videos
+   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
   
+   const urlCache = useRef<Record<string, string>>({});
+
+const getUrl = (item: StoredFile) => {
+  if (!urlCache.current[item.id]) {
+    const blob = new Blob([item.data], { type: item.type });
+    urlCache.current[item.id] = URL.createObjectURL(blob);
+  }
+  return urlCache.current[item.id];
+};
+
 
  // ============ Database Setup ============
    useEffect(() => { console.log("useEffect - Load from IndexedDB");
@@ -73,13 +84,31 @@ function Video({
      };
    }, []);  // Empty dependency array = run once on mount
    // ============ END DATABASE SETUP ============
- 
+
+
+   // Generate thumbnails for video files whenever the files state changes
+      useEffect(() => {
+        files.forEach(async (file) => {
+          if (file.type.startsWith("video/") && !thumbnails[file.id]) {
+            const thumb = await generateThumbnail(file);
+            setThumbnails(prev => ({ ...prev, [file.id]: thumb }));
+          }
+        });
+      }, [files]); // runs every time files array changes
+
+      useEffect(() => {
+  return () => {
+    Object.values(urlCache.current).forEach(URL.revokeObjectURL);
+  };
+}, []);
+
+
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
      const selectedFiles = Array.from(e.target.files ?? []);
  
      //the code below goes through each file selected and saves it to the database
  
-     // ============ ADD THIS: Save each file to IndexedDB ============
+     // ============: Save each file to IndexedDB ============
      selectedFiles.forEach((file) => {                    //Loop through selected files//
        const reader = new FileReader();                     //Read file content//
  
@@ -126,6 +155,30 @@ function Video({
       setIsPlaying(true)
     };
 
+
+// Helper function to generate thumbnail for a video file
+const generateThumbnail = (file: StoredFile): Promise<string> => {
+  return new Promise((resolve) => {
+    const blob = new Blob([file.data], { type: file.type });
+    const url = URL.createObjectURL(blob);
+    const video = document.createElement("video");
+    video.src = url;
+    video.muted = true;
+    video.playsInline = true;
+    video.onloadedmetadata = () => { video.currentTime = 1; };
+    video.onseeked = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 320;
+      canvas.height = 180;
+      const ctx = canvas.getContext("2d");
+      ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const thumbnail = canvas.toDataURL("image/jpeg", 0.7);
+      URL.revokeObjectURL(url);
+      resolve(thumbnail);
+    };
+  });
+};
+
    return (
       <div className="right-main">
 
@@ -151,31 +204,50 @@ function Video({
           <p className="text-gray-500">No files chosen yet</p>
         )}
 
-      {files.map((item) => {
-         const blob = new Blob([item.data], { type: item.type });
-         const fileURL = URL.createObjectURL(blob);
+{files.map((item) => {
+  if (!item.type.startsWith("video/")) return null;
+
+  const isActive = item.id === currentMediaId;
+  const url = getUrl(item);
+
+  
+  return (
+    <div key={item.id} className="cart-div">
+
+      {/* 👇 SWAP: show video when active, thumbnail when not */}
+      {isActive ? (
+        <video
+          ref={videoRef}
+          src={url}
+          width="300"
+          className="video"
+          autoPlay
+          
+        />
+      ) : (
+        <>
+          <img
+            src={thumbnails[item.id] || ""}
+            width="300"
+            className="video"
+            alt={item.name}
+          />
+          <button
+            className="video-play-btn"
+            onClick={() => handleplay(item.id)}
+          >▶</button>
+        </>
+      )}
+
+      <p className="text">{item.name}</p>
+    </div>
+  );
+})}
         
-
-         const currentfile = files.find(f => f.id === currentMediaId);
-          if (item.type.startsWith("video/")) {
-            return (
-              <div key={item.id} className="cart-div">
-                <video
-                  ref={item.id === currentMediaId ? videoRef : null}
-                  src={fileURL}
-                  width="300"
-                  className="video"
-                />
-
-                <button className="video-play-btn" onClick={() => handleplay(item.id)}>▶</button>
-                <p className="text">{item.name}</p>
-              </div>
-            );
-          }
-
-          return null;
-        })}
       </div>{/*closing*/}
+
+
+
      </div>
 
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import './Music.css';
 import type { StoredFile } from "../type/media.ts";
 
@@ -44,6 +44,17 @@ function MyMusic({
   };
  ///////🛠️ END Helper Function/////////////////
 
+   // 👇 
+  const urlCache = useRef<Record<string, string>>({});
+
+  const getUrl = (item: StoredFile) => {
+    if (!urlCache.current[item.id]) {
+      const blob = new Blob([item.data], { type: item.type });
+      urlCache.current[item.id] = URL.createObjectURL(blob);
+    }
+    return urlCache.current[item.id];
+  };
+
    // ============ Database Setup ============
    useEffect(() => { console.log("useEffect - Load from IndexedDB");
      // Initialize IndexedDB when component loads
@@ -88,13 +99,21 @@ function MyMusic({
      };
    }, []);  // Empty dependency array = run once on mount
    // ============ END DATABASE SETUP ============
+
+  // 👇
+  useEffect(() => {
+    return () => {
+      Object.values(urlCache.current).forEach(URL.revokeObjectURL);
+    };
+  }, []);
+
  
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
      const selectedFiles = Array.from(e.target.files ?? []);
  
      //the code below goes through each file selected and saves it to the database
  
-     // ============ ADD THIS: Save each file to IndexedDB ============
+     // ============ Save each file to IndexedDB ============
      selectedFiles.forEach((file) => {                    //Loop through selected files//
        const reader = new FileReader();                     //Read file content//
  
@@ -165,8 +184,7 @@ function MyMusic({
         )}
         
         {files.map((item) => {
-         const blob = new Blob([item.data], { type: item.type });
-         const fileURL = URL.createObjectURL(blob);
+         const fileURL = getUrl(item);
          const { artist, song } = parseFileName(item); //Parse artist and song from filename//
 
          const currentfile = files.find(f => f.id === currentMediaId);

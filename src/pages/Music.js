@@ -66,7 +66,7 @@ function MyMusicUi() {
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files ?? []);
         //the code below goes through each file selected and saves it to the database
-        // ============ ADD THIS: Save each file to IndexedDB ============
+        // ============ : Save each file to IndexedDB ============
         selectedFiles.forEach((file) => {
             const reader = new FileReader(); //Read file content//
             reader.onload = (event) => {

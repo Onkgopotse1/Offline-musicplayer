@@ -67,7 +67,7 @@ export default function Home() {
 
     //the code below goes through each file selected and saves it to the database
 
-    // ============ ADD THIS: Save each file to IndexedDB ============
+    // ============: Save each file to IndexedDB ============
     selectedFiles.forEach((file) => {                    //Loop through selected files//
       const reader = new FileReader();                     //Read file content//
 
