@@ -1,9 +1,11 @@
 .bottom{
-height: auto;
-height: auto;
+height: 119px;
+width: 100%;
 display: grid;
 place-items: center;
-
+  position: fixed;
+  bottom: 0;
+  left: 0;
 }
 
 .bottom-mother-container {
@@ -82,7 +84,7 @@ place-items: center;
   display: flex;
   align-items: center;
   gap: 10px;
-  
+  position: fixed;
 }
 
 .volume-button,

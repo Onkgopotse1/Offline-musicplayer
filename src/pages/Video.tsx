@@ -12,7 +12,6 @@ interface VideoProps {
   setCurrentMediaType: React.Dispatch<
   React.SetStateAction<"audio" | "video" | null>>;
   videoRef: React.RefObject<HTMLVideoElement | null>;
-
 }
 
 function Video({

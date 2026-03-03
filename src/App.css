@@ -2,7 +2,7 @@
   display: grid;
   height: 100vh;
   width: 100vw;
-  grid-template-rows: 70% 15%;
+  grid-template-rows: 70% 17.4%;
   grid-template-columns: 17% 83%;
   grid-template-areas:
     "sidebar right-main"
@@ -192,6 +192,7 @@
   align-items: center;
   padding-left: 10px;
   border: none;
+  
 }
 
 .right-main{

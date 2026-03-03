@@ -141,7 +141,7 @@ export default function Home() {
               </div>
             );
           }
-
+/*
           if (file.type.startsWith("video/")) {
             return (
               <div key={index} className="cart-div">
@@ -155,7 +155,7 @@ export default function Home() {
               </div>
             );
           }
-
+*/
           return null;
         })}
       </div>
