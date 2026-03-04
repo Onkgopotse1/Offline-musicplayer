@@ -1,12 +1,11 @@
 // src/types/media.ts
 
  export interface StoredFile {
-   id: string // autoIncrement key
+   id: string 
    name: string
    type: string
    lastModified: number
    size: number
    data: ArrayBuffer
    uploadedAt: string
-   
  }; 

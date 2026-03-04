@@ -5,6 +5,7 @@ import type { StoredFile } from "../type/media.ts";
 interface MusicProps {
   files: StoredFile[];
   setFiles: React.Dispatch<React.SetStateAction<StoredFile[]>>;
+  saveFile: (file: StoredFile) => void;
   currentMediaId: string | null;
   setCurrentMediaId: React.Dispatch<React.SetStateAction<string | null>>;
   setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
@@ -13,16 +14,16 @@ interface MusicProps {
 }
 
 function MyMusic({
-  //All of this props are been passed by down App.tsx
   files,           
   setFiles,
+  saveFile,
   currentMediaId,
   setCurrentMediaId,
   setIsPlaying,
   setCurrentMediaType
 }: MusicProps){
  
- ////////🛠️ Helper Function/////////////////
+ //////// Helper Function /////////////////
     const parseFileName = (file: any) => {
     // Split on the first dash
     const parts = file.name.split("-");
@@ -44,9 +45,11 @@ function MyMusic({
   };
  ///////🛠️ END Helper Function/////////////////
 
-   // 👇 
+   //
   const urlCache = useRef<Record<string, string>>({});
 
+// Helper function to get object URL for a file, with caching to avoid regenerating URLs
+// This is important for performance, especially when we have many files or large videos
   const getUrl = (item: StoredFile) => {
     if (!urlCache.current[item.id]) {
       const blob = new Blob([item.data], { type: item.type });
@@ -55,66 +58,18 @@ function MyMusic({
     return urlCache.current[item.id];
   };
 
-   // ============ Database Setup ============
-   useEffect(() => { console.log("useEffect - Load from IndexedDB");
-     // Initialize IndexedDB when component loads
-     const request: IDBOpenDBRequest = indexedDB.open("MediaDB", 1);
- 
-     request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
-       const db = (event.target as IDBOpenDBRequest).result as IDBDatabase;
-       // Create storage for files if it doesn't exist
-       if (!db.objectStoreNames.contains("media")) {
-         db.createObjectStore("media", { keyPath: "id"});
-       }
-     };
- 
-     request.onsuccess = () => {console.log("📂 Database opened successfully");
-       const db = request.result;
- 
-        // Load existing files from database when page loads
-       const transaction = db.transaction(["media"], "readonly");
-       const store = transaction.objectStore("media");
-       const getRequest = store.getAll();
- 
-       getRequest.onsuccess = () => {
-         const storedFiles = getRequest.result as StoredFile[];
-        //at this point the data is in ArrayBuffer format//
- 
-         const fileObjects = storedFiles.map((item) => {
-         // Create Blob from stored data
- 
-           const blob = new Blob([item.data], { type: item.type });// Convert stored data from ArrayBuffer back to File objects
-           // Create File object from Blob
-           return new File([blob], item.name, {
-             type: item.type,
-             lastModified: item.lastModified,
-           });
-         });
-          
-         // Add that fileObject to your existing files state
-         if (fileObjects.length > 0) {
-           setFiles(storedFiles);
-         }
-       };
-     };
-   }, []);  // Empty dependency array = run once on mount
-   // ============ END DATABASE SETUP ============
-
-
-   
-  // 👇
+  // Revoke object URLs when component unmounts to free memory
   useEffect(() => {
     return () => {
       Object.values(urlCache.current).forEach(URL.revokeObjectURL);
     };
   }, []);
 
- 
+ ///------------- Helper Function to handle file uploads from the input element---------
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
      const selectedFiles = Array.from(e.target.files ?? []);
  
      //the code below goes through each file selected and saves it to the database
- 
      // ============ Save each file to IndexedDB ============
      selectedFiles.forEach((file) => {                    //Loop through selected files//
        const reader = new FileReader();                     //Read file content//
@@ -129,33 +84,19 @@ function MyMusic({
            data: event.target?.result as ArrayBuffer,  // This is the file content as ArrayBuffer
            uploadedAt: new Date().toISOString(),
          }; // gets saved to indexedDB
-          // at this moment this is NOT a File anymore, It’s just plain data (which IndexedDB loves)//
- 
-        
 
-          // Open the same database and save the data
-         const dbRequest: IDBOpenDBRequest = indexedDB.open("MediaDB", 1);
- 
-         dbRequest.onsuccess = () => {
-           const db = dbRequest.result;
-           const transaction = db.transaction(["media"], "readwrite");  //Open transaction so we can save the data//
-           const store = transaction.objectStore("media");              //Get the object store bcos is where we gonna save our data//
-           
-           // Store the file data
-           store.add(fileData);
-           //SAVE TO STATE HERE
-           setFiles(prev => [...prev, fileData]);
-           
-         };
+          // When DB is successfully opened, we save the file to the "media" object store
+           saveFile(fileData);
+
        };
-
        // Read file as ArrayBuffer
        reader.readAsArrayBuffer(file);
-       
      });
-     // ============ END SAVE TO DATABASE ============
    };
+//-----------------------end of file upload handler------------------------
 
+
+   // Handler for when user clicks play button on a music track
     const handleplay = (id: string) => {
       setCurrentMediaId(id);
       setCurrentMediaType("audio");

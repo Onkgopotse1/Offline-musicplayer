@@ -22,16 +22,13 @@ import Sidebar  from './Homee/Sidebar.tsx';
 import RightMain  from './Homee/Rightmain.tsx';
 import Bottom  from './Homee/Bottom.tsx';
 import type { StoredFile } from "./type/media.ts";
-
-//const Home = lazy(() => import("./pages/Home.tsx"));
-//const Video = lazy(() => import("./pages/Video.tsx"));
-//const MyMusic = lazy(() => import("./pages/Music.tsx"));
+import { useMediaDB } from "./hooks/useMediaDB.ts";
 
 
 function App() {
   
 // All uploaded media (audio + video) lives in this state
-  const [files, setFiles] = useState<StoredFile[]>([]);
+  const { files, setFiles, saveFile } = useMediaDB();
 
 // Which media is currently selected to play
   const [currentMediaId, setCurrentMediaId] = useState<string | null>(null);
@@ -43,6 +40,7 @@ function App() {
 // (Future-proofing)
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
+// We will use this ref to control the video element in the Video page from the Bottom player controls
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
 
@@ -58,6 +56,7 @@ function App() {
         <Route path="music" element={<MyMusic
          files={files}
          setFiles={setFiles}
+         saveFile={saveFile}
          currentMediaId={currentMediaId}
          setCurrentMediaId={setCurrentMediaId}
          setIsPlaying={setIsPlaying}
@@ -67,6 +66,7 @@ function App() {
         <Route path="video" element={<Video 
          files={files}
          setFiles={setFiles}
+         saveFile={saveFile}
          currentMediaId={currentMediaId}
          setCurrentMediaId={setCurrentMediaId}
          setIsPlaying={setIsPlaying}
@@ -80,7 +80,6 @@ function App() {
         <Route path="notfound" element={<Notfound />} />
       </Routes>
       </Suspense>
-
 
        <Bottom
         files={files}
