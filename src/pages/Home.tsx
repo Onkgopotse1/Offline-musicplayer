@@ -1,166 +1,69 @@
-import { Link} from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import './Home.css';
+import type { StoredFile } from "../type/media.ts";
+import { Suspense } from "react";
+import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 
-// Define the shape of what we store in IndexedDB
-interface StoredFile {
-  id?: number; // autoIncrement key
-  name: string;
-  type: string;
-  lastModified: number;
-  size: number;
-  data: ArrayBuffer;
-  uploadedAt: string;
-};
 
-export default function Home() {
-  // State holds actual File objects for rendering
-  const [files, setFiles] = useState<File[]>([]);
+interface HomeProps {
+  files: StoredFile[];
+  recentIds: string[];
+  setCurrentMediaId: React.Dispatch<React.SetStateAction<string | null>>;
+  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurrentMediaType: React.Dispatch<React.SetStateAction<"audio" | "video" | null>>;
+  saveFile: (file: StoredFile) => void;
+}
 
-  // ============ Database Setup ============
-  useEffect(() => {
-    // Initialize IndexedDB when component loads
-    const request: IDBOpenDBRequest = indexedDB.open("MediaDB", 1);
+export default function Home({ 
+  files,     // all media files stored in indexedDB. actual files not id
+  recentIds, // files that were recently played in Music.tsx, stored as an array of their IDs in indexedDB
+  saveFile,           // function to save a file to indexedDB
+  setCurrentMediaId,  // function to set which media is currently selected to play
+  setIsPlaying,       // function to set whether the media is currently playing or paused
+  setCurrentMediaType // function to set whether the currently selected media is audio or video
+ }: HomeProps) {
 
-    request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
-      const db = (event.target as IDBOpenDBRequest).result as IDBDatabase;
-      // Create storage for files if it doesn't exist
-      if (!db.objectStoreNames.contains("media")) {
-        db.createObjectStore("media", { keyPath: "id", autoIncrement: true });
-      }
-    };
-
-    request.onsuccess = () => {
-      const db = request.result;
-
-       // Load existing files from database when page loads
-      const transaction = db.transaction(["media"], "readonly");
-      const store = transaction.objectStore("media");
-      const getRequest = store.getAll();
-
-      getRequest.onsuccess = () => {
-        const storedFiles = getRequest.result as StoredFile[];
-       //at this point the data is in ArrayBuffer format//
-
-        const fileObjects = storedFiles.map((item) => {
-        // Create Blob from stored data
-
-          const blob = new Blob([item.data], { type: item.type });// Convert stored data from ArrayBuffer back to File objects
-          // Create File object from Blob
-          return new File([blob], item.name, {
-            type: item.type,
-            lastModified: item.lastModified,
-          });
-        });
-         
-        // Add to your existing files state
-        if (fileObjects.length > 0) {
-          setFiles((prevFiles) => [...prevFiles, ...fileObjects]);
-        }
-      };
-    };
-  }, []);  // Empty dependency array = run once on mount
-  // ============ END DATABASE SETUP ============
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(e.target.files ?? []);
-
-    //the code below goes through each file selected and saves it to the database
-
-    // ============: Save each file to IndexedDB ============
-    selectedFiles.forEach((file) => {                    //Loop through selected files//
-      const reader = new FileReader();                     //Read file content//
-
-      reader.onload = (event: ProgressEvent<FileReader>) => {        //FileReader reads file into memory//
-        const fileData: StoredFile = {                                //Prepare file object for database//
-
-          name: file.name,
-          type: file.type,
-          lastModified: file.lastModified,
-          size: file.size,
-          data: event.target?.result as ArrayBuffer,  // This is the file content as ArrayBuffer
-          uploadedAt: new Date().toISOString(),
-        };
-         // at this moment this is NOT a File anymore, It’s just plain data (which IndexedDB loves)//
-
-         // Open the same database and save the data
-        const dbRequest: IDBOpenDBRequest = indexedDB.open("MediaDB", 1);
-
-        dbRequest.onsuccess = () => {
-          const db = dbRequest.result;
-          const transaction = db.transaction(["media"], "readwrite");  //Open transaction so we can save the data//
-          const store = transaction.objectStore("media");              //Get the object store bcos is where we gonna save our data//
-          
-          // Store the file data
-          store.add(fileData);
-          console.log("Saved to database:", file.name);
-        };
-      };
-
-      // Read file as ArrayBuffer
-      reader.readAsArrayBuffer(file);
-    });
-    // ============ END SAVE TO DATABASE ============
-
-    // Update state to render selected files immediately
-    setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
+  const handleplay = (id: string) => {
+    setCurrentMediaId(id);
+    setCurrentMediaType("audio");
+    setIsPlaying(true);
   };
 
-  
-  
+  // Map recentIds to their corresponding file objects, filtering out any that might not be found (e.g., if a file was deleted)
+  // id are just a string represnting a each file in indexedDB
+  const recentFiles = recentIds
+    .map(id => files.find(f => f.id === id))
+    .filter(Boolean) as StoredFile[];
+
+    
+
   return (
     <div className="right-main">
       <div className="topbar">
         <h1>Home Page</h1>
-  
-        <div className="upload-section">
-          <h2 className="text-xl font-bold mb-2">Upload Media</h2>
-          <input
-            type="file"
-            multiple
-            accept="audio/*,video/*"
-            onChange={handleFileChange}
-            className="border p-2 rounded"
-          />
-        </div>
       </div>
 
+      <ErrorBoundary>
       <div className="main">
-        {/*///////it checks if no file have been uploaded. if no then it display a text/////////////////*/}
-        {files.length === 0 && (
-          <p className="text-gray-500">No files chosen yet</p>
-        )}
+        {/* if the is no recent files played show the text "No recently played songs yet" */}
+        {recentFiles.length === 0 && (
+          <p className="text-gray-500">No recently played songs yet</p>
+        )}     
 
-        {files.map((file, index) => {
-          const fileURL = URL.createObjectURL(file);
-
-          if (file.type.startsWith("audio/")) {
-            return (
-              <div key={index} className="cart-div">
-                <audio controls src={fileURL} className="audio" />
-                <p className="text">{file.name}</p>
-              </div>
-            );
-          }
-/*
-          if (file.type.startsWith("video/")) {
-            return (
-              <div key={index} className="cart-div">
-                <video
-                  controls
-                  src={fileURL}
-                  width="300"
-                  className="video"
-                />
-                <p className="text">{file.name}</p>
-              </div>
-            );
-          }
-*/
-          return null;
-        })}
+      {/* Display the list of recently played files with a play button from recentFiles*/}
+        
+        {recentFiles.map((item) => (
+          
+          <div key={item.id} className="cart-div">
+            <button
+              onClick={() => handleplay(item.id)}
+              className="play-buttons"
+            >▶</button>
+            <p className="text">{item.name}</p>
+          </div>
+        ))}
       </div>
+      </ErrorBoundary>
     </div>
   );
 }
-

@@ -8,6 +8,7 @@ import { faVideo } from '@fortawesome/free-solid-svg-icons';
 import { faList } from '@fortawesome/free-solid-svg-icons';
 import { faCompactDisc } from '@fortawesome/free-solid-svg-icons';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
+import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 
 export default function Sidebar() {
 
@@ -23,6 +24,7 @@ export default function Sidebar() {
               <p className="media-player">Media Player</p>
             </div>
 
+          <ErrorBoundary>
           <div className="last-div-left">
                 <div className="search-div">
                   <input type="text" className="search" placeholder="search" />
@@ -71,7 +73,7 @@ export default function Sidebar() {
                 </button>
                 
           </div>
+          </ErrorBoundary>
           </div>
           )  
 }
-

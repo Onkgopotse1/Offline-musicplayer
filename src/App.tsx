@@ -9,6 +9,7 @@ import './pages/PlayQueue.css';
 import './Homee/Bottom.css';
 import { Routes, Route } from "react-router-dom";
 import { useState, useRef, lazy, Suspense } from "react";
+import ErrorBoundary from "./Error boundaries/Error boundry.tsx";
 
 const Home = lazy(() => import('./pages/Home.tsx'));
 const Video = lazy(() => import('./pages/Video.tsx'));
@@ -40,23 +41,48 @@ function App() {
 // (Future-proofing)
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
+// Recently played media history (for "Recently Played" section in Home page)
+// we store the IDs of recently played media here in localStorage
+  const [recentIds, setRecentIds] = useState<string[]>(() => {
+  const saved = localStorage.getItem("recentIds");
+  return saved ? JSON.parse(saved) : [];
+});
+
+// addToRecent is a helper function to manage the recently played media list.
+const addToRecent = (id: string) => {
+  setRecentIds(prev => {
+    const filtered = prev.filter(r => r !== id);
+    const updated = [id, ...filtered].slice(0, 20); //only keep the 10 most recent
+    localStorage.setItem("recentIds", JSON.stringify(updated)); 
+    return updated;
+  });
+};
+
 // We will use this ref to control the video element in the Video page from the Bottom player controls
   const videoRef = useRef<HTMLVideoElement | null>(null);
-
 
  return (
   <div className="layout">
      <Sidebar />
  
+        <ErrorBoundary>
         <Suspense fallback={<div>Loading...</div>}>
         <Routes>
         
-         <Route path="/" element={<Home />} />
+         <Route path="/" element={<Home 
+          files={files}
+          recentIds={recentIds}
+          saveFile={saveFile}
+          setCurrentMediaId={setCurrentMediaId}
+          setIsPlaying={setIsPlaying}
+          setCurrentMediaType={setCurrentMediaType}
+         />} />
 
         <Route path="music" element={<MyMusic
          files={files}
          setFiles={setFiles}
          saveFile={saveFile}
+         addToRecent={addToRecent}
          currentMediaId={currentMediaId}
          setCurrentMediaId={setCurrentMediaId}
          setIsPlaying={setIsPlaying}
@@ -80,7 +106,9 @@ function App() {
         <Route path="notfound" element={<Notfound />} />
       </Routes>
       </Suspense>
+      </ErrorBoundary>
 
+       <ErrorBoundary>
        <Bottom
         files={files}
         currentMediaId={currentMediaId}
@@ -90,6 +118,7 @@ function App() {
         currentMediaType={currentMediaType}
         videoRef={videoRef}
        />
+       </ErrorBoundary>
 
   </div>
  );

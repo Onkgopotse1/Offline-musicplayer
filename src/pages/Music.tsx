@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import './Music.css';
 import type { StoredFile } from "../type/media.ts";
+import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 
 interface MusicProps {
   files: StoredFile[];
@@ -11,6 +12,7 @@ interface MusicProps {
   setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
   setCurrentMediaType: React.Dispatch<
   React.SetStateAction<"audio" | "video" | null>>;
+  addToRecent: (id: string) => void;
 }
 
 function MyMusic({
@@ -20,7 +22,8 @@ function MyMusic({
   currentMediaId,
   setCurrentMediaId,
   setIsPlaying,
-  setCurrentMediaType
+  setCurrentMediaType,
+  addToRecent
 }: MusicProps){
  
  //////// Helper Function /////////////////
@@ -32,7 +35,7 @@ function MyMusic({
       return { artist: "Unknown Artist", song: file.name };
     }
 
-    const firstPart = parts[0].trim();
+    const firstPart = parts[0].trim();//
     const secondPart = parts[1].replace(/\.[^/.]+$/, "").trim(); // remove extension
 
     // Logic: if first part looks like a word/letters, treat as artist
@@ -86,6 +89,7 @@ function MyMusic({
          }; // gets saved to indexedDB
 
           // When DB is successfully opened, we save the file to the "media" object store
+          
            saveFile(fileData);
 
        };
@@ -100,9 +104,12 @@ function MyMusic({
     const handleplay = (id: string) => {
       setCurrentMediaId(id);
       setCurrentMediaType("audio");
-      setIsPlaying(true)
+      setIsPlaying(true);
+      addToRecent(id);
     };
       
+    
+
     return (
     <div className="right-main">
       <div className="topbar">
@@ -120,7 +127,8 @@ function MyMusic({
         </div>
       </div>
 
-      <div className="music-main">{/*openning*/}
+      <ErrorBoundary>
+      <div className="music-main">
        {/*///////it checks if no file have been uploaded. if no then it display a text/////////////////*/}
               {files.length === 0 && (
           <p className="text-gray-500">No files chosen yet</p>
@@ -134,7 +142,6 @@ function MyMusic({
 
           if (item.type.startsWith("audio/")) {
             return (
-            
               <div key={`${item.id}`} className="horizontal-divs">
                 <div className="check-box">
                 <input type="checkbox" className="checkbox" />
@@ -166,6 +173,7 @@ function MyMusic({
           return null;
         })}
       </div>{/*closing*/}
+      </ErrorBoundary>
      </div>
 
     );

@@ -29,7 +29,7 @@ export function useMediaDB() {
       getAll.onsuccess = () => {
         const storedFiles = getAll.result as StoredFile[];
         if (storedFiles.length > 0) {
-          setFiles(storedFiles); // load files into state existing files in DB into state
+          setFiles(storedFiles); // load files existing from indexedDB into state
         }
       };
     };

@@ -15,10 +15,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import type { StoredFile } from "../type/media.ts";
+import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 
-// ===============================
-// Props coming FROM parent
-// ===============================
+
 interface BottomProps {
   files: StoredFile[];                 // All media from IndexedDB (state)
   currentMediaId: string | null;
@@ -129,8 +128,6 @@ const handleNext = () => {
   setCurrentMediaId(nextFile.id);
   setIsPlaying(true);
 };
-///////////////////////////////////end////////////////////////////////
-
 ////////////////////Previous button Logic/////////////////////////////
 const handlePrevious = () => {
   if (!currentMediaId || files.length === 0) return;
@@ -174,8 +171,6 @@ useEffect(() => {
     media.removeEventListener("ended", handleEnded);
   };
 }, [currentMediaId, files, currentMediaType]);
-
- 
 //////////////////////////end/////////////////////////////////
 
   // ===============================
@@ -223,6 +218,7 @@ useEffect(() => {
 
 return(
     <div className="bottom">
+      <ErrorBoundary>
       <div className="bottom-mother-container">
           {currentMediaType === "audio" && <audio ref={audioRef} />}
 {/* ================Progress Bar==============*/}
@@ -261,6 +257,7 @@ return(
           <button className="threedots-button" id="3dots-button-id"><FontAwesomeIcon icon={faEllipsis} /></button>
         </div>
       </div>
+      </ErrorBoundary>
                   
     </div>    
 )  

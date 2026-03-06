@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./video.css"
 import type { StoredFile } from "../type/media.ts";
+import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 
 interface VideoProps {
   files: StoredFile[];
@@ -51,11 +52,11 @@ function Video({
       }, [files]);
 
     // Revoke object URLs when component unmounts to free memory
-    useEffect(() => {
-      return () => {
-        Object.values(urlCache.current).forEach(URL.revokeObjectURL);
-      };
-    }, []);
+      useEffect(() => {
+        return () => {
+          Object.values(urlCache.current).forEach(URL.revokeObjectURL);
+        };
+      }, []);
 
 ///------------- Helper Function to handle file uploads from the input element----------
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,10 +77,11 @@ function Video({
            uploadedAt: new Date().toISOString(),                     // gets saved to indexedDB
          }; 
           
-         const dbRequest: IDBOpenDBRequest = indexedDB.open("MediaDB", 1); // Open the database
+         //const dbRequest: IDBOpenDBRequest = indexedDB.open("MediaDB", 1); // Open the database
 
        // When DB is successfully opened, we save the file to the "media" object store
-        reader.readAsArrayBuffer(file);
+        //reader.readAsArrayBuffer(file);
+        saveFile(fileData);
        };
 
        // Read file as ArrayBuffer
@@ -137,6 +139,7 @@ const generateThumbnail = (file: StoredFile): Promise<string> => {
       </div>
     </div>
 
+    <ErrorBoundary>
     <div className="video-main">{/*openning*/}
 
           {files.length === 0 && (
@@ -184,6 +187,7 @@ const generateThumbnail = (file: StoredFile): Promise<string> => {
 })}
         
       </div>{/*closing*/}
+      </ErrorBoundary>
 
 
 

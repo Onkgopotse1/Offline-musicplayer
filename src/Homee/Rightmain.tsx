@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 
 export default function RightMain() {
 
@@ -12,12 +13,11 @@ export default function RightMain() {
             </div>
 
             {/* Main giv */}
-  
+            <ErrorBoundary>
               <div className="main">
-main
+               main
               </div>
+            </ErrorBoundary>
         </div> 
     )  
 }
-
-
