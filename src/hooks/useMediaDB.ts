@@ -38,18 +38,21 @@ export function useMediaDB() {
 
   /// Helper function to save a new single file to IndexedDB and update state
   /// This function is called from the Music and Video pages when user uploads new media
-  const saveFile = (file: StoredFile) => {
-    const request = indexedDB.open("MediaDB", 1);
+const saveFile = (file: StoredFile) => {
+  // Update state immediately with the original file
+  setFiles(prev => [...prev, file]);
 
-    request.onsuccess = () => {
-      const db = request.result;
-      const tx = db.transaction(["media"], "readwrite");
-      const store = tx.objectStore("media");
-      store.add(file);
-    };
-
-    setFiles(prev => [...prev, file]);
+  // Send a COPY to IndexedDB so the ArrayBuffer isn't transferred/detached
+  const fileCopy = { ...file, data: file.data.slice(0) };
+  
+  const request = indexedDB.open("MediaDB", 1);
+  request.onsuccess = () => {
+    const db = request.result;
+    const tx = db.transaction(["media"], "readwrite");
+    const store = tx.objectStore("media");
+    store.add(fileCopy);
   };
+};
 //////////////end
 
 

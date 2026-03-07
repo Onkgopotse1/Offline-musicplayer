@@ -1,3 +1,44 @@
+/* ── Global base styles (replaces index.css) ── */
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* Link styles — used in NotFound page */
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+}
+/* ── End global base styles ── */
+
 .layout {
   display: grid;
   height: 100vh;
@@ -230,14 +271,23 @@
     display: none;
   }
 
+  .home-div,
+  .music-div,
+  .video-div,
+  .play-queue-div,
+  .playlist-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .home-button,
   .music-button,
   .video-button,
   .play-queue-button,
   .playlist-button {
-    grid-template-columns: 100%;
+    display: grid;
     place-items: center;
-    gap: 0;
   }
 
   .home-icon,
@@ -246,15 +296,12 @@
   .play-queue-icon,
   .playlist-icon {
     width: auto;
-    font-size: 1.2rem; 
+    font-size: 1.2rem;
   }
 
   .settings-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    left: 0;
-    width: 100%;
+    display: grid;
+    place-items: center;
   }
   
   .settings-icon {
@@ -272,3 +319,5 @@
   }
 
 }
+/* h1 for NotFound page (no own CSS file) */
+h1 { font-size: 3em; line-height: 1.1; }

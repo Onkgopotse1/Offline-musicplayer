@@ -14,6 +14,27 @@ interface HomeProps {
   saveFile: (file: StoredFile) => void;
 }
 
+// Generates a unique gradient background from the song name
+const getGradient = (name: string) => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const h1 = Math.abs(hash) % 360;
+  const h2 = (h1 + 40) % 360;
+  return `linear-gradient(135deg, hsl(${h1}, 60%, 25%), hsl(${h2}, 70%, 15%))`;
+};
+
+// Same helper used in Music.tsx — splits filename into artist and song
+const parseFileName = (file: StoredFile) => {
+  const parts = file.name.split("-");
+  if (parts.length < 2) return { artist: "Unknown Artist", song: file.name };
+  const firstPart = parts[0].trim();
+  const secondPart = parts[1].replace(/\.[^/.]+$/, "").trim();
+  if (/^[A-Za-z]/.test(firstPart)) return { artist: firstPart, song: secondPart };
+  return { song: firstPart, artist: secondPart };
+};
+
 export default function Home({ 
   files,     // all media files stored in indexedDB. actual files not id
   recentIds, // files that were recently played in Music.tsx, stored as an array of their IDs in indexedDB
@@ -52,16 +73,24 @@ export default function Home({
 
       {/* Display the list of recently played files with a play button from recentFiles*/}
         
-        {recentFiles.map((item) => (
-          
-          <div key={item.id} className="cart-div">
-            <button
-              onClick={() => handleplay(item.id)}
-              className="play-buttons"
-            >▶</button>
-            <p className="text">{item.name}</p>
-          </div>
-        ))}
+{recentFiles.map((item) => {
+  const { artist, song } = parseFileName(item);
+  const gradient = getGradient(item.name);
+  return (
+    <div key={item.id} className="cart-div">
+      {/* Thumbnail area — gradient background with music note icon */}
+      <div className="cart-thumbnail" style={{ background: gradient }}>
+        <div className="cart-thumbnail-icon">♪</div>
+        <button className="video-play-btn" onClick={() => handleplay(item.id)}>▶</button>
+      </div>
+      {/* Song title and artist below the thumbnail */}
+      <div className="cart-info">
+        <p className="cart-title">{song}</p>
+        <p className="cart-artist">{artist}</p>
+      </div>
+    </div>
+  );
+})}
       </div>
       </ErrorBoundary>
     </div>
