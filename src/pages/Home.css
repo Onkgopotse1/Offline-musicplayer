@@ -39,40 +39,28 @@
 }
 
 /* Music note icon centered in the thumbnail */
-.cart-thumbnail-icon {
-  font-size: 2.5rem;
-  color: rgba(255, 255, 255, 0.25);
-  pointer-events: none;
-  user-select: none;
-}
+
 
 /* Play button — same positioning style as video-play-btn in Video.css
    hidden by default, appears on hover */
-.video-play-btn {
-  background-color: rgba(0, 0, 0, 0.6);
+.play-btn {
   display: grid;
   place-items: center;
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  width: 36px;
-  height: 36px;
-  border: none;
-  padding: 0;
-  border-radius: 50%;
+  font-size: 2.5rem;
+  color: rgba(255, 255, 255, 0.897);
   cursor: pointer;
-  color: #ffffff;
-  font-size: 12px;
-  opacity: 0; /* hidden until hover */
-  transition: opacity 0.2s ease, transform 0.1s ease;
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  height: 100%;
 }
 
 /* Show play button when hovering over the card */
-.cart-div:hover .video-play-btn {
+.cart-div:hover .play-btn {
   opacity: 1;
 }
 
-.video-play-btn:hover {
+.play-btn:hover {
   transform: scale(1.1);
   background-color: rgba(255, 255, 255, 0.25);
 }

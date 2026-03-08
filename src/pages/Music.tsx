@@ -134,6 +134,17 @@ function MyMusic({
           <p className="text-gray-500">No files chosen yet</p>
         )}
         
+    {/* ── Column headers ── */}
+<div className="music-header">
+  <div></div> {/* checkbox */}
+  <div></div> {/* play */}
+  <div className="header-text">Title</div>
+  <div className="header-text">Artist</div>
+  <div className="header-text">Album</div>
+  <div className="header-text">Genre</div>
+  <div className="header-text">Time</div>
+</div>
+
         {files.map((item) => {
          const fileURL = getUrl(item);
          const { artist, song } = parseFileName(item); //Parse artist and song from filename//

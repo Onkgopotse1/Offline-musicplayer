@@ -1,131 +1,149 @@
-.music-main{
-    width: 100%; 
-    height: 80%;
-    overflow-wrap: break-word;
-    overflow-y: auto;          
-    overflow-x: hidden;
-    display: grid;
-    grid-template-columns: 1fr; 
-    grid-auto-rows: 60px;      
-    gap: 8px;                  
-    border: none;  
-    background-color: rgba(36, 30, 30, 0.397);
-    
+/* ── Music list container ── */
+.music-main {
+  width: 100%;
+  height: 80%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  border: none;
+  background-color: rgba(36, 30, 30, 0.397);
+  padding: 0 0 8px 0;
+  box-sizing: border-box;
 }
 
-.cart-div {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+/* ── Column header row ── */
+.music-header {
+  width: 95%;
+  height: 36px;
+  margin-left: 2%;
+  display: grid;
+  align-items: center;
+  grid-template-columns: 2% 4% 21% 21% 21% 20% 9%;
+  gap: 4px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #1f1f1f;
+  margin-bottom: 4px;
+  position: sticky;
+  top: 0;
+  background-color: #161616; /* same as topbar */
+  z-index: 1;
 }
 
-.text {
-    border: none;
-    width: 99%;
-    height: 100%;
-    display: grid;
-    place-items: center;
-    font-size: 14px;
-    text-align: center;
-   /*  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; /*
+.header-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: #555555;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
 }
 
-.video,
-.audio {
-    border: 1px solid #000;
-    width: 100%;
-    flex: 0 0 70%;
-    box-sizing: border-box;
-    overflow: hidden; /* or auto if you need scrolling */
+/* ── Each track row ── */
+.horizontal-divs {
+  background-color: transparent;
+  width: 95%;
+  height: 52px;
+  border-radius: 8px;
+  display: grid;
+  align-items: center;
+  grid-template-columns: 2% 4% 21% 21% 21% 20% 9%;
+  gap: 4px;
+  box-sizing: border-box;
+  margin-left: 2%;
+  margin-top: 2px;
+  transition: background-color 0.15s ease;
+  cursor: pointer;
 }
 
-.horizontal-divs{
-    background-color: #413939;
-    width: 95%;
-    height: 60px;                      
-    border-radius: 10px;
-    display: grid;
-    align-items: center;               
-    grid-template-columns: 2% 4% 21% 21% 21% 20% 9%;
-    gap: 4px;
-    box-sizing: border-box;
-    margin-left: 2%;
+.horizontal-divs:hover {
+  background-color: #1a1a1a;
 }
 
 .horizontal-divs > * { min-width: 0; }
 
-
+/* ── Cells ── */
 .song-name,
 .artist-name,
 .album-name,
 .genre,
 .time,
-.check-box{
- display: grid;
- place-items: center;
- height: 100%;
- width: 100%;
+.check-box {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  width: 100%;
 }
 
-.check-box{
-display: grid;
-place-items: center;
-/*border: solid greenyellow; */
-border-radius: 10px 0px 0px 10px;
+.check-box {
+  display: grid;
+  place-items: center;
+  border-radius: 8px 0 0 8px;
 }
 
-.checkbox{
-    width: 70%;
-    height: 70%;
-}
-/*
-.play{
-border: solid rgb(137, 194, 52); 
-
-
+.checkbox {
+  width: 13px;
+  height: 13px;
+  accent-color: #e53935;
+  cursor: pointer;
 }
 
-.song-name{
-border: solid greenyellow; 
-
+/* ── Cell text ── */
+.text {
+  width: 95%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  color: #aaaaaa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  margin: 0;
 }
 
-.artist-name{
-border: solid greenyellow; 
+/* Song title slightly brighter */
+.song-name .text {
+  color: #e0e0e0;
+  font-weight: 500;
 }
 
-.album-name{
-border: solid greenyellow; 
+/* Muted columns */
+.album-name .text,
+.genre .text,
+.time .text {
+  color: #555555;
+  font-size: 12px;
 }
 
-.genre{
-border: solid greenyellow; 
-}
-*/
-
-.time{
-/* border: solid greenyellow; */
-border-radius: 0px 10px 10px 0px;
-display: grid;
-place-items: center;
+.time {
+  border-radius: 0 8px 8px 0;
+  display: grid;
+  place-items: center;
 }
 
+/* ── Play button ── */
 .play-buttons {
-    width: 100%;
-    height: 100%;
-    margin: 0px;
-    padding: 18% 24% 18% 24%;
-    border-radius: 50%;
-    background-color: rgb(65, 52, 52);
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  color: #555555;
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
 }
 
-.bottom {
-    background-color: rgb(31, 32, 32);
+.play-buttons:hover {
+  color: #ffffff;
+  background-color: #e53935;
+  transform: scale(1.1);
 }
 
-/*
-.audio-play-button{
-    
-} */
 h1 { font-size: 3em; line-height: 1.1; }

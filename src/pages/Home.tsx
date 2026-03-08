@@ -80,8 +80,7 @@ export default function Home({
     <div key={item.id} className="cart-div">
       {/* Thumbnail area — gradient background with music note icon */}
       <div className="cart-thumbnail" style={{ background: gradient }}>
-        <div className="cart-thumbnail-icon">♪</div>
-        <button className="video-play-btn" onClick={() => handleplay(item.id)}>▶</button>
+        <button className="play-btn" onClick={() => handleplay(item.id)}>♪</button>
       </div>
       {/* Song title and artist below the thumbnail */}
       <div className="cart-info">

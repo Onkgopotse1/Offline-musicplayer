@@ -52,19 +52,24 @@ a:hover {
 }
 
 .topbar {
- height: 20%;
- min-height: 56px;       
- display: flex;
- align-items: center;
- justify-content: space-between; 
- gap: 12px;
- padding: 0 16px;
- box-sizing: border-box;
+  height: 20%;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 20px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #1f1f1f;
  background-color: rgba(36, 30, 30, 0.397);
 }
 
+
+
 .sidebar {
   grid-area: sidebar;
+  background-color: #1414149c;
+  border-right: 1px solid #1f1f1f;
 }
 
 .bottom {
@@ -72,48 +77,55 @@ a:hover {
 }
 
 .top-div {
-  border-bottom: 1px solid rgba(68, 64, 64, 0.397); 
   width: 100%;
-  height: 50px; 
+  height: 56px;
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 12px;
   box-sizing: border-box;
-  gap: 12px;
+  gap: 10px;
+  border-bottom: 1px solid #1f1f1f;
 }
 
 .last-div-left {
-  background-color: rgba(34, 34, 34, 0.397);
+  background-color: transparent;
   width: 100%;
-  height: calc(100% - 50px); 
+  height: calc(100% - 56px);
   display: flex;
   flex-direction: column;
-  padding-bottom: 10px;
-  box-sizing: border-box; 
+  padding: 8px 0 10px;
+  box-sizing: border-box;
+  overflow-y: auto;        /* 👈 scrolls the nav items before they hit settings */
+  overflow-x: hidden;
+  justify-content: flex-start;
+  min-height: 280px; 
   overflow: hidden; 
 }
 
 .search-div{
-  background-color: rgb(54, 52, 52);
   width: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
+  margin-bottom: 8px;
 }
 
 .search {
-  margin-left: 0%;
-  width: 95%45rv;
-  height: 31px;
-  border-radius: 0px 0px 5px 5px;
-  border: none;
-  background-color: rgb(54, 52, 52);
-  margin-bottom: 4%;
-  text-align: left;       
-  padding-left: 12px;       
-  box-sizing: border-box;   
-  color: azure;
+  width: 100%;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #2a2a2a;
+  background-color: #1a1a1a;
+  color: #cccccc;
+  font-size: 0.8rem;
+  padding-left: 12px;
+  box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
 }
 
 .search::placeholder {
+    color: #555555;
   text-align: left;
 }
 
@@ -129,8 +141,8 @@ a:hover {
   }
 
   .top-play-icon {
-    color: azure;
-    font-size: 1.1rem;
+    color: #b4b3b3;
+  font-size: 1.3rem;
   }
     #play-button {
       margin-left: 9%;
@@ -139,12 +151,13 @@ a:hover {
     }
 
     .media-player {
-      margin: 0; 
-      color: beige;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 0.85rem; 
-      font-weight: 500;
-      white-space: nowrap;
+  margin: 0;
+  color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
     }
 
 .home-div,
@@ -152,15 +165,22 @@ a:hover {
 .video-div,
 .play-queue-div,
 .playlist-div {
-  width: 95%;
-  height: 40px; 
-  margin-left: 2%;
-  margin-top: 4px; 
-  background-color: rgb(54, 52, 52);
-  border-radius: 5px;
+  width: 90%;
+  height: 38px;
+  margin-left: 5%;
+  margin-top: 2px;
+  background-color: transparent;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
 }
 
-
+.home-div:hover,
+.music-div:hover,
+.video-div:hover,
+.play-queue-div:hover,
+.playlist-div:hover {
+  background-color: #1a1a1a;
+}
 
 .home-icon,
 .music-icon,
@@ -168,28 +188,39 @@ a:hover {
 .play-queue-icon,
 .playlist-icon,
 .settings-icon {
-  color: azure;
-  width: 18px;  
-  height: 18px; 
+  color: #777777;
+  width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.home-div:hover .home-icon,
+.music-div:hover .music-icon,
+.video-div:hover .video-icon,
+.play-queue-div:hover .play-queue-icon,
+.playlist-div:hover .playlist-icon {
+  color: #e53935;
 }
 
 .home-button,
 .music-button,
 .video-button,
 .play-queue-button,
-.playlist-button,
-.settings-button {
+.playlist-button {
   width: 100%;
-  height: 40px; 
+  height: 38px;
   background-color: transparent;
   border: none;
   display: grid;
-  grid-template-columns: 40px 1fr;
+  grid-template-columns: 36px 1fr;
   align-items: center;
   padding-left: 10px;
+  cursor: pointer;
+  border-radius: 8px;
+
 }
    
 .home-text,
@@ -198,42 +229,65 @@ a:hover {
 .play-queue-text,
 .playlist-text,
 .settings-text {
-  color: azure;
+  color: #aaaaaa;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 14px;
+  font-size: 0.85rem;
   text-align: left;
   margin: 0;
   padding: 0;
-  position: static; 
-  width: auto;
-  height: auto;
+  transition: color 0.15s ease;
+}
+
+.home-div:hover .home-text,
+.music-div:hover .music-text,
+.video-div:hover .video-text,
+.play-queue-div:hover .play-queue-text,
+.playlist-div:hover .playlist-text {
+  color: #ffffff;
 }
 
   .play-queue-text {
      width: 100%;
   }
 
-    .div-line {
-      width: 100%;
-      background-color: rgba(68, 64, 64, 0.397);
-      padding: 1px;
-      margin-top: 1px;
+  .div-line {
+  width: 80%;
+  margin: 8px auto;
+  background-color: #1f1f1f;
+  height: 1px;
+  padding: 0;
     }
 
 .settings-button {
-  width: 95%;
-  height: 40px; 
-  margin-left: 2%;
-  margin-top: auto; 
-  margin-bottom: -6px; 
-  background-color: rgb(54, 52, 52);
-  border-radius: 5px;
+  width: 15.6%;
+  position: absolute;
+  bottom: 124px;
+  left: 10px;    
+
+  height: 38px;
+  margin-top: 0;
+  margin-bottom: 0;
+  background-color: transparent;
+  border-radius: 8px;
+  border: none;
   display: grid;
-  grid-template-columns: 40px 1fr;
+  grid-template-columns: 36px 1fr;
   align-items: center;
   padding-left: 10px;
-  border: none;
-  
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.settings-button:hover {
+  background-color: #1a1a1a;
+}
+
+.settings-button:hover .settings-icon {
+  color: #e53935;
+}
+
+.settings-button:hover .settings-text {
+  color: #ffffff;
 }
 
 .right-main{
@@ -300,8 +354,11 @@ a:hover {
   }
 
   .settings-button {
-    display: grid;
-    place-items: center;
+  display: grid;
+  place-items: center;
+  width: 5%;
+  left: 12px;
+  padding-left: 0;
   }
   
   .settings-icon {
