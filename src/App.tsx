@@ -29,7 +29,7 @@ import { useMediaDB } from "./hooks/useMediaDB.ts";
 function App() {
   
 // All uploaded media (audio + video) lives in this state
-  const { files, setFiles, saveFile } = useMediaDB();
+  const { files, setFiles, saveFile, loadFileData } = useMediaDB();
 
 // Which media is currently selected to play
   const [currentMediaId, setCurrentMediaId] = useState<string | null>(null);
@@ -62,7 +62,7 @@ const addToRecent = (id: string) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 //
   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
-  
+
 
  return (
   <div className="layout">
@@ -103,7 +103,7 @@ const addToRecent = (id: string) => {
          videoRef={videoRef}
          thumbnails={thumbnails}
          setThumbnails={setThumbnails}
-
+         loadFileData={loadFileData}
         />} />
 
         <Route path="playqueue" element={<Playqueue />} />
@@ -123,6 +123,7 @@ const addToRecent = (id: string) => {
         setIsPlaying={setIsPlaying}
         currentMediaType={currentMediaType}
         videoRef={videoRef}
+        loadFileData={loadFileData}
        />
        </ErrorBoundary>
 

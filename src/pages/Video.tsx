@@ -15,6 +15,7 @@ interface VideoProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
   thumbnails: Record<string, string>;
   setThumbnails: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  loadFileData: (id: string) => Promise<ArrayBuffer>;
 }
 
 function Video({
@@ -27,7 +28,8 @@ function Video({
   videoRef,
   saveFile,
   thumbnails,
-  setThumbnails
+  setThumbnails,
+  loadFileData
 }: VideoProps) {
 
   
@@ -42,17 +44,43 @@ function Video({
       }
       return urlCache.current[item.id];
     };
-
+/////
    // Generate thumbnails for video files whenever the files state changes
-      useEffect(() => {
-        files.forEach(async (file) => {
+    const generateThumbnails = (file: StoredFile, data: ArrayBuffer): Promise<string> => {
+      return new Promise((resolve) => {
+        const blob = new Blob([data], { type: file.type });
+        const url = URL.createObjectURL(blob);
+        const video = document.createElement("video");
+        video.src = url;
+        video.muted = true;
+        video.playsInline = true;
+        video.onloadedmetadata = () => { video.currentTime = 1; };
+        video.onseeked = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = 320;
+          canvas.height = 180;
+          canvas.getContext("2d")?.drawImage(video, 0, 0, 320, 180);
+          const thumbnail = canvas.toDataURL("image/jpeg", 0.7);
+          URL.revokeObjectURL(url);
+          resolve(thumbnail);
+        };
+      });
+    };
+
+    // Generate thumbnails one at a time using loadFileData
+    useEffect(() => {
+      const generate = async () => {
+        for (const file of files) {
           if (file.type.startsWith("video/") && !thumbnails[file.id]) {
-            const thumb = await generateThumbnail(file);
+            const data = await loadFileData(file.id); // 👈 fetch actual data on demand
+            const thumb = await generateThumbnails(file, data);
             setThumbnails(prev => ({ ...prev, [file.id]: thumb }));
           }
-        });
-      }, [files]);
-
+        }
+      };
+      generate();
+    }, [files]);
+//////
     // Revoke object URLs when component unmounts to free memory
       useEffect(() => {
         return () => {

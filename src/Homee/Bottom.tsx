@@ -26,6 +26,7 @@ interface BottomProps {
   setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
   currentMediaType: "audio" | "video" | null;
   videoRef: React.RefObject<HTMLVideoElement | null>;
+  loadFileData: (id: string) => Promise<ArrayBuffer>;
 }
 
 export default function Bottom({
@@ -35,7 +36,8 @@ export default function Bottom({
   isPlaying,
   setIsPlaying,
   currentMediaType,
-  videoRef
+  videoRef,
+  loadFileData
 }: BottomProps) {
 
   // ===============================
@@ -58,30 +60,24 @@ export default function Bottom({
   // ===============================
   // Load & play audio when media changes
   // ===============================
-  useEffect(() => {
+useEffect(() => {
   if (!currentFile || !currentMediaType) return;
 
-  const media =
-    currentMediaType === "video"
-      ? videoRef.current
-      : audioRef.current;
+  const media = currentMediaType === "video"
+    ? videoRef.current
+    : audioRef.current;
 
   if (!media) return;
 
-  const blob = new Blob([currentFile.data], {
-    type: currentFile.type,
+  // 👇 load data on demand instead of using currentFile.data directly
+  loadFileData(currentFile.id).then((data) => {
+    const blob = new Blob([data], { type: currentFile.type });
+    const url = URL.createObjectURL(blob);
+    media.src = url;
+    if (isPlaying) media.play();
+    return () => URL.revokeObjectURL(url);
   });
 
-  const url = URL.createObjectURL(blob);
-  media.src = url;
-
-  if (isPlaying) {
-    media.play();
-  }
-
-  return () => {
-    URL.revokeObjectURL(url);
-  };
 }, [currentMediaId, currentMediaType]);
 
 

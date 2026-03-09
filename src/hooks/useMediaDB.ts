@@ -5,21 +5,18 @@ export function useMediaDB() {
 
   const [files, setFiles] = useState<StoredFile[]>([]);
 
-  // ── Open DB + load all files once on mount ──
+  // ── Open DB + load only metadata on mount (no ArrayBuffers) ──
   useEffect(() => {
-    const request = indexedDB.open("MediaDB", 1); //name of the database and version number
+    const request = indexedDB.open("MediaDB", 1);
 
-//// If the database doesn't exist or version is upgraded, this event will fire
-// this code creates an object store (like a table) named "media" with "id" as the primary key
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
-      if 
-      (!db.objectStoreNames.contains("media")) {
+      if (!db.objectStoreNames.contains("media")) {
         db.createObjectStore("media", { keyPath: "id" });
       }
     };
 
-    // When DB is successfully opened, we read all stored files and put them in state so UI can display them
+    // Load only metadata — skip the heavy data field
     request.onsuccess = () => {
       const db = request.result;
       const tx = db.transaction(["media"], "readonly");
@@ -29,33 +26,52 @@ export function useMediaDB() {
       getAll.onsuccess = () => {
         const storedFiles = getAll.result as StoredFile[];
         if (storedFiles.length > 0) {
-          setFiles(storedFiles); // load files existing from indexedDB into state
+          // Store metadata only — data is an empty ArrayBuffer as placeholder
+          // actual data is fetched on demand in loadFileData()
+          const metaOnly = storedFiles.map(f => ({
+            ...f,
+            data: new ArrayBuffer(0), // placeholder — not loaded yet
+          }));
+          setFiles(metaOnly);
         }
       };
     };
-  }, []);// runs only once when component mounts
-///////////////////end
+  }, []);
 
-  /// Helper function to save a new single file to IndexedDB and update state
-  /// This function is called from the Music and Video pages when user uploads new media
-const saveFile = (file: StoredFile) => {
-  // Update state immediately with the original file
-  setFiles(prev => [...prev, file]);
+  // ── Load full data for a single file on demand ──
+  // Called by Bottom.tsx when a file is actually played
+  const loadFileData = (id: string): Promise<ArrayBuffer> => {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("MediaDB", 1);
+      request.onsuccess = () => {
+        const db = request.result;
+        const tx = db.transaction(["media"], "readonly");
+        const store = tx.objectStore("media");
+        const get = store.get(id);
 
-  // Send a COPY to IndexedDB so the ArrayBuffer isn't transferred/detached
-  const fileCopy = { ...file, data: file.data.slice(0) };
-  
-  const request = indexedDB.open("MediaDB", 1);
-  request.onsuccess = () => {
-    const db = request.result;
-    const tx = db.transaction(["media"], "readwrite");
-    const store = tx.objectStore("media");
-    store.add(fileCopy);
+        get.onsuccess = () => {
+          resolve(get.result.data as ArrayBuffer);
+        };
+        get.onerror = () => reject(get.error);
+      };
+    });
   };
-};
-//////////////end
 
+  // ── Save a new file ──
+  const saveFile = (file: StoredFile) => {
+    // Update state immediately with the original file
+    setFiles(prev => [...prev, file]);
 
-  // We return the files state and the saveFile function so that other components can use them
-  return { files, setFiles, saveFile };
+    // Send a COPY to IndexedDB so the ArrayBuffer isn't transferred/detached
+    const fileCopy = { ...file, data: file.data.slice(0) };
+
+    const request = indexedDB.open("MediaDB", 1);
+    request.onsuccess = () => {
+      const db = request.result;
+      const tx = db.transaction(["media"], "readwrite");
+      tx.objectStore("media").add(fileCopy);
+    };
+  };
+
+  return { files, setFiles, saveFile, loadFileData };
 }
