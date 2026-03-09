@@ -110,22 +110,22 @@ function MyMusic({
       
     
 
-    return (
+  return (
     <div className="right-main">
-      <div className="topbar">
-       <h1>Music Page</h1>
+    <div className="topbar">
+      <h1 className="topbar-h1">Music Page</h1>
 
-       <div className="upload-section">
-        <h2 className="text-xl font-bold mb-2">Upload Media</h2>
+      <label className="upload-label">
+        + Add Music
         <input
           type="file"
           multiple
           accept="audio/*"
           onChange={handleFileChange}
-          className="border p-2 rounded"
-         />
-        </div>
-      </div>
+          style={{ display: "none" }}
+        />
+      </label>
+    </div>
 
       <ErrorBoundary>
       <div className="music-main">
@@ -153,7 +153,7 @@ function MyMusic({
 
           if (item.type.startsWith("audio/")) {
             return (
-              <div key={`${item.id}`} className="horizontal-divs">
+              <div key={`${item.id}`} className={`horizontal-divs ${item.id === currentMediaId ? "playing" : ""}`}>
                 <div className="check-box">
                 <input type="checkbox" className="checkbox" />
                 </div>

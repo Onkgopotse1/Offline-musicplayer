@@ -29,8 +29,8 @@ const getGradient = (name: string) => {
 const parseFileName = (file: StoredFile) => {
   const parts = file.name.split("-");
   if (parts.length < 2) return { artist: "Unknown Artist", song: file.name };
-  const firstPart = parts[0].trim();
-  const secondPart = parts[1].replace(/\.[^/.]+$/, "").trim();
+const firstPart = parts[0]?.trim() ?? "";
+const secondPart = parts[1]?.replace(/\.[^/.]+$/, "").trim() ?? "";
   if (/^[A-Za-z]/.test(firstPart)) return { artist: firstPart, song: secondPart };
   return { song: firstPart, artist: secondPart };
 };
@@ -61,7 +61,7 @@ export default function Home({
   return (
     <div className="right-main">
       <div className="topbar">
-        <h1>Home Page</h1>
+        <h1 className="topbar-h1">Home Page</h1>
       </div>
 
       <ErrorBoundary>

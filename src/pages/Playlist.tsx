@@ -6,7 +6,7 @@ function Playlist() {
     <div className="right-main">
 
               <div className="topbar">
-              <h1>Playlist Page</h1>
+              <h1 className="topbar-h1">Playlist Page</h1>
 
             </div>
             

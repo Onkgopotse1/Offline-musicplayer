@@ -12,8 +12,8 @@ import { useState, useRef, lazy, Suspense } from "react";
 import ErrorBoundary from "./Error boundaries/Error boundry.tsx";
 
 const Home = lazy(() => import('./pages/Home.tsx'));
-const Video = lazy(() => import('./pages/Video.tsx'));
-const MyMusic = lazy(() => import('./pages/Music.tsx'));
+import MyMusic from './pages/Music.tsx';
+import Video from './pages/Video.tsx';
 const Notfound = lazy(() => import('./pages/NotFound.tsx'));
 const Playlist = lazy(() => import('./pages/Playlist.tsx'));
 const Settings = lazy(() => import('./pages/Settings.tsx'));
@@ -60,6 +60,9 @@ const addToRecent = (id: string) => {
 
 // We will use this ref to control the video element in the Video page from the Bottom player controls
   const videoRef = useRef<HTMLVideoElement | null>(null);
+//
+  const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
+  
 
  return (
   <div className="layout">
@@ -98,6 +101,9 @@ const addToRecent = (id: string) => {
          setIsPlaying={setIsPlaying}
          setCurrentMediaType={setCurrentMediaType}
          videoRef={videoRef}
+         thumbnails={thumbnails}
+         setThumbnails={setThumbnails}
+
         />} />
 
         <Route path="playqueue" element={<Playqueue />} />

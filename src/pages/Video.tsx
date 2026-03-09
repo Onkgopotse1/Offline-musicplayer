@@ -13,6 +13,8 @@ interface VideoProps {
   setCurrentMediaType: React.Dispatch<
   React.SetStateAction<"audio" | "video" | null>>;
   videoRef: React.RefObject<HTMLVideoElement | null>;
+  thumbnails: Record<string, string>;
+  setThumbnails: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
 function Video({
@@ -23,11 +25,11 @@ function Video({
   setIsPlaying,
   setCurrentMediaType,
   videoRef,
-  saveFile
+  saveFile,
+  thumbnails,
+  setThumbnails
 }: VideoProps) {
 
-  // Add thumbnail state to store generated thumbnails for videos
-   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
   
    const urlCache = useRef<Record<string, string>>({});
 
@@ -124,19 +126,19 @@ const generateThumbnail = (file: StoredFile): Promise<string> => {
    return (
     <div className="right-main">
 
-        <div className="topbar">
-        <h1>Video Page</h1>
+      <div className="topbar">
+      <h1 className="topbar-h1">Video Page</h1>
 
-      <div className="upload-section">
-        <h2 className="text-xl font-bold mb-2">Upload Media</h2>
-        <input
-          type="file"
-          multiple
-          accept="image/*,audio/*,video/*"
-          onChange={handleFileChange}
-          className="border p-2 rounded"
-        />
-      </div>
+  <label className="upload-label">
+    + Add Videos
+    <input
+      type="file"
+      multiple
+      accept="video/*"
+      onChange={handleFileChange}
+      style={{ display: "none" }}
+    />
+  </label>
     </div>
 
     <ErrorBoundary>
@@ -154,23 +156,20 @@ const generateThumbnail = (file: StoredFile): Promise<string> => {
 
   
   return (
-    <div key={item.id} className="cart-div">
+  <div key={item.id} className="cart-div">
+    <div className="video-thumb-wrapper">
 
-      {/* show video when active, thumbnail when not */}
       {isActive ? (
         <video
           ref={videoRef}
           src={url}
-          width="300"
           className="video"
           autoPlay
-          
         />
       ) : (
         <>
           <img
             src={thumbnails[item.id] || ""}
-            width="300"
             className="video"
             alt={item.name}
           />
@@ -181,8 +180,11 @@ const generateThumbnail = (file: StoredFile): Promise<string> => {
         </>
       )}
 
-      <p className="text">{item.name}</p>
     </div>
+    <div className="video-card-info">
+      <p className="video-card-title">{item.name}</p>
+    </div>
+  </div>
   );
 })}
         

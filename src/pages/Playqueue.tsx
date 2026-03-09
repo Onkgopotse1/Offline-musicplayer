@@ -7,7 +7,7 @@ function Playqueue() {
     <div className="right-main">
 
               <div className="topbar">
-              <h1>Playqueue Page</h1>
+              <h1 className="topbar-h1">Playqueue Page</h1>
 
             </div>
             
