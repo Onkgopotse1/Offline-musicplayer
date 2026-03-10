@@ -91,8 +91,7 @@ function Video({
 ///------------- Helper Function to handle file uploads from the input element----------
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
      const selectedFiles = Array.from(e.target.files ?? []);
-     //the code below goes through each file selected and saves it to the database
-     // ============: Save each file to IndexedDB ============
+
      selectedFiles.forEach((file) => {                    //Loop through selected files//
        const reader = new FileReader();                     //Read file content//
  
@@ -103,15 +102,11 @@ function Video({
            type: file.type,
            lastModified: file.lastModified,
            size: file.size,
-           data: event.target?.result as ArrayBuffer,  
-           uploadedAt: new Date().toISOString(),                     // gets saved to indexedDB
+           data: event.target?.result as ArrayBuffer,  //data is the actual audio/vudeo/image/text
+           uploadedAt: new Date().toISOString(),     //is just a timestamp it tells u when u saved the file
          }; 
-          
-         //const dbRequest: IDBOpenDBRequest = indexedDB.open("MediaDB", 1); // Open the database
 
-       // When DB is successfully opened, we save the file to the "media" object store
-        //reader.readAsArrayBuffer(file);
-        saveFile(fileData);
+        saveFile(fileData); //all files goes to saveFile prop then passed to App.tsx
        };
 
        // Read file as ArrayBuffer

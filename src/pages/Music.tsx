@@ -13,7 +13,50 @@ interface MusicProps {
   setCurrentMediaType: React.Dispatch<
   React.SetStateAction<"audio" | "video" | null>>;
   addToRecent: (id: string) => void;
+  loadFileData: (id: string) => Promise<ArrayBuffer>;
 }
+
+// Gets the duration of an audio file from its URL
+const useDuration = (url: string) => {
+  const [duration, setDuration] = useState("--:--");
+
+  useEffect(() => {
+    const audio = new Audio(url);
+    audio.onloadedmetadata = () => {
+      const mins = Math.floor(audio.duration / 60);
+      const secs = Math.floor(audio.duration % 60).toString().padStart(2, "0");
+      setDuration(`${mins}:${secs}`);
+    };
+  }, [url]);
+
+  return duration;
+};
+
+function DurationCell({ fileId, fileType, loadFileData }: {
+  fileId: string;
+  fileType: string;
+  loadFileData: (id: string) => Promise<ArrayBuffer>;
+}) {
+  const [duration, setDuration] = useState("--:--");
+
+  useEffect(() => {
+    loadFileData(fileId).then((data) => {
+      const blob = new Blob([data], { type: fileType });
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+
+      audio.onloadedmetadata = () => {
+        const mins = Math.floor(audio.duration / 60);
+        const secs = Math.floor(audio.duration % 60).toString().padStart(2, "0");
+        setDuration(`${mins}:${secs}`);
+        URL.revokeObjectURL(url);
+      };
+    });
+  }, [fileId]);
+
+  return <>{duration}</>;
+}
+
 
 function MyMusic({
   files,           
@@ -23,7 +66,8 @@ function MyMusic({
   setCurrentMediaId,
   setIsPlaying,
   setCurrentMediaType,
-  addToRecent
+  addToRecent,
+  loadFileData
 }: MusicProps){
  
  //////// Helper Function /////////////////
@@ -72,11 +116,12 @@ function MyMusic({
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
      const selectedFiles = Array.from(e.target.files ?? []);
  
-     //the code below goes through each file selected and saves it to the database
-     // ============ Save each file to IndexedDB ============
      selectedFiles.forEach((file) => {                    //Loop through selected files//
        const reader = new FileReader();                     //Read file content//
  
+      // Read file as ArrayBuffer
+       reader.readAsArrayBuffer(file);
+
        reader.onload = (event: ProgressEvent<FileReader>) => {        //FileReader reads file into memory//
          const fileData: StoredFile = {                                //Prepare file object for database//
            id: crypto.randomUUID(),
@@ -84,17 +129,15 @@ function MyMusic({
            type: file.type,
            lastModified: file.lastModified,
            size: file.size,
-           data: event.target?.result as ArrayBuffer,  // This is the file content as ArrayBuffer
-           uploadedAt: new Date().toISOString(),
+           data: event.target?.result as ArrayBuffer,  //data is the actual audio/vudeo/image/text
+           uploadedAt: new Date().toISOString(), //is just a timestamp it tells u when u saved the file
          }; // gets saved to indexedDB
 
           // When DB is successfully opened, we save the file to the "media" object store
           
-           saveFile(fileData);
-
+           saveFile(fileData); //all files goes to saveFile prop then passed to App.tsx
        };
-       // Read file as ArrayBuffer
-       reader.readAsArrayBuffer(file);
+
      });
    };
 //-----------------------end of file upload handler------------------------
@@ -175,7 +218,7 @@ function MyMusic({
                 <p className="text">genre name</p>
                 </div>
                 <div className="time">
-                <p className="text">time</p>
+                 <p className="text"><DurationCell fileId={item.id} fileType={item.type} loadFileData={loadFileData} /></p>
                 </div>
               </div>
             );

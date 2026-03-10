@@ -90,6 +90,7 @@ const addToRecent = (id: string) => {
          setCurrentMediaId={setCurrentMediaId}
          setIsPlaying={setIsPlaying}
          setCurrentMediaType={setCurrentMediaType}
+         loadFileData={loadFileData}
         />} />
 
         <Route path="video" element={<Video 
