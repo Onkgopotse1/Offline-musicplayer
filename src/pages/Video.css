@@ -90,3 +90,70 @@
 }
 
 h1 { font-size: 3em; line-height: 1.1; }
+
+
+/* --------- Big video player panel -------- */
+.video-player-panel {
+  position: absolute;
+  top: 56px;          /* below topbar */
+  left: 0;
+  right: 0;
+  bottom: 0;          /* 👈 stretch to bottom */
+  z-index: 10;
+  background-color: #0d0d0d;
+  border-bottom: 1px solid #1f1f1f;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.video-player-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.video-player-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #cccccc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+}
+
+.video-player-close {
+  background: transparent;
+  border: none;
+  color: #666666;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.video-player-close:hover {
+  color: #ffffff;
+  background-color: #e53935;
+}
+
+.video-player-screen {
+  width: 100%;
+  max-height: calc(100% - 60px); /* 👈 fill the panel */
+  border-radius: 6px;
+  background-color: #000;
+  object-fit: contain;
+}
+
+/* ── Active card highlight ── */
+.cart-div.video-active .video-card-title {
+  color: #e53935;
+}
+
+/* ----------------------- end ---------------------- */

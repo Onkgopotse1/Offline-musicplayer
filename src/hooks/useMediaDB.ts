@@ -3,9 +3,13 @@ import type { StoredFile } from "../type/media.ts";
 
 export function useMediaDB() {
 
+// ── Open DB + load only metadata on mount (no ArrayBuffers)-----------------------------------
+
+//files starts as empty untill it gets data from setFiles
+// this state only hold metadata
   const [files, setFiles] = useState<StoredFile[]>([]);
 
-  // ── Open DB + load only metadata on mount (no ArrayBuffers) ──
+
   useEffect(() => {
     const request = indexedDB.open("MediaDB", 1);
 
@@ -16,6 +20,7 @@ export function useMediaDB() {
       }
     };
 
+    //each file metadata is loaded from DB then to be renderd in UI horizontal-divs 
     // Load only metadata — skip the heavy data field
     request.onsuccess = () => {
       const db = request.result;
@@ -26,17 +31,17 @@ export function useMediaDB() {
       getAll.onsuccess = () => {
         const storedFiles = getAll.result as StoredFile[];
         if (storedFiles.length > 0) {
-          // Store metadata only — data is an empty ArrayBuffer as placeholder
-          // actual data is fetched on demand in loadFileData()
           const metaOnly = storedFiles.map(f => ({
             ...f,
             data: new ArrayBuffer(0), // placeholder — not loaded yet
           }));
-          setFiles(metaOnly);
+          setFiles(metaOnly); //this updates files with new metadata of the audio
         }
       };
     };
   }, []);
+//----------------------------------end-----------------------------
+
 
   // ── Load full data for a single file on demand ──
   // Called by Bottom.tsx when a file is actually played
@@ -56,10 +61,12 @@ export function useMediaDB() {
       };
     });
   };
+//------------------end-----------------------------
 
-  // ── Save a new file ──
+//// this handles file from file upload ----------------------------------------------------
+  // ── saveFile give its new data that it got from fileData and then give it to (file)👇
   const saveFile = (file: StoredFile) => {
-    // Update state immediately with the original file
+    // Update state immediately
     setFiles(prev => [...prev, file]);
 
     // Send a COPY to IndexedDB so the ArrayBuffer isn't transferred/detached
@@ -72,6 +79,8 @@ export function useMediaDB() {
       tx.objectStore("media").add(fileCopy);
     };
   };
+//----------------------------------end--------------------------------
 
   return { files, setFiles, saveFile, loadFileData };
+
 }

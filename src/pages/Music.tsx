@@ -135,7 +135,7 @@ function MyMusic({
 
           // When DB is successfully opened, we save the file to the "media" object store
           
-           saveFile(fileData); //all files goes to saveFile prop then passed to App.tsx
+           saveFile(fileData); //all files that u selected gets saved to saveFile 
        };
 
      });

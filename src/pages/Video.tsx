@@ -29,10 +29,12 @@ function Video({
   saveFile,
   thumbnails,
   setThumbnails,
-  loadFileData
+  loadFileData,
 }: VideoProps) {
 
-  
+  const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
+   const [activeVideoName, setActiveVideoName] = useState<string>("");
+
    const urlCache = useRef<Record<string, string>>({});
 
    // Helper function to get object URL for a file, with caching to avoid regenerating URLs
@@ -45,6 +47,7 @@ function Video({
       return urlCache.current[item.id];
     };
 /////
+
    // Generate thumbnails for video files whenever the files state changes
     const generateThumbnails = (file: StoredFile, data: ArrayBuffer): Promise<string> => {
       return new Promise((resolve) => {
@@ -67,12 +70,13 @@ function Video({
       });
     };
 
-    // Generate thumbnails one at a time using loadFileData
+    // Generate thumbnails one at a time using loadFileData-----
     useEffect(() => {
       const generate = async () => {
         for (const file of files) {
           if (file.type.startsWith("video/") && !thumbnails[file.id]) {
-            const data = await loadFileData(file.id); // 👈 fetch actual data on demand
+           //loadFileData has an id of a file from indexedDB which we use to generate a thumbnaing of the id's file
+            const data = await loadFileData(file.id); 
             const thumb = await generateThumbnails(file, data);
             setThumbnails(prev => ({ ...prev, [file.id]: thumb }));
           }
@@ -80,7 +84,8 @@ function Video({
       };
       generate();
     }, [files]);
-//////
+  ////////////////end
+
     // Revoke object URLs when component unmounts to free memory
       useEffect(() => {
         return () => {
@@ -106,7 +111,7 @@ function Video({
            uploadedAt: new Date().toISOString(),     //is just a timestamp it tells u when u saved the file
          }; 
 
-        saveFile(fileData); //all files goes to saveFile prop then passed to App.tsx
+        saveFile(fileData); //all files gets saved to saveFile
        };
 
        // Read file as ArrayBuffer
@@ -115,13 +120,31 @@ function Video({
    };
   //---------------------------end of file upload handler------------------------
 
-// Handler for when user clicks play button on a video thumbnail
-    const handleplay = (id: string) => {
-      setCurrentMediaId(id);
-      setCurrentMediaType("video");
-      setIsPlaying(true)
-    };
+  
+// Handler for when user clicks play button on a video thumbnail-----------
+const handleplay = (item: StoredFile) => {
+  setCurrentMediaId(item.id);
+  setCurrentMediaType("video");
+  setIsPlaying(true);
 
+  // load real data then open the big player
+  loadFileData(item.id).then((data) => {
+    const blob = new Blob([data], { type: item.type });
+    const url = URL.createObjectURL(blob);
+    if (activeVideoUrl) URL.revokeObjectURL(activeVideoUrl); // clean up previous
+    setActiveVideoUrl(url);
+    setActiveVideoName(item.name);
+  });
+};
+
+const closePlayer = () => {
+  if (activeVideoUrl) URL.revokeObjectURL(activeVideoUrl);
+  setActiveVideoUrl(null);
+  setActiveVideoName("");
+  setCurrentMediaId(null);
+  setIsPlaying(false);
+};
+//--------------
 
 // Helper function to generate thumbnail for a video file
 const generateThumbnail = (file: StoredFile): Promise<string> => {
@@ -146,80 +169,69 @@ const generateThumbnail = (file: StoredFile): Promise<string> => {
   });
 };
 
-   return (
-    <div className="right-main">
+return (
+  <div className="right-main" style={{ position: "relative" }}>
 
-      <div className="topbar">
+
+    <div className="topbar">
       <h1 className="topbar-h1">Video Page</h1>
-
-  <label className="upload-label">
-    + Add Videos
-    <input
-      type="file"
-      multiple
-      accept="video/*"
-      onChange={handleFileChange}
-      style={{ display: "none" }}
-    />
-  </label>
+      <label className="upload-label">
+        + Add Videos
+        <input type="file" multiple accept="video/*" onChange={handleFileChange} style={{ display: "none" }} />
+      </label>
     </div>
 
     <ErrorBoundary>
-    <div className="video-main">{/*openning*/}
 
-          {files.length === 0 && (
-           <p className="text-gray-500">No files chosen yet</p>
-          )}
-
-  {files.map((item) => {
-      if (!item.type.startsWith("video/")) return null;
-
-      const isActive = item.id === currentMediaId;
-      const url = getUrl(item);
-
-  
-  return (
-  <div key={item.id} className="cart-div">
-    <div className="video-thumb-wrapper">
-
-      {isActive ? (
-        <video
-          ref={videoRef}
-          src={url}
-          className="video"
-          autoPlay
-        />
-      ) : (
-        <>
-          <img
-            src={thumbnails[item.id] || ""}
-            className="video"
-            alt={item.name}
+      {/* ── Big video player panel — shown when a video is playing ── */}
+      {activeVideoUrl && (
+        <div className="video-player-panel">
+          <div className="video-player-header">
+            <p className="video-player-title">{activeVideoName}</p>
+            <button className="video-player-close" onClick={closePlayer}>✕</button>
+          </div>
+          <video
+            ref={videoRef}
+            src={activeVideoUrl}
+            className="video-player-screen"
+            autoPlay
+            
           />
-          <button
-            className="video-play-btn"
-            onClick={() => handleplay(item.id)}
-          >▶</button>
-        </>
+        </div>
       )}
 
-    </div>
-    <div className="video-card-info">
-      <p className="video-card-title">{item.name}</p>
-    </div>
+      {/* ── Thumbnail grid — always visible ── */}
+      <div className="video-main">
+        {files.length === 0 && (
+          <p className="text-gray-500">No files chosen yet</p>
+        )}
+
+        {files.map((item) => {
+          if (!item.type.startsWith("video/")) return null;
+          return (
+            <div key={item.id} className={`cart-div ${item.id === currentMediaId ? "video-active" : ""}`}>
+              <div className="video-thumb-wrapper">
+                <img
+                  src={thumbnails[item.id] || ""}
+                  className="video"
+                  alt={item.name}
+                />
+                <button
+                  className="video-play-btn"
+                  onClick={() => handleplay(item)}
+                >▶</button>
+              </div>
+              <div className="video-card-info">
+                <p className="video-card-title">{item.name}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+    </ErrorBoundary>
   </div>
-  );
-})}
-        
-      </div>{/*closing*/}
-      </ErrorBoundary>
-
-
-
-     </div>
-
-
-    )
+);
 }
 
 export default Video;
