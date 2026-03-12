@@ -16,6 +16,7 @@ interface VideoProps {
   thumbnails: Record<string, string>;
   setThumbnails: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   loadFileData: (id: string) => Promise<ArrayBuffer>;
+  saveThumbnail: (id: string, dataUrl: string) => void;
 }
 
 function Video({
@@ -30,6 +31,7 @@ function Video({
   thumbnails,
   setThumbnails,
   loadFileData,
+  saveThumbnail
 }: VideoProps) {
 
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
@@ -70,17 +72,19 @@ function Video({
       });
     };
 
-    // Generate thumbnails one at a time using loadFileData-----
+    //this gets the id of a file then tells generateThumbnails to create thumbnails
+    //after that it save the thumbnails to setThumbnails. Generate thumbnails one at a time using loadFileData in useMediaDB.ts
     useEffect(() => {
       const generate = async () => {
         for (const file of files) {
           if (file.type.startsWith("video/") && !thumbnails[file.id]) {
            //loadFileData has an id of a file from indexedDB which we use to generate a thumbnaing of the id's file
-            const data = await loadFileData(file.id); 
-            const thumb = await generateThumbnails(file, data);
-            setThumbnails(prev => ({ ...prev, [file.id]: thumb }));
+            const data = await loadFileData(file.id); //it waits for a id's of a file(video)
+            const thumb = await generateThumbnails(file, data); //this has generateThumbnail which creates thumbnails 
+            setThumbnails(prev => ({ ...prev, [file.id]: thumb })); //then save thumbnail to state
+            saveThumbnail(file.id, thumb);
           }
-        }
+        } 
       };
       generate();
     }, [files]);
@@ -146,11 +150,14 @@ const closePlayer = () => {
 };
 //--------------
 
-// Helper function to generate thumbnail for a video file
+// Helper function to generate thumbnail for a video file---------
 const generateThumbnail = (file: StoredFile): Promise<string> => {
   return new Promise((resolve) => {
+  //variable blob converts arraybuffer data to file type that can be used by html audio element, ---
+  //then variable url creates a address of where to get variable blob data
     const blob = new Blob([file.data], { type: file.type });
     const url = URL.createObjectURL(blob);
+    //--------------
     const video = document.createElement("video");
     video.src = url;
     video.muted = true;

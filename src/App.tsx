@@ -8,7 +8,7 @@ import './pages/Settings.css';
 import './pages/PlayQueue.css';
 import './Homee/Bottom.css';
 import { Routes, Route } from "react-router-dom";
-import { useState, useRef, lazy, Suspense } from "react";
+import { useState, useRef, useEffect, lazy, Suspense } from "react";
 import ErrorBoundary from "./Error boundaries/Error boundry.tsx";
 
 const Home = lazy(() => import('./pages/Home.tsx'));
@@ -29,7 +29,12 @@ import { useMediaDB } from "./hooks/useMediaDB.ts";
 function App() {
   
 // All uploaded media (audio + video) lives in this state
-  const { files, setFiles, saveFile, loadFileData } = useMediaDB();
+  const { files, setFiles, saveFile, loadFileData, loadThumbnails, saveThumbnail } = useMediaDB();
+
+// load saved thumbnails once on mount
+useEffect(() => {
+  loadThumbnails().then(setThumbnails);
+}, []);
 
 // Which media is currently selected to play
   const [currentMediaId, setCurrentMediaId] = useState<string | null>(null);
@@ -105,6 +110,7 @@ const addToRecent = (id: string) => {
          thumbnails={thumbnails}
          setThumbnails={setThumbnails}
          loadFileData={loadFileData}
+         saveThumbnail={saveThumbnail}
         />} />
 
         <Route path="playqueue" element={<Playqueue />} />
