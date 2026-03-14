@@ -29,7 +29,7 @@ import { useMediaDB } from "./hooks/useMediaDB.ts";
 function App() {
   
 // All uploaded media (audio + video) lives in this state
-  const { files, setFiles, saveFile, loadFileData, loadThumbnails, saveThumbnail } = useMediaDB();
+  const { files, setFiles, saveFile, loadFileData, loadThumbnails, saveThumbnail, loaded } = useMediaDB();
 
 // load saved thumbnails once on mount
 useEffect(() => {
@@ -68,13 +68,31 @@ const addToRecent = (id: string) => {
 //
   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
 
+const [thumbnailsReady, setThumbnailsReady] = useState(false);
+
+
+
+
+useEffect(() => {
+  loadThumbnails().then((saved) => {
+    setThumbnails(saved);
+    setThumbnailsReady(true); // 👈 signals thumbnails are done
+  });
+}, []);
+
+const loading = !loaded || !thumbnailsReady;
 
  return (
+  <Suspense fallback={<div style={{display: 'grid', placeItems: "center"}}>Loading...</div>}>
+        {loading ? (
+        <div style={{display: 'grid', placeItems: "center",margin: "0", height: "100vh" , fontSize: "60px"}}>Loading...</div>
+      ) : ( 
   <div className="layout">
+
      <Sidebar />
  
         <ErrorBoundary>
-        <Suspense fallback={<div>Loading...</div>}>
+        
         <Routes>
         
          <Route path="/" element={<Home 
@@ -118,7 +136,7 @@ const addToRecent = (id: string) => {
         <Route path="settings" element={<Settings />} />
         <Route path="notfound" element={<Notfound />} />
       </Routes>
-      </Suspense>
+      
       </ErrorBoundary>
 
        <ErrorBoundary>
@@ -133,8 +151,9 @@ const addToRecent = (id: string) => {
         loadFileData={loadFileData}
        />
        </ErrorBoundary>
-
-  </div>
+      
+  </div> )}
+  </Suspense>
  );
 }
 

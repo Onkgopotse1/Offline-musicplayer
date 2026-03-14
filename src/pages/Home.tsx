@@ -1,8 +1,9 @@
 import React from "react";
 import './Home.css';
 import type { StoredFile } from "../type/media.ts";
-import { Suspense } from "react";
+import { lazy, Suspense } from "react";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
+
 
 
 interface HomeProps {

@@ -81,8 +81,8 @@ function Video({
            //loadFileData has an id of a file from indexedDB which we use to generate a thumbnaing of the id's file
             const data = await loadFileData(file.id); //it waits for a id's of a file(video)
             const thumb = await generateThumbnails(file, data); //this has generateThumbnail which creates thumbnails 
-            setThumbnails(prev => ({ ...prev, [file.id]: thumb })); //then save thumbnail to state
-            saveThumbnail(file.id, thumb);
+            const sender = setThumbnails(prev => ({ ...prev, [file.id]: thumb })); //then save thumbnail to state
+            saveThumbnail(file.id, thumb); //save to indexedDB
           }
         } 
       };

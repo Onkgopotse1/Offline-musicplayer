@@ -3,6 +3,8 @@ import type { StoredFile } from "../type/media.ts";
 
 export function useMediaDB() {
 
+const [loaded, setLoaded] = useState(false);
+
 // ── Open DB + load only metadata on mount (no ArrayBuffers)-----------------------------------
 
 //files starts as empty untill it gets data from setFiles
@@ -11,7 +13,7 @@ export function useMediaDB() {
 
 
   useEffect(() => {
-    const request = indexedDB.open("MediaDB", 2); // 👈 bumped to 2 to add thumbnails store
+    const request = indexedDB.open("MediaDB", 2); // 
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
@@ -32,16 +34,17 @@ export function useMediaDB() {
       const store = tx.objectStore("media");
       const getAll = store.getAll();
 
-      getAll.onsuccess = () => {
-        const storedFiles = getAll.result as StoredFile[];
-        if (storedFiles.length > 0) {
-          const metaOnly = storedFiles.map(f => ({
-            ...f,
-            data: new ArrayBuffer(0), // placeholder — not loaded yet
-          }));
-          setFiles(metaOnly); //this updates files with new metadata of the audio
-        }
-      };
+getAll.onsuccess = () => {
+  const storedFiles = getAll.result as StoredFile[];
+  if (storedFiles.length > 0) {
+    const metaOnly = storedFiles.map(f => ({
+      ...f,
+      data: new ArrayBuffer(0), // placeholder — not loaded yet
+    }));
+    setFiles(metaOnly); //this updates files with new metadata of the audio
+  }
+  setLoaded(true); // signals that DB read is done whether or not there are files
+};
     };
   }, []);
 //----------------------------------end-----------------------------
@@ -117,6 +120,6 @@ export function useMediaDB() {
   };
 //----------------------------------end--------------------------------
 
-  return { files, setFiles, saveFile, loadFileData, loadThumbnails, saveThumbnail };
+  return { files, setFiles, saveFile, loadFileData, loadThumbnails, saveThumbnail, loaded };
 
 }
