@@ -123,3 +123,24 @@ place-items: center;
     display: none;
   }
 }
+
+/* Active state for shuffle and repeat */
+.shuffle-button.active,
+.repeat-button.active {
+  color: #e53935;
+}
+
+/* Volume wrapper — positions slider next to button */
+.volume-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.volume-slider {
+  width: 80px;
+  height: 3px;
+  accent-color: #e53935;
+  cursor: pointer;
+  border-radius: 2px;
+}

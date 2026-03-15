@@ -1,5 +1,5 @@
 import "./Bottom.css";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faShuffle,
@@ -16,6 +16,7 @@ import {
 
 import type { StoredFile } from "../type/media.ts";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
+
 
 
 interface BottomProps {
@@ -39,6 +40,11 @@ export default function Bottom({
   videoRef,
   loadFileData
 }: BottomProps) {
+
+const [isShuffle, setIsShuffle] = useState(false);
+const [isRepeat, setIsRepeat] = useState(false);
+const [volume, setVolume] = useState(1); // 1 = 100%
+const [showVolume, setShowVolume] = useState(false);
 
   // ===============================
   // Global audio element reference
@@ -105,22 +111,21 @@ useEffect(() => {
 const handleNext = () => {
   if (!currentMediaId || files.length === 0) return;
 
-  const currentIndex = files.findIndex(
-    (file) => file.id === currentMediaId
-  );
+  const audioFiles = files.filter(f => f.type.startsWith(currentMediaType === "video" ? "video/" : "audio/"));
+  if (audioFiles.length === 0) return;
 
-  if (currentIndex === -1) return;
-
-  const nextIndex =
-    currentIndex + 1 >= files.length ? 0 : currentIndex + 1;
-
-  const nextFile = files[nextIndex];
+  let nextFile;
+  if (isShuffle) {
+    // pick a random file that isn't the current one
+    const others = audioFiles.filter(f => f.id !== currentMediaId);
+    nextFile = others[Math.floor(Math.random() * others.length)];
+  } else {
+    const currentIndex = audioFiles.findIndex(f => f.id === currentMediaId);
+    const nextIndex = currentIndex + 1 >= audioFiles.length ? 0 : currentIndex + 1;
+    nextFile = audioFiles[nextIndex];
+  }
 
   if (!nextFile) return;
-
-  // Set new media ID
-  // (App updates global state)
-  // Bottom reacts automatically
   setCurrentMediaId(nextFile.id);
   setIsPlaying(true);
 };
@@ -128,19 +133,16 @@ const handleNext = () => {
 const handlePrevious = () => {
   if (!currentMediaId || files.length === 0) return;
 
-  const currentIndex = files.findIndex(
-    (file) => file.id === currentMediaId
-  );
+ const audioFiles = files.filter(f => f.type.startsWith(currentMediaType === "video" ? "video/" : "audio/"));
+  if (audioFiles.length === 0) return;
 
+  const currentIndex = audioFiles.findIndex(f => f.id === currentMediaId);
   if (currentIndex === -1) return;
 
-  const prevIndex =
-    currentIndex - 1 < 0 ? files.length - 1 : currentIndex - 1;
-
-  const prevFile = files[prevIndex];
+  const prevIndex = currentIndex - 1 < 0 ? audioFiles.length - 1 : currentIndex - 1;
+  const prevFile = audioFiles[prevIndex];
 
   if (!prevFile) return;
-
   setCurrentMediaId(prevFile.id);
   setIsPlaying(true);
 };
@@ -157,17 +159,30 @@ useEffect(() => {
 
   if (!media) return;
 
-  const handleEnded = () => {
+const handleEnded = () => {
+  if (isRepeat) {
+    // replay same track
+    const media = currentMediaType === "video" ? videoRef.current : audioRef.current;
+    if (media) { media.currentTime = 0; media.play(); }
+  } else {
     handleNext();
-  };
+  }
+}; 
 
   media.addEventListener("ended", handleEnded);
 
   return () => {
     media.removeEventListener("ended", handleEnded);
   };
-}, [currentMediaId, files, currentMediaType]);
+}, [currentMediaId, files, currentMediaType, isRepeat]);
+
 //////////////////////////end/////////////////////////////////
+
+// Sync volume to audio/video element whenever it changes
+useEffect(() => {
+  const media = currentMediaType === "video" ? videoRef.current : audioRef.current;
+  if (media) media.volume = volume;
+}, [volume, currentMediaType]);
 
   // ===============================
   // Update progress bar as audio plays
@@ -228,29 +243,55 @@ return(
         {/* ==================Main Controls=================*/}
 
 
+        {/* middle-playstation */}
         <div className="middle-playstation">
-          <button className="shuffle-button" id="shuffle-button-id"><FontAwesomeIcon icon={faShuffle} /></button>
-          <button className="backward-fast-button" id="backward-fast-button-id" 
-            onClick={handlePrevious}>
+          <button
+            className={`shuffle-button ${isShuffle ? "active" : ""}`}
+            onClick={() => setIsShuffle(p => !p)}
+          >
+            <FontAwesomeIcon icon={faShuffle} />
+          </button>
+          <button className="backward-fast-button" onClick={handlePrevious}>
             <FontAwesomeIcon icon={faBackward} />
           </button>
-          <button className="play-button" id="play-button-id"
-            onClick={togglePlay}>
+          <button className="play-button" onClick={togglePlay}>
             <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} />
           </button>
-          <button className="forward-fast-button" id="forward-fast-button-id" 
-            onClick={handleNext}>
+          <button className="forward-fast-button" onClick={handleNext}>
             <FontAwesomeIcon icon={faForward} />
           </button>
-          <button className="repeat-button" id="repeat-button-id"><FontAwesomeIcon icon={faRepeat} /></button>
+          <button
+            className={`repeat-button ${isRepeat ? "active" : ""}`}
+            onClick={() => setIsRepeat(p => !p)}
+          >
+            <FontAwesomeIcon icon={faRepeat} />
+          </button>
         </div>
 
-{/* ================Secondary Controls======================*/}
+        {/* second-playstation */}
         <div className="second-playstation">
-          <button className="volume-button" id="volume-button-id"><FontAwesomeIcon icon={faVolumeHigh} /></button>
-          <button className="maximize-button" id="maximize-button-id"><FontAwesomeIcon icon={faMaximize} /></button>
-          <button className="minimize-button" id="minimize-button-id"><FontAwesomeIcon icon={faMinimize} /></button>
-          <button className="threedots-button" id="3dots-button-id"><FontAwesomeIcon icon={faEllipsis} /></button>
+          <div className="volume-wrapper">
+            <button
+              className="volume-button"
+              onClick={() => setShowVolume(p => !p)}
+            >
+              <FontAwesomeIcon icon={faVolumeHigh} />
+            </button>
+            {showVolume && (
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={volume}
+                onChange={e => setVolume(parseFloat(e.target.value))}
+                className="volume-slider"
+              />
+            )}
+          </div>
+          <button className="maximize-button"><FontAwesomeIcon icon={faMaximize} /></button>
+          <button className="minimize-button"><FontAwesomeIcon icon={faMinimize} /></button>
+          <button className="threedots-button"><FontAwesomeIcon icon={faEllipsis} /></button>
         </div>
       </div>
       </ErrorBoundary>
