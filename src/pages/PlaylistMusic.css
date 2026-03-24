@@ -1,0 +1,32 @@
+/* ── Detail page ── */
+.playlist-detail-main {
+  flex: 1;
+  height: auto;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(36, 30, 30, 0.397);
+  box-sizing: border-box;
+}
+
+.playlist-detail-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.playlist-back-btn {
+  background: transparent;
+  border: none;
+  color: #888888;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.playlist-back-btn:hover {
+  color: #ffffff;
+  background-color: #1a1a1a;
+}

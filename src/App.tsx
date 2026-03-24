@@ -18,6 +18,7 @@ const Notfound = lazy(() => import('./pages/NotFound.tsx'));
 const Playlist = lazy(() => import('./pages/Playlist.tsx'));
 const Settings = lazy(() => import('./pages/Settings.tsx'));
 const Playqueue = lazy(() => import('./pages/Playqueue.tsx'));
+const PlaylistDetail = lazy(() => import('./pages/PlaylistMusic.tsx'));
 
 import Sidebar  from './Homee/Sidebar.tsx';
 import RightMain  from './Homee/Rightmain.tsx';
@@ -71,12 +72,10 @@ const addToRecent = (id: string) => {
 const [thumbnailsReady, setThumbnailsReady] = useState(false);
 
 
-
-
 useEffect(() => {
   loadThumbnails().then((saved) => {
     setThumbnails(saved);
-    setThumbnailsReady(true); // 👈 signals thumbnails are done
+    setThumbnailsReady(true); // signals thumbnails are done
   });
 }, []);
 
@@ -133,6 +132,19 @@ const loading = !loaded || !thumbnailsReady;
 
         <Route path="playqueue" element={<Playqueue />} />
         <Route path="playlist" element={<Playlist />} />
+
+        <Route path="playlist/:name" element={<PlaylistDetail 
+         files={files}
+         setFiles={setFiles}
+         saveFile={saveFile}
+         addToRecent={addToRecent}
+         currentMediaId={currentMediaId}
+         setCurrentMediaId={setCurrentMediaId}
+         setIsPlaying={setIsPlaying}
+         setCurrentMediaType={setCurrentMediaType}
+         loadFileData={loadFileData}
+        />} />
+        
         <Route path="settings" element={<Settings />} />
         <Route path="notfound" element={<Notfound />} />
       </Routes>

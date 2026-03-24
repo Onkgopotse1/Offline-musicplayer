@@ -13,7 +13,7 @@ const [loaded, setLoaded] = useState(false);
 
 
   useEffect(() => {
-    const request = indexedDB.open("MediaDB", 2); // 
+    const request = indexedDB.open("MediaDB", 3); // 
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
@@ -53,7 +53,7 @@ getAll.onsuccess = () => {
   // ── Load ArrayBuffer for a single file on demand 
   const loadFileData = (id: string): Promise<ArrayBuffer> => {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open("MediaDB", 2);
+      const request = indexedDB.open("MediaDB", 3);
       request.onsuccess = () => {
         const db = request.result;
         const tx = db.transaction(["media"], "readonly");
@@ -73,7 +73,7 @@ getAll.onsuccess = () => {
   // returns a Record<id, dataUrl> so App.tsx can set thumbnails state instantly
   const loadThumbnails = (): Promise<Record<string, string>> => {
     return new Promise((resolve) => {
-      const request = indexedDB.open("MediaDB", 2);
+      const request = indexedDB.open("MediaDB", 3);
       request.onsuccess = () => {
         const db = request.result;
         const tx = db.transaction(["thumbnails"], "readonly");
@@ -93,7 +93,7 @@ getAll.onsuccess = () => {
 
   // ── Save a generated thumbnail to IndexedDB so we never regenerate it again ──
   const saveThumbnail = (id: string, dataUrl: string) => {
-    const request = indexedDB.open("MediaDB", 2);
+    const request = indexedDB.open("MediaDB", 3);
     request.onsuccess = () => {
       const db = request.result;
       const tx = db.transaction(["thumbnails"], "readwrite");
@@ -103,7 +103,7 @@ getAll.onsuccess = () => {
 //------------------end-----------------------------
 
 //// this handles file from file upload ----------------------------------------------------
-  // ── saveFile give its new data that it got from fileData and then give it to (file)👇
+  // ── saveFile give it's new data that it got from fileData and then give it to (file)👇
   const saveFile = (file: StoredFile) => {
     // Update state immediately
     setFiles(prev => [...prev, file]);
@@ -111,7 +111,7 @@ getAll.onsuccess = () => {
     // Send a COPY to IndexedDB so the ArrayBuffer isn't transferred/detached
     const fileCopy = { ...file, data: file.data.slice(0) };
 
-    const request = indexedDB.open("MediaDB", 2);
+    const request = indexedDB.open("MediaDB", 3);
     request.onsuccess = () => {
       const db = request.result;
       const tx = db.transaction(["media"], "readwrite");

@@ -52,16 +52,19 @@ a:hover {
 }
 
 .topbar {
-  height: 20%;
-  min-height: 56px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  height: 90px;               
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 0 24px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 24px;
   box-sizing: border-box;
- border-bottom: 1px solid #1f1f1f;
- background-color: rgba(36, 30, 30, 0.397);
+  background-color: #161616;
+  border-bottom: 1px solid #1f1f1f;
 }
 
 .topbar h1 {
@@ -121,7 +124,7 @@ a:hover {
   flex-direction: column;
   padding: 8px 0 10px;
   box-sizing: border-box;
-  overflow-y: auto;        /* 👈 scrolls the nav items before they hit settings */
+  overflow-y: auto;        
   overflow-x: hidden;
   justify-content: flex-start;
   min-height: 280px; 
@@ -318,6 +321,10 @@ a:hover {
 
 .right-main{
   grid-area: right-main;
+  display: flex;             
+  flex-direction: column;     
+  overflow: hidden;           
+  height: 100%;  
 }
 
 /* ---RESPONSIVE SIDEBAR COLLAPSE --- */
@@ -404,3 +411,123 @@ a:hover {
 }
 /* h1 for NotFound page (no own CSS file) */
 h1 { font-size: 3em; line-height: 1.1; }
+
+.topbar {
+  height: 20%;
+  min-height: 56px;
+  display: flex;
+  flex-direction: column;        
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 24px;
+  box-sizing: border-box;
+  background-color: #242424;
+  border-bottom: 1px solid #1f1f1f;
+}
+
+/* top row — title + button */
+.topbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.sub-menu {
+  width: 100%;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #242424;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 1 12px;
+  box-sizing: border-box;
+  margin-bottom: -10px;
+  margin-top: 18px;
+}
+
+.sub-menu-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sub-menu-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ── Shuffle and play button ── */
+.sub-menu-shuffle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background-color: #e53935;
+  border: none;
+  border-radius: 5px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.sub-menu-shuffle-btn:hover {
+  background-color: #c62828;
+  transform: scale(1.02);
+}
+
+/* ── Sort by ── */
+.sub-menu-sort {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+}
+
+.sub-menu-sort-label {
+  color: #555555;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* wrapper so we can style the arrow */
+.sub-menu-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sub-menu-select-wrapper::after {
+  content: "⌄";
+  position: absolute;
+  right: 2px;
+  color: #e53935;
+  font-size: 11px;
+  pointer-events: none;
+  line-height: 1;
+}
+
+.sub-menu-select {
+  background-color: transparent;
+  border: none;
+  color: #e53935;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  padding: 2px 16px 2px 2px; /* right padding for the arrow */
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.sub-menu-select option {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  font-size: 12px;
+}

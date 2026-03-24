@@ -1,16 +1,13 @@
 /* ── Grid container ── */
 .video-main {
-  width: 100%;
-  height: 80%;
+  flex: 1;
+  height: auto;
   overflow-y: scroll;
   overflow-x: hidden;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0;
-  border: none;
-  background-color: rgba(36, 30, 30, 0.397);
   align-content: start;
-  box-sizing: border-box;
+  background-color: rgba(36, 30, 30, 0.397);
 }
 
 /* ── Card ── */
@@ -95,10 +92,10 @@ h1 { font-size: 3em; line-height: 1.1; }
 /* --------- Big video player panel -------- */
 .video-player-panel {
   position: absolute;
-  top: 56px;          /* below topbar */
+  top: 56px;       
   left: 0;
   right: 0;
-  bottom: 0;          /* 👈 stretch to bottom */
+  bottom: 0;          
   z-index: 10;
   background-color: #0d0d0d;
   border-bottom: 1px solid #1f1f1f;
@@ -145,8 +142,7 @@ h1 { font-size: 3em; line-height: 1.1; }
 
 .video-player-screen {
   width: 100%;
-  max-height: calc(100% - 60px); /* 👈 fill the panel */
-  border-radius: 6px;
+  max-height: calc(100% - 60px);
   background-color: #000;
   object-fit: contain;
 }
@@ -155,5 +151,3 @@ h1 { font-size: 3em; line-height: 1.1; }
 .cart-div.video-active .video-card-title {
   color: #e53935;
 }
-
-/* ----------------------- end ---------------------- */

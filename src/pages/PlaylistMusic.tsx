@@ -1,20 +1,20 @@
+import { useParams, useNavigate, } from 'react-router-dom';
 import React, { useEffect, useState, useRef } from "react";
-import './Music.css';
+import './Playlist.css';
 import type { StoredFile } from "../type/media.ts";
-import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 
-interface MusicProps {
+interface PlaylistMusicProps {
   files: StoredFile[];
-  setFiles: React.Dispatch<React.SetStateAction<StoredFile[]>>;
-  saveFile: (file: StoredFile) => void;
-  currentMediaId: string | null;
-  setCurrentMediaId: React.Dispatch<React.SetStateAction<string | null>>;
-  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
-  setCurrentMediaType: React.Dispatch<
-  React.SetStateAction<"audio" | "video" | null>>;
-  addToRecent: (id: string) => void;
-  loadFileData: (id: string) => Promise<ArrayBuffer>;
-}
+    setFiles: React.Dispatch<React.SetStateAction<StoredFile[]>>;
+    saveFile: (file: StoredFile) => void;
+    currentMediaId: string | null;
+    setCurrentMediaId: React.Dispatch<React.SetStateAction<string | null>>;
+    setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+    setCurrentMediaType: React.Dispatch<
+    React.SetStateAction<"audio" | "video" | null>>;
+    addToRecent: (id: string) => void;
+    loadFileData: (id: string) => Promise<ArrayBuffer>;
+};
 
 // Gets the duration of an audio file from its URL
 const useDuration = (url: string) => {
@@ -58,8 +58,9 @@ function DurationCell({ fileId, fileType, loadFileData }: {
 }
 
 
-function MyMusic({
-  files,           
+
+function PlaylistMusic({
+  files,
   setFiles,
   saveFile,
   currentMediaId,
@@ -68,18 +69,21 @@ function MyMusic({
   setCurrentMediaType,
   addToRecent,
   loadFileData
-}: MusicProps){
- 
-//sub-menu
+ }: PlaylistMusicProps) 
+ {
+
+  //sub menu
 const [sortBy, setSortBy] = useState("date");
 
-//a state for if a checkbox is clicked
-  const [isChecked, setIsChecked] = useState(false);
+//this state holds only audios from (file prop)
+const [visibleSongs, setVisibleSongs] = useState<StoredFile[]>([]);
 
-  const [checkedIds, setCheckedIds] = useState<string[]>([]);
+  const { name } = useParams();
+  const navigate = useNavigate();
+  const playlistName = decodeURIComponent(name ?? "");
 
 
- //////// Helper Function /////////////////
+   //////// Helper Function /////////////////
     const parseFileName = (file: any) => {
     // Split on the first dash
     const parts = file.name.split("-");
@@ -101,7 +105,7 @@ const [sortBy, setSortBy] = useState("date");
   };
  ///////🛠️ END Helper Function/////////////////
 
-   //
+  //
   const urlCache = useRef<Record<string, string>>({});
 
 // Helper function to get object URL for a file, with caching to avoid regenerating URLs
@@ -120,77 +124,56 @@ const [sortBy, setSortBy] = useState("date");
       Object.values(urlCache.current).forEach(URL.revokeObjectURL);
     };
   }, []);
-
- ///------------- Helper Function to handle file uploads from the input element---------
-   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-     const selectedFiles = Array.from(e.target.files ?? []);
  
-     selectedFiles.forEach((file) => {                    //Loop through selected files//
-       const reader = new FileReader();                     //Read file content//
- 
-      // Read file as ArrayBuffer
-       reader.readAsArrayBuffer(file);
-
-       reader.onload = (event: ProgressEvent<FileReader>) => {        //FileReader reads file into memory//
-         const fileData: StoredFile = {                                //Prepare file object for database//
-           id: crypto.randomUUID(),
-           name: file.name,
-           type: file.type,
-           lastModified: file.lastModified,
-           size: file.size,
-           data: event.target?.result as ArrayBuffer,  //data is the actual audio/vudeo/image/text
-           uploadedAt: new Date().toISOString(), //is just a timestamp it tells u when u saved the file
-         }; // gets saved to indexedDB
-
-          // When DB is successfully opened, we save the file to the "media" object store
-          
-           saveFile(fileData); //all files that u selected gets saved to saveFile 
-       };
-
-     });
-   };
-//-----------------------end of file upload handler------------------------
-
-
-   // Handler for when user clicks play button on a music track
-    const handleplay = (id: string) => {
+     const handleplay = (id: string) => {
       setCurrentMediaId(id);
       setCurrentMediaType("audio");
       setIsPlaying(true);
       addToRecent(id);
     };
-  
-  // handler for checkbox: user check the box then display a second sub-menu
-  const toggleCheckbox = (id: string) => {
-    setCheckedIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-    
+
+const saveToUserAudio = (audioFiles: StoredFile[]) => {
+  const request = indexedDB.open("MediaDB", 3);
+  request.onsuccess = () => {
+    const db = request.result;
+    const tx = db.transaction("userAudio", "readwrite");
+    const store = tx.objectStore("userAudio");
+    audioFiles.forEach((file) => {
+      store.put(file); // ✅ put = insert or update
+    });
+    tx.oncomplete = () => {
+      console.log("Audio saved to userAudio store");
+    };
+    tx.onerror = () => {
+      console.error("Error saving audio");
+    };
   };
-  
+};
+
+ //this opens (files prop) to get audios
+const handleAddSongs = () => {
+  const audioFiles = files.filter(file =>
+    file.type.startsWith("audio/")
+  );
+
+  //setVisibleSongs(audioFiles);
+
+  // ✅ Persist to IndexedDB
+  saveToUserAudio(audioFiles);
+};
+
+
 
   return (
     <div className="right-main">
-    <div className="topbar">
+<div className="topbar">
   <div className="topbar-row">
-    <h1 className="topbar-h1">Music</h1>
-    <label className="upload-label">
-      + Add Music
-      <input type="file" multiple accept="audio/*" onChange={handleFileChange} style={{ display: "none" }} />
-    </label>
-  </div>
-
-  {checkedIds.length > 0 ? (
-  <div className="sub-menu">
-    <div className="sub-menu-left">
-     <input type="checkbox" />
-     <p>0 song selected</p>
-     <button>Play</button>
-     <button>Play next</button>
-     <button>Add to</button>
+    <div className="playlist-detail-topbar-left">
+      <button className="playlist-back-btn" onClick={() => navigate('/playlist')}>←</button>
+      <h1 className="topbar-h1">{playlistName}</h1>
     </div>
+    <button className="upload-label" onClick={handleAddSongs}>+ Add Songs</button>
   </div>
-  ) : (
 
   <div className="sub-menu">
     <div className="sub-menu-left">
@@ -207,29 +190,14 @@ const [sortBy, setSortBy] = useState("date");
       </div>
     </div>
   </div>
-  )}
-
 </div>
 
-      <ErrorBoundary>
-      <div className="music-main">
-       {/*///////it checks if no file have been uploaded. if no then it display a text/////////////////*/}
-              {files.length === 0 && (
-          <p className="text-gray-500">No files chosen yet</p>
-        )}
-        
-    {/* ── Column headers ── */}
-      <div className="music-header">
-        <div></div> {/* checkbox */}
-        <div></div> {/* play */}
-        <div className="header-text">Title</div>
-        <div className="header-text">Artist</div>
-        <div className="header-text">Album</div>
-        <div className="header-text">Genre</div>
-        <div className="header-text">Time</div>
-      </div>
+      <div className="playlist-detail-main">
+        {/* you'll wire real song list here later *
+        <p className="playlist-empty">No songs in this playlist yet</p>
+        */}
 
-        {files.map((item) => {
+        {visibleSongs.map((item) => {
          const fileURL = getUrl(item);
          const { artist, song } = parseFileName(item); //Parse artist and song from filename//
 
@@ -239,10 +207,7 @@ const [sortBy, setSortBy] = useState("date");
             return (
               <div key={`${item.id}`} className={`horizontal-divs ${item.id === currentMediaId ? "playing" : ""}`}>
                 <div className="check-box">
-                <input type="checkbox" className="checkbox" 
-                  checked={checkedIds.includes(item.id)}
-                  onChange={() => toggleCheckbox(item.id)}
-                />
+                <input type="checkbox" className="checkbox" />
                 </div>
                 <div className="play">
                 <button onClick={() => handleplay(item.id)} className="play-buttons">
@@ -270,12 +235,10 @@ const [sortBy, setSortBy] = useState("date");
 
           return null;
         })}
-      </div>{/*closing*/}
-      </ErrorBoundary>
-     </div>
 
-    );
-  };
-  
+      </div>
+    </div>
+  );
+}
 
-export default MyMusic;
+export default PlaylistMusic;

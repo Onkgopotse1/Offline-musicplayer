@@ -34,6 +34,9 @@ function Video({
   saveThumbnail
 }: VideoProps) {
 
+  //sub menu
+const [sortBy, setSortBy] = useState("date");
+
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
    const [activeVideoName, setActiveVideoName] = useState<string>("");
 
@@ -180,13 +183,30 @@ return (
   <div className="right-main" style={{ position: "relative" }}>
 
 
-    <div className="topbar">
-      <h1 className="topbar-h1">Video Page</h1>
-      <label className="upload-label">
-        + Add Videos
-        <input type="file" multiple accept="video/*" onChange={handleFileChange} style={{ display: "none" }} />
-      </label>
+<div className="topbar">
+  <div className="topbar-row">
+    <h1 className="topbar-h1">Video</h1>
+    <label className="upload-label">
+      + Add Videos
+      <input type="file" multiple accept="video/*" onChange={handleFileChange} style={{ display: "none" }} />
+    </label>
+  </div>
+
+  <div className="sub-menu">
+    <div className="sub-menu-left">
+      <button className="sub-menu-shuffle-btn">⇄ Shuffle and play</button>
     </div>
+    <div className="sub-menu-right">
+      <div className="sub-menu-sort">
+        <span>Sort by:</span>
+        <select className="sub-menu-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
+          <option value="date">Date added</option>
+          <option value="title">Title</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
 
     <ErrorBoundary>
 
