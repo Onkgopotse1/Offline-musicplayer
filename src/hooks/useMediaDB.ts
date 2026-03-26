@@ -91,6 +91,7 @@ getAll.onsuccess = () => {
   };
 //------------------end-----------------------------
 
+
   // ── Save a generated thumbnail to IndexedDB so we never regenerate it again ──
   const saveThumbnail = (id: string, dataUrl: string) => {
     const request = indexedDB.open("MediaDB", 3);
@@ -103,7 +104,7 @@ getAll.onsuccess = () => {
 //------------------end-----------------------------
 
 //// this handles file from file upload ----------------------------------------------------
-  // ── saveFile give it's new data that it got from fileData and then give it to (file)👇
+  // ── saveFile give it's new data that it got from fileData and then give it to (file)
   const saveFile = (file: StoredFile) => {
     // Update state immediately
     setFiles(prev => [...prev, file]);

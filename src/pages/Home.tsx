@@ -4,16 +4,10 @@ import type { StoredFile } from "../type/media.ts";
 import { lazy, Suspense } from "react";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 
+import { useMedia } from "../MediaContext/MediaContext.tsx";
+import { usePlayer } from "../MediaContext/MediaContext.tsx";
 
 
-interface HomeProps {
-  files: StoredFile[];
-  recentIds: string[];
-  setCurrentMediaId: React.Dispatch<React.SetStateAction<string | null>>;
-  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
-  setCurrentMediaType: React.Dispatch<React.SetStateAction<"audio" | "video" | null>>;
-  saveFile: (file: StoredFile) => void;
-}
 
 // Generates a unique gradient background from the song name
 const getGradient = (name: string) => {
@@ -36,14 +30,9 @@ const secondPart = parts[1]?.replace(/\.[^/.]+$/, "").trim() ?? "";
   return { song: firstPart, artist: secondPart };
 };
 
-export default function Home({ 
-  files,     // all media files stored in indexedDB. actual files not id
-  recentIds, // files that were recently played in Music.tsx, stored as an array of their IDs in indexedDB
-  saveFile,           // function to save a file to indexedDB
-  setCurrentMediaId,  // function to set which media is currently selected to play
-  setIsPlaying,       // function to set whether the media is currently playing or paused
-  setCurrentMediaType // function to set whether the currently selected media is audio or video
- }: HomeProps) {
+export default function Home() {
+  const { files } = useMedia();
+  const { recentIds, setCurrentMediaId, setIsPlaying, setCurrentMediaType } = usePlayer();
 
   const handleplay = (id: string) => {
     setCurrentMediaId(id);

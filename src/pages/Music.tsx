@@ -1,20 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext, createContext } from "react";
 import './Music.css';
 import type { StoredFile } from "../type/media.ts";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
+import PlaylistMusic from "./PlaylistMusic.tsx";
 
-interface MusicProps {
-  files: StoredFile[];
-  setFiles: React.Dispatch<React.SetStateAction<StoredFile[]>>;
-  saveFile: (file: StoredFile) => void;
-  currentMediaId: string | null;
-  setCurrentMediaId: React.Dispatch<React.SetStateAction<string | null>>;
-  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
-  setCurrentMediaType: React.Dispatch<
-  React.SetStateAction<"audio" | "video" | null>>;
-  addToRecent: (id: string) => void;
-  loadFileData: (id: string) => Promise<ArrayBuffer>;
-}
+import { useMedia } from "../MediaContext/MediaContext.tsx";
+import { usePlayer } from "../MediaContext/MediaContext.tsx";
 
 // Gets the duration of an audio file from its URL
 const useDuration = (url: string) => {
@@ -58,17 +49,9 @@ function DurationCell({ fileId, fileType, loadFileData }: {
 }
 
 
-function MyMusic({
-  files,           
-  setFiles,
-  saveFile,
-  currentMediaId,
-  setCurrentMediaId,
-  setIsPlaying,
-  setCurrentMediaType,
-  addToRecent,
-  loadFileData
-}: MusicProps){
+function MyMusic() {
+  const { files, setFiles, saveFile, loadFileData } = useMedia();
+  const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, addToRecent } = usePlayer();
  
 //sub-menu
 const [sortBy, setSortBy] = useState("date");
@@ -165,9 +148,10 @@ const [sortBy, setSortBy] = useState("date");
     setCheckedIds(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
-    
   };
   
+
+
 
   return (
     <div className="right-main">

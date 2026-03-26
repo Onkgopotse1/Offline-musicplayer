@@ -3,36 +3,17 @@ import "./video.css"
 import type { StoredFile } from "../type/media.ts";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 
+import { useMedia } from "../MediaContext/MediaContext.tsx";
+import { usePlayer } from "../MediaContext/MediaContext.tsx";
+
 interface VideoProps {
-  files: StoredFile[];
-  setFiles: React.Dispatch<React.SetStateAction<StoredFile[]>>;
-  saveFile: (file: StoredFile) => void;
-  currentMediaId: string | null;
-  setCurrentMediaId: React.Dispatch<React.SetStateAction<string | null>>;
-  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
-  setCurrentMediaType: React.Dispatch<
-  React.SetStateAction<"audio" | "video" | null>>;
-  videoRef: React.RefObject<HTMLVideoElement | null>;
   thumbnails: Record<string, string>;
   setThumbnails: React.Dispatch<React.SetStateAction<Record<string, string>>>;
-  loadFileData: (id: string) => Promise<ArrayBuffer>;
-  saveThumbnail: (id: string, dataUrl: string) => void;
-}
+};
 
-function Video({
-  files,           
-  setFiles,
-  currentMediaId,
-  setCurrentMediaId,
-  setIsPlaying,
-  setCurrentMediaType,
-  videoRef,
-  saveFile,
-  thumbnails,
-  setThumbnails,
-  loadFileData,
-  saveThumbnail
-}: VideoProps) {
+function Video({ thumbnails, setThumbnails }: VideoProps) {
+  const { files, setFiles, saveFile, loadFileData, saveThumbnail } = useMedia();
+  const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, videoRef } = usePlayer();
 
   //sub menu
 const [sortBy, setSortBy] = useState("date");

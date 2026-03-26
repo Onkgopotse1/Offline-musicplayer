@@ -64,10 +64,6 @@ const handleDelete = (nameToDelete: string) => {
   }`}
 >
 
-  
-
-
-
         {/* popup — renders inside div2 */}
         {showPopup && (
           <div className="playlist-popup-overlay">

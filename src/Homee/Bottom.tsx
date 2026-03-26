@@ -16,37 +16,22 @@ import {
 
 import type { StoredFile } from "../type/media.ts";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
+import { useMedia } from "../MediaContext/MediaContext.tsx";
+import { usePlayer } from "../MediaContext/MediaContext.tsx";
 
 
 
-interface BottomProps {
-  files: StoredFile[];                 // All media from IndexedDB (state)
-  currentMediaId: string | null;
-  setCurrentMediaId: React.Dispatch<React.SetStateAction<string | null>>;      
-  isPlaying: boolean;                                                      // Play / pause state
-  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
-  currentMediaType: "audio" | "video" | null;
-  videoRef: React.RefObject<HTMLVideoElement | null>;
-  loadFileData: (id: string) => Promise<ArrayBuffer>;
-}
 
-export default function Bottom({
-  files,
-  currentMediaId,
-  setCurrentMediaId,
-  isPlaying,
-  setIsPlaying,
-  currentMediaType,
-  videoRef,
-  loadFileData
-}: BottomProps) {
+export default function Bottom() {
+  const { files, loadFileData } = useMedia();
+  const { currentMediaId, setCurrentMediaId, isPlaying, setIsPlaying, currentMediaType, videoRef } = usePlayer();
 
 const [isShuffle, setIsShuffle] = useState(false);
 const [isRepeat, setIsRepeat] = useState(false);
 const [volume, setVolume] = useState(1); // 1 = 100%
 const [showVolume, setShowVolume] = useState(false);
 
-  // ===============================
+
   // Global audio element reference
   // ===============================
   // This is the ONE and ONLY audio player in the entire app
@@ -55,15 +40,13 @@ const [showVolume, setShowVolume] = useState(false);
   // Progress bar reference
   const progressRef = useRef<HTMLProgressElement | null>(null);
 
-  // ===============================
+
   // Find currently selected file
-  // ===============================
   // When a row is clicked in Music.tsx, only the ID changes.
   // Bottom.tsx derives the actual file from that ID.
   const currentFile =
     files.find((file) => file.id === currentMediaId) ?? null;
 
-  // ===============================
   // Load & play audio when media changes
   // ===============================
 useEffect(() => {
@@ -87,7 +70,6 @@ useEffect(() => {
 }, [currentMediaId, currentMediaType]);
 
 
-  // ===============================
   // Sync play / pause with state
   // ===============================
   useEffect(() => {
