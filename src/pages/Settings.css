@@ -1,0 +1,102 @@
+.settings-page {
+  min-height: 100vh;
+  padding: 24px;
+   background-color: #242424;
+  transition: all 0.3s ease;
+}
+
+.settings-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.settings-title {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.settings-card {
+  background: #161616;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.settings-card h2 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  color: #f8f2f2;
+}
+
+.accent-options {
+  display: flex;
+  gap: 12px;
+}
+
+.accent-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease, border 0.2s ease;
+}
+
+.accent-btn:hover {
+  transform: scale(1.1);
+}
+
+.accent-btn.active {
+  border: 2px solid #000;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.theme-btn {
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.theme-btn.active {
+  border: 2px solid #3b82f6;
+}
+
+.preview-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.preview-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #2e2e2e;
+  font-size: 12px;
+}
+
+.preview-box {
+  margin-top: 15px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #1a1a1a;
+  font-size: 14px;
+  color: #555;
+}
+
+.preview-accent {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+}

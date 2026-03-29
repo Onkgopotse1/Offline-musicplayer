@@ -8,4 +8,6 @@
    size: number
    data: ArrayBuffer
    uploadedAt: string
+   album?: string
+   year?: number
  }; 

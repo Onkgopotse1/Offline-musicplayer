@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useContext, createContext } from "react";
+import React, { useEffect, useState, useRef, useContext, createContext,  } from "react";
 import './Music.css';
 import type { StoredFile } from "../type/media.ts";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
@@ -52,17 +52,52 @@ function DurationCell({ fileId, fileType, loadFileData }: {
 function MyMusic() {
   const { files, setFiles, saveFile, loadFileData } = useMedia();
   const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, addToRecent } = usePlayer();
- 
+  
 //sub-menu
 const [sortBy, setSortBy] = useState("date");
 
 //a state for if a checkbox is clicked
   const [isChecked, setIsChecked] = useState(false);
-
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
+//sorting function: sort things like : artist name, song name, album name, release year, date added-------
+  const sortFiles = (files: StoredFile[]) => {
+  const sorted = [...files];
 
- //////// Helper Function /////////////////
+  return sorted.sort((a, b) => {
+    const { artist: artistA, song: songA } = parseFileName(a);
+    const { artist: artistB, song: songB } = parseFileName(b);
+
+    switch (sortBy) {
+      case "az":
+        return songA.localeCompare(songB);
+
+      case "artist":
+        return artistA.localeCompare(artistB);
+
+      case "album":
+        
+        return 0;
+        
+      case "year":
+
+        return 0;
+
+        case "album":
+        return (a.album ?? "").localeCompare(b.album ?? "");
+
+        case "year":
+          return (b.year ?? 0) - (a.year ?? 0);
+
+        case "date":
+      default:
+        return b.lastModified - a.lastModified; // newest first
+    }
+  });
+};
+//------------------end of sorting function------------------
+
+ //////// Extract artist and song from file name: to be able to access song information /////////////////
     const parseFileName = (file: any) => {
     // Split on the first dash
     const parts = file.name.split("-");
@@ -82,7 +117,7 @@ const [sortBy, setSortBy] = useState("date");
       return { song: firstPart, artist: secondPart };
     }
   };
- ///////🛠️ END Helper Function/////////////////
+ /////// END Helper Function/////////////////
 
    //
   const urlCache = useRef<Record<string, string>>({});
@@ -108,8 +143,8 @@ const [sortBy, setSortBy] = useState("date");
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
      const selectedFiles = Array.from(e.target.files ?? []);
  
-     selectedFiles.forEach((file) => {                    //Loop through selected files//
-       const reader = new FileReader();                     //Read file content//
+     selectedFiles.forEach((file) => {                    
+       const reader = new FileReader();                     
  
       // Read file as ArrayBuffer
        reader.readAsArrayBuffer(file);
@@ -149,9 +184,29 @@ const [sortBy, setSortBy] = useState("date");
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
   };
-  
 
+// ADD below toggleCheckbox------------------------
+// Load playlist names from localStorage
+const loadPlaylists = (): string[] => {
+  const saved = localStorage.getItem("playlists");
+  return saved ? JSON.parse(saved) : [];
+};
 
+// Save checked song IDs into the selected playlist in localStorage
+const addToPlaylist = (playlistName: string) => {
+  if (checkedIds.length === 0 || !playlistName) return;
+
+  const key = `playlist_songs_${playlistName}`;
+  const existing: string[] = JSON.parse(localStorage.getItem(key) ?? "[]");
+
+  // merge — avoid duplicates
+  const merged = Array.from(new Set([...existing, ...checkedIds]));
+  localStorage.setItem(key, JSON.stringify(merged));
+
+  // clear checkboxes after adding
+  setCheckedIds([]);
+};
+//*---------------------- 
 
   return (
     <div className="right-main">
@@ -164,6 +219,7 @@ const [sortBy, setSortBy] = useState("date");
     </label>
   </div>
 
+ {/* "Add to" dropdown — lists all saved playlists as options */}
   {checkedIds.length > 0 ? (
   <div className="sub-menu">
     <div className="sub-menu-left">
@@ -171,7 +227,25 @@ const [sortBy, setSortBy] = useState("date");
      <p>0 song selected</p>
      <button>Play</button>
      <button>Play next</button>
-     <button>Add to</button>
+      <div className="sub-menu-sort">
+        <span className="sub-menu-sort-label">Add to:</span>
+        <div className="sub-menu-select-wrapper">
+          <select
+            className="sub-menu-select"
+            defaultValue=""
+            onChange={e => {
+              addToPlaylist(e.target.value);
+              e.target.value = ""; // reset after selecting
+            }}
+          >
+            <option value="" disabled>playlist</option>
+            {loadPlaylists().map((name, i) => (
+              <option key={i} value={name}>{name}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
     </div>
   </div>
   ) : (
@@ -183,10 +257,16 @@ const [sortBy, setSortBy] = useState("date");
     <div className="sub-menu-right">
       <div className="sub-menu-sort">
         <span>Sort by:</span>
-        <select className="sub-menu-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
-          <option value="date">Date added</option>
-          <option value="title">Title</option>
+        <select
+          className="sub-menu-select"
+          value={sortBy}
+          onChange={e => setSortBy(e.target.value)}
+        >
+          <option value="date">Date Modified</option>
+          <option value="az">A-Z</option>
           <option value="artist">Artist</option>
+          <option value="album">Album</option>
+          <option value="year">Release Year</option>
         </select>
       </div>
     </div>
@@ -213,7 +293,7 @@ const [sortBy, setSortBy] = useState("date");
         <div className="header-text">Time</div>
       </div>
 
-        {files.map((item) => {
+        {sortFiles(files).map((item) => {
          const fileURL = getUrl(item);
          const { artist, song } = parseFileName(item); //Parse artist and song from filename//
 
