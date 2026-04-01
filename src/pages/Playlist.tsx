@@ -83,7 +83,7 @@ const handleDelete = (nameToDelete: string) => {
                   Cancel
                 </button>
                 <button className="playlist-popup-submit" onClick={handleSubmit}>
-                  Submit
+                  Add
                 </button>
               </div>
             </div>

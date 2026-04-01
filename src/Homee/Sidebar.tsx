@@ -1,4 +1,4 @@
-import {  Link, useNavigate } from "react-router-dom";
+import {  Link, useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { faCirclePlay } from '@fortawesome/free-solid-svg-icons';
@@ -13,11 +13,27 @@ import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 export default function Sidebar() {
 
    const navigate = useNavigate();
-   
+   const location = useLocation();
+
+
+  const handleBack = () => {
+    if (location.pathname === "/") {
+      // Already at Home, do nothing
+      return;
+    }
+
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      // If no history, fallback to Home
+      navigate("/");
+    }
+  };
+
           return (
           <div className="sidebar">
             <div className="top-div">
-              <button className="back-button" >
+              <button className="back-button" onClick={handleBack}>
                 <FontAwesomeIcon icon={faArrowLeft}  />
               </button>
               <FontAwesomeIcon icon={faCirclePlay} className="top-play-icon" />

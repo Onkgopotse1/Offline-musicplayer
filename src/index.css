@@ -1,0 +1,175 @@
+:root {
+  /* ─────────────────────────────────────────────────────────────────
+     CORE LAYOUT BACKGROUNDS
+     ───────────────────────────────────────────────────────────────── */
+  --bg-core-primary: #242424;           /* Main body/page background */
+  --bg-core-primary-light: #ffffff;     /* Light mode main background */
+  --bg-core-header: #161616;            /* Top bar, headers */
+  --bg-core-sidebar: #1414149c;         /* Sidebar with transparency */
+  --bg-core-bottom: #242424;            /* Bottom player bar */
+  
+  /* ─────────────────────────────────────────────────────────────────
+     CARDS & CONTAINERS
+     ───────────────────────────────────────────────────────────────── */
+  --bg-card-main: rgba(36, 30, 30, 0.397);     /* Main content grid areas */
+  --bg-card-hover: #1a1a1a;                    /* Card/element hover state */
+  --bg-card-hover-light: rgba(255, 255, 255, 0.07);  /* Light hover overlay */
+  --bg-card-overlay: rgba(255, 255, 255, 0.25);     /* Play button overlay */
+  --bg-container-modal: transparent;               /* Modal/popup containers */
+  --bg-container-video: #0d0d0d;               /* Video player panel */
+  --bg-container-preview: #2e2e2e;             /* Preview badge background */
+  --bg-video-screen: #000000;                  /* Video display screen */
+  --bg-sidebar-light: rgb(214, 209, 209);      /* Light mode sidebar */
+  
+  /* ─────────────────────────────────────────────────────────────────
+     TEXT BACKGROUNDS & INPUT FIELDS
+     ───────────────────────────────────────────────────────────────── */
+  --bg-input-default: transparent;      /* Default input background */
+  --text-color-primary: #ffffff;        /* Primary text color */
+  --text-color-secondary: #9e9e9e;      /* Secondary/muted text */
+  --text-color-header: #555555;         /* Header text color */
+  --text-color-muted: #777777;          /* Control button text */
+  
+  /* ─────────────────────────────────────────────────────────────────
+     BUTTONS
+     ───────────────────────────────────────────────────────────────── */
+  --btn-primary-bg: #e0e0e0;            /* Play button background */
+  --btn-primary-hover: #e0e0e0;         /* Play button hover */
+  --btn-primary-text: #c44e4e;          /* Play button text */
+  --btn-accent-bg: #e53935;             /* Upload/action button */
+  --btn-accent-hover: #c62828;          /* Upload button hover */
+  --btn-accent-text: #ffffff;           /* Action button text */
+  --btn-overlay-bg: rgba(0, 0, 0, 0.6); /* Video play button overlay */
+  --btn-transparent-bg: transparent;    /* Transparent button background */
+  
+  /* ─────────────────────────────────────────────────────────────────
+     DIVIDERS & BORDERS
+     ───────────────────────────────────────────────────────────────── */
+  --border-color-default: #1f1f1f;      /* Standard border/divider */
+  --bg-progress-bar: #2a2a2a;           /* Progress bar background */
+  --bg-playing-row: rgba(229, 57, 53, 0.08);  /* Playing item background */
+  --border-playing-row: rgba(229, 57, 53, 0.2); /* Playing item border */
+  --shadow-weak: rgba(0,0,0,0.08);           /* Subtle card shadow */
+  --accent-color: #e53935;              /* Accent/highlight color */
+  
+  /* ─────────────────────────────────────────────────────────────────
+     TYPOGRAPHY - GLOBAL
+     ───────────────────────────────────────────────────────────────── */
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: var(--bg-core-primary);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   LIGHT MODE OVERRIDES
+   ───────────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-core-primary: var(--bg-core-primary-light);
+    --bg-core-header: #f5f5f5;
+    --bg-core-sidebar: var(--bg-sidebar-light);
+    --bg-core-bottom: #ffffff;
+    --text-color-primary: #213547;
+    color: #213547;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   BASE STYLES
+   ───────────────────────────────────────────────────────────────── */
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+a {
+  font-weight: 500;
+  color: var(--accent-color);
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: var(--accent-color);
+  opacity: 0.8;
+}
+
+@media (prefers-color-scheme: light) {
+  a:hover {
+    color: var(--link-hover-color);
+  }
+}
+
+h1 {
+  font-size: 3em;
+  line-height: 1.1;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   THEME CLASSES (manual overrides)
+   Add `theme-light` or `theme-dark` to the <html> element
+   to force a theme regardless of OS preference.
+   ───────────────────────────────────────────────────────────────── */
+.theme-light {
+  --bg-core-primary: var(--bg-core-primary-light);
+  --bg-core-header: #f5f5f5;
+  --bg-core-sidebar: var(--bg-sidebar-light);
+  --bg-core-bottom: #ffffff;
+
+  --text-color-primary: #213547;
+  --text-color-secondary: #555555;
+  --text-color-header: #555555;
+  --text-color-muted: #777777;
+
+  --link-color: #646cff;
+  --link-hover-color: #747bff;
+
+  --border-color-default: #e6e6e6;
+  --border-weak: #cccccc;
+  --border-muted: #444444;
+  --border-translucent: rgba(0,0,0,0.06);
+
+  --bg-card-main: rgba(250,250,250,0.95);
+  --bg-card-hover: #f2f2f2;
+  --bg-card-hover-light: rgba(0,0,0,0.03);
+}
+
+.theme-dark {
+  /* Explicit dark values (defaults already match these) */
+  --bg-core-primary: #242424;
+  --bg-core-header: #161616;
+  --bg-core-sidebar: #1414149c;
+  --bg-core-bottom: #242424;
+
+  --text-color-primary: #ffffff;
+  --text-color-secondary: #9e9e9e;
+  --text-color-header: #555555;
+  --text-color-muted: #777777;
+
+  --link-color: #646cff;
+  --link-hover-color: #535bf2;
+
+  --border-color-default: #1f1f1f;
+  --border-weak: #2a2a2a;
+  --border-muted: #444444;
+  --border-translucent: rgba(255,255,255,0.05);
+
+  --bg-card-main: rgba(36,30,30,0.397);
+  --bg-card-hover: #1a1a1a;
+  --bg-card-hover-light: rgba(255,255,255,0.07);
+}
+
+/* helpful aliases */
+:root {
+  --link-color: #646cff;
+  --link-hover-color: #535bf2;
+  --border-translucent: rgba(255,255,255,0.05);
+  --border-weak: #444444;
+}

@@ -51,7 +51,7 @@ export default function Home() {
   return (
     <div className="right-main">
       <div className="topbar">
-        <h1 className="topbar-h1">Home Page</h1>
+        <h1 className="topbar-h1">Home</h1>
       </div>
 
       <ErrorBoundary>

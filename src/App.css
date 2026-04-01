@@ -1,54 +1,15 @@
-/* ── Global base styles (replaces index.css) ── */
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-/* Link styles — used in NotFound page */
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-}
-/* ── End global base styles ── */
+/* Global theme variables are now in index.css */
 
 .layout {
   display: grid;
-  height: 100vh;
+  height: calc(100vh - 119px);
   width: 100vw;
-  grid-template-rows: 44% 44%;
+  grid-template-rows: 1fr 1fr;
   grid-template-columns: 17% 83%;
   grid-template-areas:
     "sidebar right-main"
-    "sidebar right-main"
-    "bottom bottom";
+    "sidebar right-main";
+  margin-bottom: 119px;
 }
 
 .topbar {
@@ -63,14 +24,14 @@ a:hover {
   gap: 6px;
   padding: 6px 24px;
   box-sizing: border-box;
-  background-color: #161616;
-  border-bottom: 1px solid #1f1f1f;
+  background-color: var(--bg-core-header);
+  border-bottom: 1px solid var(--border-color-default);
 }
 
 .topbar h1 {
   margin: 0;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-color-primary);
   letter-spacing: -0.3px;
 }
 
@@ -79,8 +40,8 @@ a:hover {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background-color: #e53935;
-  color: #ffffff;
+  background-color: var(--btn-accent-bg);
+  color: var(--btn-accent-text);
   font-size: 0.82rem;
   font-weight: 600;
   border-radius: 6px;
@@ -91,14 +52,14 @@ a:hover {
 }
 
 .upload-label:hover {
-  background-color: #c62828;
+  background-color: var(--btn-accent-hover);
   transform: scale(1.02);
 }
 
 .sidebar {
   grid-area: sidebar;
-  background-color: #1414149c;
-  border-right: 1px solid #1f1f1f;
+  background-color: var(--bg-core-sidebar);
+  border-right: 1px solid var(--border-color-default);
 }
 
 .bottom {
@@ -113,7 +74,7 @@ a:hover {
   padding: 0 12px;
   box-sizing: border-box;
   gap: 10px;
-  border-bottom: 1px solid #1f1f1f;
+  border-bottom: 1px solid var(--border-color-default);
 }
 
 .last-div-left {
@@ -142,9 +103,9 @@ a:hover {
   width: 100%;
   height: 32px;
   border-radius: 6px;
-  border: 1px solid #2a2a2a;
-  background-color: #1a1a1a;
-  color: #cccccc;
+  border: 1px solid var(--bg-progress-bar);
+  background-color: var(--bg-card-hover);
+  color: var(--text-color-primary);
   font-size: 0.8rem;
   padding-left: 12px;
   box-sizing: border-box;
@@ -154,7 +115,7 @@ a:hover {
 }
 
 .search::placeholder {
-    color: #555555;
+    color: var(--text-color-header);
   text-align: left;
 }
 
@@ -162,26 +123,31 @@ a:hover {
   background-color: transparent;
   padding: 5px;
   border: none;
-  color: azure;
+  color: var(--accent-color);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.15s ease;
+  }
+
+  .back-button:hover {
+    color: var(--text-color-primary);
   }
 
   .top-play-icon {
-    color: #b4b3b3;
+    color: var(--text-color-muted);
   font-size: 1.3rem;
   }
     #play-button {
       margin-left: 9%;
-      background-color: rgb(214, 209, 209);
+      background-color: var(--bg-sidebar-light);
       border-radius: 10px;
     }
 
   .media-player {
   margin: 0;
-  color: #ffffff;
+  color: var(--text-color-primary);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 0.9rem;
   font-weight: 700;
@@ -208,7 +174,7 @@ a:hover {
 .video-div:hover,
 .play-queue-div:hover,
 .playlist-div:hover {
-  background-color: #1a1a1a;
+  background-color: var(--bg-card-hover);
 }
 
 .home-icon,
@@ -217,7 +183,7 @@ a:hover {
 .play-queue-icon,
 .playlist-icon,
 .settings-icon {
-  color: #777777;
+  color: var(--text-color-muted);
   width: 16px;
   height: 16px;
   display: flex;
@@ -231,7 +197,7 @@ a:hover {
 .video-div:hover .video-icon,
 .play-queue-div:hover .play-queue-icon,
 .playlist-div:hover .playlist-icon {
-  color: #e53935;
+  color: var(--accent-color);
 }
 
 .home-button,
@@ -252,13 +218,13 @@ a:hover {
 
 }
    
-.home-text,
-.music-text,
-.video-text,
-.play-queue-text,
-.playlist-text,
-.settings-text {
-  color: #aaaaaa;
+  .home-text,
+  .music-text,
+  .video-text,
+  .play-queue-text,
+  .playlist-text,
+  .settings-text {
+  color: var(--text-color-secondary);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 0.85rem;
   text-align: left;
@@ -272,7 +238,7 @@ a:hover {
 .video-div:hover .video-text,
 .play-queue-div:hover .play-queue-text,
 .playlist-div:hover .playlist-text {
-  color: #ffffff;
+  color: var(--text-color-primary);
 }
 
   .play-queue-text {
@@ -282,7 +248,7 @@ a:hover {
   .div-line {
   width: 80%;
   margin: 8px auto;
-  background-color: #1f1f1f;
+  background-color: var(--border-color-default);
   height: 1px;
   padding: 0;
     }
@@ -290,7 +256,7 @@ a:hover {
 .settings-button {
   width: 15.6%;
   position: absolute;
-  bottom: 124px;
+  bottom: 135px;
   left: 10px;    
 
   height: 38px;
@@ -308,15 +274,15 @@ a:hover {
 }
 
 .settings-button:hover {
-  background-color: #1a1a1a;
+  background-color: var(--bg-card-hover);
 }
 
 .settings-button:hover .settings-icon {
-  color: #e53935;
+  color: var(--accent-color);
 }
 
 .settings-button:hover .settings-text {
-  color: #ffffff;
+  color: var(--text-color-primary);
 }
 
 .right-main{
@@ -421,8 +387,8 @@ h1 { font-size: 3em; line-height: 1.1; }
   gap: 6px;
   padding: 6px 24px;
   box-sizing: border-box;
-  background-color: #242424;
-  border-bottom: 1px solid #1f1f1f;
+  background-color: var(--bg-core-primary);
+  border-bottom: 1px solid var(--border-color-default);
 }
 
 /* top row — title + button */
@@ -439,8 +405,8 @@ h1 { font-size: 3em; line-height: 1.1; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #242424;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background-color: var(--bg-core-primary);
+  border: 1px solid var(--border-translucent);
   border-radius: 6px;
   padding: 1 12px;
   box-sizing: border-box;
@@ -466,10 +432,10 @@ h1 { font-size: 3em; line-height: 1.1; }
   align-items: center;
   gap: 6px;
   padding: 10px 14px;
-  background-color: #e53935;
+  background-color: var(--btn-accent-bg);
   border: none;
   border-radius: 5px;
-  color: #ffffff;
+  color: var(--btn-accent-text);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.3px;
@@ -478,7 +444,7 @@ h1 { font-size: 3em; line-height: 1.1; }
 }
 
 .sub-menu-shuffle-btn:hover {
-  background-color: #c62828;
+  background-color: var(--btn-accent-hover);
   transform: scale(1.02);
 }
 
@@ -490,8 +456,14 @@ h1 { font-size: 3em; line-height: 1.1; }
   font-size: 12px;
 }
 
+.sub-menu-sort span {
+  color: var(--text-color-primary);
+  font-size: 12px;
+  margin-right: 6px;
+}
+
 .sub-menu-sort-label {
-  color: #555555;
+  color: var(--text-color-header);
   font-size: 11px;
   white-space: nowrap;
 }
@@ -507,16 +479,16 @@ h1 { font-size: 3em; line-height: 1.1; }
   content: "⌄";
   position: absolute;
   right: 2px;
-  color: #e53935;
+  color: var(--accent-color);
   font-size: 11px;
   pointer-events: none;
   line-height: 1;
 }
 
 .sub-menu-select {
-  background-color: transparent;
+  background-color: var(--btn-transparent-bg);
   border: none;
-  color: #e53935;
+  color: var(--accent-color);
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
@@ -527,7 +499,7 @@ h1 { font-size: 3em; line-height: 1.1; }
 }
 
 .sub-menu-select option {
-  background-color: #1a1a1a;
-  color: #ffffff;
+  background-color: var(--bg-card-hover);
+  color: var(--text-color-primary);
   font-size: 12px;
 }

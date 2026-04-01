@@ -191,25 +191,25 @@ return (
 
     <ErrorBoundary>
 
-      {/* ── Big video player panel — shown when a video is playing ── */}
-      {activeVideoUrl && (
-        <div className="video-player-panel">
-          <div className="video-player-header">
-            <p className="video-player-title">{activeVideoName}</p>
-            <button className="video-player-close" onClick={closePlayer}>✕</button>
-          </div>
-          <video
-            ref={videoRef}
-            src={activeVideoUrl}
-            className="video-player-screen"
-            autoPlay
-            
-          />
-        </div>
-      )}
-
       {/* ── Thumbnail grid — always visible ── */}
-      <div className="video-main">
+      <div className={`video-main ${activeVideoUrl ? 'video-player-active' : ''}`}>
+        {/* ── Big video player panel — shown when a video is playing ── */}
+        {activeVideoUrl && (
+          <div className="video-player-panel">
+            <div className="video-player-header">
+              <p className="video-player-title">{activeVideoName}</p>
+              <button className="video-player-close" onClick={closePlayer}>✕</button>
+            </div>
+            <video
+              ref={videoRef}
+              src={activeVideoUrl}
+              className="video-player-screen"
+              autoPlay
+              
+            />
+          </div>
+        )}
+        
         {files.length === 0 && (
           <p className="text-gray-500">No files chosen yet</p>
         )}

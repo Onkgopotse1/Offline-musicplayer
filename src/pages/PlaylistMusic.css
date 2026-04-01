@@ -5,7 +5,7 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  background-color: rgba(36, 30, 30, 0.397);
+  background-color: var(--bg-card-main);
   box-sizing: border-box;
 }
 
@@ -18,7 +18,7 @@
 .playlist-back-btn {
   background: transparent;
   border: none;
-  color: #888888;
+  color: var(--text-color-muted);
   font-size: 1.2rem;
   cursor: pointer;
   padding: 4px 8px;
@@ -27,6 +27,6 @@
 }
 
 .playlist-back-btn:hover {
-  color: #ffffff;
-  background-color: #1a1a1a;
+  color: var(--text-color-primary);
+  background-color: var(--bg-card-hover);
 }

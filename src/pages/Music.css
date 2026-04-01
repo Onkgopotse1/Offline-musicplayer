@@ -7,8 +7,8 @@
   display: flex;
   flex-direction: column;
   border: none;
-  background-color: rgba(36, 30, 30, 0.397);
-  padding: 8px;
+  background-color: var(--bg-card-main);
+  padding: 0;
   box-sizing: border-box;
   gap: 4px;
 }
@@ -23,18 +23,19 @@
   grid-template-columns: 2% 4% 21% 21% 21% 20% 9%;
   gap: 4px;
   box-sizing: border-box;
-  border-bottom: 1px solid #1f1f1f;
-  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-color-default);
+  margin-bottom: 0;
   position: sticky;
   top: 0;
-  background-color: #161616; 
+  background-color: var(--bg-core-header); 
   z-index: 1;
+  padding: 8px 0;
 }
 
 .header-text {
   font-size: 11px;
   font-weight: 600;
-  color: #555555;
+  color: var(--accent-color);
   text-transform: uppercase;
   letter-spacing: 1px;
   text-align: center;
@@ -44,32 +45,33 @@
 .horizontal-divs {
   background-color: transparent;
   width: 95%;
-  height: 52px;
+  height: 36px;
   border-radius: 8px;
   display: grid;
   align-items: center;
   grid-template-columns: 2% 4% 21% 21% 21% 20% 9%;
-  gap: 4px;
+  gap: 5px;
   box-sizing: border-box;
   margin-left: 2%;
   margin-top: 2px;
+  padding: 0 8px;
   transition: background-color 0.15s ease;
   cursor: pointer;
 }
 
 .horizontal-divs:hover {
-  background-color: #1a1a1a;
+  background-color: var(--bg-card-hover);
 }
 
 .horizontal-divs > * { min-width: 0; }
 
 .horizontal-divs.playing {
-  background-color: rgba(229, 57, 53, 0.08);
-  border-color: rgba(229, 57, 53, 0.2);
+  background-color: var(--bg-playing-row);
+  border-color: var(--border-playing-row);
 }
 
 .horizontal-divs.playing .song-name .text {
-  color: #e53935;
+  color: var(--accent-color);
 }
 
 
@@ -94,7 +96,7 @@
 .checkbox {
   width: 13px;
   height: 13px;
-  accent-color: #e53935;
+  accent-color: var(--accent-color);
   cursor: pointer;
 }
 
@@ -105,18 +107,17 @@
   display: grid;
   place-items: center;
   font-size: 13px;
-  color: #aaaaaa;
+  color: var(--text-color-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
   margin: 0;
-  color: #ffffff;
 }
 
 /* Song title slightly brighter */
 .song-name .text {
-  color: #e0e0e0;
+  color: var(--text-color-primary);
   font-weight: 500;
 }
 
@@ -124,7 +125,7 @@
 .album-name .text,
 .genre .text,
 .time .text {
-  color: #555555;
+  color: var(--text-color-header);
   font-size: 12px;
 }
 
@@ -142,8 +143,8 @@
   padding: 0;
   border-radius: 50%;
   border: none;
-  background-color: transparent;
-  color: #555555;
+  background-color: var(--btn-transparent-bg);
+  color: var(--text-color-header);
   font-size: 0.7rem;
   cursor: pointer;
   display: grid;
@@ -152,8 +153,8 @@
 }
 
 .play-buttons:hover {
-  color: #ffffff;
-  background-color: #e53935;
+  color: var(--text-color-primary);
+  background-color: var(--accent-color);
   transform: scale(1.1);
 }
 
