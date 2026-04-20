@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-import "./Settings.css";
+import "../local styles/Settings.css";
 
 const accentColors = ["#3b82f6", "#a855f7", "#22c55e", "#ef4444", "#f97316", "#a09797" ];
 
@@ -85,9 +85,6 @@ function Settings() {
           <h2>App Theme Preview</h2>
           <div className="preview-row">
             <span>Current Theme</span>
-            <span className="preview-badge">
-              {mode === "light" ? "Light" : "Dark"}
-            </span>
           </div>
 
           <div className="preview-box">

@@ -10,4 +10,5 @@
    uploadedAt: string
    album?: string
    year?: number
+   duration?: number // in seconds
  }; 

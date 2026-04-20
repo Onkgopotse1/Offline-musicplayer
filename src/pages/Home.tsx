@@ -1,11 +1,11 @@
 import React from "react";
-import './Home.css';
+import '../local styles/Home.css';
 import type { StoredFile } from "../type/media.ts";
 import { lazy, Suspense } from "react";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 
-import { useMedia } from "../MediaContext/MediaContext.tsx";
-import { usePlayer } from "../MediaContext/MediaContext.tsx";
+import { useMedia } from "../context/MediaContext.tsx";
+import { usePlayer } from "../context/MediaContext.tsx";
 
 
 
@@ -46,7 +46,6 @@ export default function Home() {
     .map(id => files.find(f => f.id === id))
     .filter(Boolean) as StoredFile[];
 
-    
 
   return (
     <div className="right-main">
