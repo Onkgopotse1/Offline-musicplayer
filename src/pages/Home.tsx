@@ -1,5 +1,5 @@
 import React from "react";
-import '../local styles/Home.css';
+import '../styles/local styles/Home.css';
 import type { StoredFile } from "../type/media.ts";
 import { lazy, Suspense } from "react";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";

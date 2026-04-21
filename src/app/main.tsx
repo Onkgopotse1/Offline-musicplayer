@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client'
-import '../global styles/index.css'
+import '../styles/global styles/index.css'
 import App from './App.tsx'
 import { BrowserRouter } from 'react-router-dom'
 // Apply persisted theme and accent before React mounts to avoid flash

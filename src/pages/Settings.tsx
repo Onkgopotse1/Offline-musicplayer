@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-import "../local styles/Settings.css";
+import "../styles/local styles/Settings.css";
 
 const accentColors = ["#3b82f6", "#a855f7", "#22c55e", "#ef4444", "#f97316", "#a09797" ];
 

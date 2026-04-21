@@ -1,6 +1,6 @@
 import { useParams, useNavigate, } from 'react-router-dom';
 import React, { useEffect, useState, useRef } from "react";
-import '../local styles/Playlist.css';
+import '../styles/local styles/Playlist.css';
 import type { StoredFile } from "../type/media.ts";
 import { useMedia } from "../context/MediaContext.tsx";
 import { usePlayer } from "../context/MediaContext.tsx";
@@ -52,7 +52,7 @@ function DurationCell({ fileId, fileType, loadFileData }: {
 function PlaylistMusic() {
 
   const { files, setFiles, saveFile, loadFileData } = useMedia();
-  const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, addToRecent } = usePlayer();
+  const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, addToRecent, setQueue } = usePlayer();
 
   //sub menu
 const [sortBy, setSortBy] = useState("date");
@@ -140,6 +140,9 @@ const [visibleSongs, setVisibleSongs] = useState<StoredFile[]>([]);
   }, []);
  
      const handleplay = (id: string) => {
+    const orderedIds = sortFiles(visibleSongs).map(f => f.id);
+
+      setQueue(orderedIds);
       setCurrentMediaId(id);
       setCurrentMediaType("audio");
       setIsPlaying(true);

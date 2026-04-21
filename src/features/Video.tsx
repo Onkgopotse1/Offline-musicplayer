@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import "../local styles/Video.css"
+import "../styles/local styles/Video.css"
 import type { StoredFile } from "../type/media.ts";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 
@@ -13,7 +13,7 @@ interface VideoProps {
 
 function Video({ thumbnails, setThumbnails }: VideoProps) {
   const { files, setFiles, saveFile, loadFileData, saveThumbnail } = useMedia();
-  const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, videoRef } = usePlayer();
+  const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, videoRef, setQueue } = usePlayer();
 
   //sub menu
 const [sortBy, setSortBy] = useState("date");
@@ -169,6 +169,11 @@ const [sortBy, setSortBy] = useState("date");
   
 // Handler for when user clicks play button on a video thumbnail-----------
 const handleplay = (item: StoredFile) => {
+    const orderedIds = sortFiles(files)
+  .filter(f => f.type.startsWith("video/"))
+  .map(f => f.id);
+
+  setQueue(orderedIds);
   setCurrentMediaId(item.id);
   setCurrentMediaType("video");
   setIsPlaying(true);

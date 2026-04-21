@@ -30,6 +30,12 @@ interface PlayerContextType {
   videoRef: React.RefObject<HTMLVideoElement | null>;
   recentIds: string[];
   addToRecent: (id: string) => void;
+  queue: string[];
+  setQueue: React.Dispatch<React.SetStateAction<string[]>>;
+  isShuffle: boolean;
+  setIsShuffle: React.Dispatch<React.SetStateAction<boolean>>;
+  isRepeat: boolean;
+  setIsRepeat: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const PlayerContext = createContext<PlayerContextType | null>(null);

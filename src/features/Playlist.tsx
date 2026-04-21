@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../local styles/Playlist.css';
+import '../styles/local styles/Playlist.css';
 
 const getGradient = (name: string) => {
   let hash = 0;

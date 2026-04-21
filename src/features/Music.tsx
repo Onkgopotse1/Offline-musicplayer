@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useContext, createContext,  } from "react";
-import '../local styles/Music.css';
+import '../styles/local styles/Music.css';
 import type { StoredFile } from "../type/media.ts";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 import PlaylistMusic from "./PlaylistMusic.tsx";
@@ -18,7 +18,7 @@ function DurationCell({ duration }: { duration: number | undefined }) {
 
 function MyMusic() {
   const { files, setFiles, saveFile, loadFileData } = useMedia();
-  const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, addToRecent } = usePlayer();
+  const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, addToRecent, setQueue } = usePlayer();
   
 //sub-menu
 const [sortBy, setSortBy] = useState("date");
@@ -138,9 +138,33 @@ const [sortBy, setSortBy] = useState("date");
    };
 //-----------------------end of file upload handler------------------------
 
+ // Handler for when user clicks "Shuffle and play" button
+const { /* ... */ setIsShuffle } = usePlayer();
+
+const handleShufflePlay = () => {
+  const audioFiles = sortFiles(files).filter(f => f.type.startsWith("audio/"));
+  if (audioFiles.length === 0) return;
+
+  const orderedIds = audioFiles.map(f => f.id);
+  setQueue(orderedIds);
+  setIsShuffle(true);
+
+  const randomIndex = Math.floor(Math.random() * orderedIds.length);
+  const randomId = orderedIds[randomIndex]!; // non-null assertion – safe because length > 0
+  setCurrentMediaId(randomId);
+  setCurrentMediaType("audio");
+  setIsPlaying(true);
+  addToRecent(randomId);
+};
+//==============================
 
    // Handler for when user clicks play button on a music track
     const handleplay = (id: string) => {
+      const orderedIds = sortFiles(files)
+      .filter(f => f.type.startsWith("audio/"))
+      .map(f => f.id);
+
+      setQueue(orderedIds);
       setCurrentMediaId(id);
       setCurrentMediaType("audio");
       setIsPlaying(true);
@@ -221,7 +245,9 @@ const addToPlaylist = (playlistName: string) => {
 
   <div className="sub-menu">
     <div className="sub-menu-left">
-      <button className="sub-menu-shuffle-btn">⇄ Shuffle and play</button>
+      <button className="sub-menu-shuffle-btn" onClick={handleShufflePlay}>
+       ⇄ Shuffle and play
+     </button>
     </div>
     <div className="sub-menu-right">
       <div className="sub-menu-sort">

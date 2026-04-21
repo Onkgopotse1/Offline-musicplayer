@@ -1,19 +1,19 @@
 // GLOBAL STYLES
-import "../global styles/App.css";
-import "../global styles/index.css";
+import "../styles/global styles/App.css";
+import "../styles/global styles/index.css";
 
 // LOCAL STYLES
-import "../local styles/Home.css";
-import "../local styles/Video.css";
-import "../local styles/Music.css";
+import "../styles/local styles/Home.css";
+import "../styles/local styles/Video.css";
+import "../styles/local styles/Music.css";
 
 // PAGE STYLES
-import "../local styles/Playlist.css";
-import "../local styles/Settings.css";
-import "../local styles/PlayQueue.css";
+import "../styles/local styles/Playlist.css";
+import "../styles/local styles/Settings.css";
+import "../styles/local styles/PlayQueue.css";
 
 // COMPONENT STYLE
-import "../local styles/Bottom.css";
+import "../styles/local styles/Bottom.css";
 
 import { Routes, Route } from "react-router-dom";
 import { useState, useRef, useEffect, lazy, Suspense } from "react";
@@ -80,6 +80,11 @@ function App() {
 
   const loading = !loaded || !thumbnailsReady;
 
+ const [queue, setQueue] = useState<string[]>([]);
+
+const [isShuffle, setIsShuffle] = useState(false);
+const [isRepeat, setIsRepeat] = useState(false);
+
   return (
     <Suspense fallback={<div style={{ display: 'grid', placeItems: "center" }}>Loading...</div>}>
       {loading ? (
@@ -87,7 +92,7 @@ function App() {
       ) : (
 
         <MediaContext.Provider value={{ files, setFiles, saveFile, loadFileData, loadThumbnails, saveThumbnail }}>
-        <PlayerContext.Provider value={{ currentMediaId, setCurrentMediaId, currentMediaType, setCurrentMediaType, isPlaying, setIsPlaying, videoRef, recentIds, addToRecent }}>
+        <PlayerContext.Provider value={{ isShuffle,  setIsShuffle, isRepeat, setIsRepeat, queue, setQueue, currentMediaId, setCurrentMediaId, currentMediaType, setCurrentMediaType, isPlaying, setIsPlaying, videoRef, recentIds, addToRecent }}>
 
         <div className="layout">
 
