@@ -20,6 +20,8 @@ const [sortBy, setSortBy] = useState("date");
 
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
    const [activeVideoName, setActiveVideoName] = useState<string>("");
+   const [showOverlay, setShowOverlay] = useState(false);
+   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
    const urlCache = useRef<Record<string, string>>({});
    const processedIds = useRef<Set<string>>(new Set()); // Track which files have been queued for thumbnail generation
@@ -223,6 +225,17 @@ const generateThumbnail = (file: StoredFile): Promise<string> => {
   });
 };
 
+const handlePlayerMouseMove = () => {
+  setShowOverlay(true);
+  if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+  hideTimerRef.current = setTimeout(() => setShowOverlay(false), 3000);
+};
+
+const handlePlayerMouseLeave = () => {
+  if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+  hideTimerRef.current = setTimeout(() => setShowOverlay(false), 800);
+};
+
 return (
   <div className="right-main" style={{ position: "relative" }}>
 
@@ -261,9 +274,13 @@ return (
       <div className={`video-main ${activeVideoUrl ? 'video-player-active' : ''}`}>
         {/* ── Big video player panel — shown when a video is playing ── */}
         {activeVideoUrl && (
-          <div className="video-player-panel">
-            <div className="video-player-header">
-              <p className="video-player-title">{activeVideoName}</p>
+          <div
+            className="video-player-panel"
+            onMouseMove={handlePlayerMouseMove}
+            onMouseLeave={handlePlayerMouseLeave}
+          >
+            <div className={`video-overlay${showOverlay ? " video-overlay--visible" : ""}`}>
+              <p className="video-overlay-title">{activeVideoName}</p>
               <button className="video-player-close" onClick={closePlayer}>✕</button>
             </div>
             <video
@@ -271,7 +288,6 @@ return (
               src={activeVideoUrl}
               className="video-player-screen"
               autoPlay
-              
             />
           </div>
         )}
