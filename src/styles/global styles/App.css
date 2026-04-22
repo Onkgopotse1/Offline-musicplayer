@@ -12,22 +12,6 @@
   margin-bottom: 119px;
 }
 
-.topbar {
-  flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  height: 90px;               
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  padding: 6px 24px;
-  box-sizing: border-box;
-  background-color: var(--bg-core-header);
-  border-bottom: 1px solid var(--border-color-default);
-}
-
 .topbar h1 {
   margin: 0;
   font-weight: 700;
@@ -85,14 +69,14 @@
   flex-direction: column;
   padding: 8px 0 10px;
   box-sizing: border-box;
-  overflow-y: auto;        
+  overflow-y: auto;
   overflow-x: hidden;
   justify-content: flex-start;
-  min-height: 280px; 
-  overflow: hidden; 
+  min-height: 280px;
+  overflow: hidden;
 }
 
-.search-div{
+.search-div {
   width: 100%;
   padding: 0 10px;
   box-sizing: border-box;
@@ -115,11 +99,11 @@
 }
 
 .search::placeholder {
-    color: var(--text-color-header);
+  color: var(--text-color-header);
   text-align: left;
 }
 
-  .back-button {
+.back-button {
   background-color: transparent;
   padding: 5px;
   border: none;
@@ -129,23 +113,24 @@
   align-items: center;
   justify-content: center;
   transition: color 0.15s ease;
-  }
+}
 
-  .back-button:hover {
-    color: var(--text-color-primary);
-  }
+.back-button:hover {
+  color: var(--text-color-primary);
+}
 
-  .top-play-icon {
-    color: var(--text-color-muted);
+.top-play-icon {
+  color: var(--text-color-muted);
   font-size: 1.3rem;
-  }
-    #play-button {
-      margin-left: 9%;
-      background-color: var(--bg-sidebar-light);
-      border-radius: 10px;
-    }
+}
 
-  .media-player {
+#play-button {
+  margin-left: 9%;
+  background-color: var(--bg-sidebar-light);
+  border-radius: 10px;
+}
+
+.media-player {
   margin: 0;
   color: var(--text-color-primary);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -153,13 +138,14 @@
   font-weight: 700;
   white-space: nowrap;
   letter-spacing: 0.3px;
-    }
+}
 
 .home-div,
 .music-div,
 .video-div,
 .play-queue-div,
-.playlist-div {
+.playlist-div,
+.settings-div {
   width: 90%;
   height: 38px;
   margin-left: 5%;
@@ -173,7 +159,8 @@
 .music-div:hover,
 .video-div:hover,
 .play-queue-div:hover,
-.playlist-div:hover {
+.playlist-div:hover,
+.settings-div:hover {
   background-color: var(--bg-card-hover);
 }
 
@@ -196,7 +183,8 @@
 .music-div:hover .music-icon,
 .video-div:hover .video-icon,
 .play-queue-div:hover .play-queue-icon,
-.playlist-div:hover .playlist-icon {
+.playlist-div:hover .playlist-icon,
+.settings-div:hover .settings-icon {
   color: var(--accent-color);
 }
 
@@ -204,7 +192,8 @@
 .music-button,
 .video-button,
 .play-queue-button,
-.playlist-button {
+.playlist-button,
+.settings-button {
   width: 100%;
   height: 38px;
   background-color: transparent;
@@ -215,15 +204,14 @@
   padding-left: 10px;
   cursor: pointer;
   border-radius: 8px;
-
 }
-   
-  .home-text,
-  .music-text,
-  .video-text,
-  .play-queue-text,
-  .playlist-text,
-  .settings-text {
+
+.home-text,
+.music-text,
+.video-text,
+.play-queue-text,
+.playlist-text,
+.settings-text {
   color: var(--text-color-secondary);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 0.85rem;
@@ -237,66 +225,35 @@
 .music-div:hover .music-text,
 .video-div:hover .video-text,
 .play-queue-div:hover .play-queue-text,
-.playlist-div:hover .playlist-text {
+.playlist-div:hover .playlist-text,
+.settings-div:hover .settings-text {
   color: var(--text-color-primary);
 }
 
-  .play-queue-text {
-     width: 100%;
-  }
+.play-queue-text {
+  width: 100%;
+}
 
-  .div-line {
+.div-line {
   width: 80%;
   margin: 8px auto;
   background-color: var(--border-color-default);
   height: 1px;
   padding: 0;
-    }
-
-.settings-button {
-  width: 15.6%;
-  position: absolute;
-  bottom: 135px;
-  left: 10px;    
-
-  height: 38px;
-  margin-top: 0;
-  margin-bottom: 0;
-  background-color: transparent;
-  border-radius: 8px;
-  border: none;
-  display: grid;
-  grid-template-columns: 36px 1fr;
-  align-items: center;
-  padding-left: 10px;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
 }
 
-.settings-button:hover {
-  background-color: var(--bg-card-hover);
-}
-
-.settings-button:hover .settings-icon {
-  color: var(--accent-color);
-}
-
-.settings-button:hover .settings-text {
-  color: var(--text-color-primary);
-}
-
-.right-main{
+.right-main {
   grid-area: right-main;
-  display: flex;             
-  flex-direction: column;     
-  overflow: hidden;           
-  height: 100%;  
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
 }
 
-/* ---RESPONSIVE SIDEBAR COLLAPSE --- */
+/* --- RESPONSIVE SIDEBAR COLLAPSE --- */
 @media (max-width: 970px) {
   .layout {
-    grid-template-columns: 70px 1fr; 
+    grid-template-columns: 70px 1fr;
   }
 
   .media-player,
@@ -315,7 +272,7 @@
     justify-content: center;
     align-items: center;
   }
-  
+
   .back-button {
     margin: 0;
   }
@@ -328,7 +285,8 @@
   .music-div,
   .video-div,
   .play-queue-div,
-  .playlist-div {
+  .playlist-div,
+  .settings-div {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -338,7 +296,8 @@
   .music-button,
   .video-button,
   .play-queue-button,
-  .playlist-button {
+  .playlist-button,
+  .settings-button {
     display: grid;
     place-items: center;
   }
@@ -347,42 +306,38 @@
   .music-icon,
   .video-icon,
   .play-queue-icon,
-  .playlist-icon {
+  .playlist-icon,
+  .settings-icon {
     width: auto;
     font-size: 1.2rem;
   }
 
-  .settings-button {
-  display: grid;
-  place-items: center;
-  width: 5%;
-  left: 12px;
-  padding-left: 0;
-  }
-  
-  .settings-icon {
-    font-size: 1.2rem;
-  }
-
   .top-div {
-    justify-content: center; 
+    justify-content: center;
     gap: 0;
   }
-  
-  .top-play-icon, 
+
+  .top-play-icon,
   .media-player {
-    display: none; 
+    display: none;
   }
-
 }
-/* h1 for NotFound page (no own CSS file) */
-h1 { font-size: 3em; line-height: 1.1; }
 
+/* h1 for NotFound page (no own CSS file) */
+h1 {
+  font-size: 3em;
+  line-height: 1.1;
+}
+
+/* ── Topbar — fixed height, never shrinks or grows ── */
 .topbar {
-  height: 20%;
-  min-height: 56px;
+  height: 160px;
+  min-height: 160px;
+  max-height: 160px;
+  flex-shrink: 0;
+  flex-grow: 0;
   display: flex;
-  flex-direction: column;        
+  flex-direction: column;
   justify-content: center;
   gap: 6px;
   padding: 6px 24px;
@@ -493,7 +448,7 @@ h1 { font-size: 3em; line-height: 1.1; }
   font-weight: 600;
   cursor: pointer;
   outline: none;
-  padding: 2px 16px 2px 2px; /* right padding for the arrow */
+  padding: 2px 16px 2px 2px;
   appearance: none;
   -webkit-appearance: none;
 }

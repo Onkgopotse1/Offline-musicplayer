@@ -1,7 +1,7 @@
 /* ── Grid container ── */
 .video-main {
   flex: 1;
-  height: auto;
+  min-height: 0; /* allows flex child to shrink and be bounded by parent */
   overflow-y: scroll;
   overflow-x: hidden;
   display: grid;
@@ -107,57 +107,75 @@ h1 { font-size: 3em; line-height: 1.1; }
   right: 0;
   bottom: 0;
   z-index: 10;
-  background-color: var(--bg-container-video);
-  border-bottom: 1px solid var(--border-color-default);
+  background-color: var(--bg-core-primary);
   display: flex;
   flex-direction: column;
-  padding: 12px 16px;
   box-sizing: border-box;
-  gap: 10px;
-  overflow-y: auto;
+  overflow: hidden;
+  cursor: none; /* hide cursor so overlay feels cinematic */
 }
 
-.video-player-header {
+/* show cursor when overlay is visible */
+.video-player-panel:hover {
+  cursor: default;
+}
+
+/* ── Overlay: sits on top of the video, fades in/out ── */
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  padding: 14px 16px 40px;
+  /* dark gradient so text is readable over any video */
+  background: linear-gradient(to bottom, rgba(0,0,0,0.72) 0%, transparent 100%);
+  opacity: 0;
+  pointer-events: none;           /* invisible = not clickable */
+  transition: opacity 0.3s ease;
 }
 
-.video-player-title {
+.video-overlay--visible {
+  opacity: 1;
+  pointer-events: auto;           /* visible = clickable (close btn works) */
+}
+
+.video-overlay-title {
   margin: 0;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-color-secondary);
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 80%;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }
 
 .video-player-close {
-  background: transparent;
+  background: rgba(0,0,0,0.35);
   border: none;
-  color: var(--text-color-muted);
+  color: #ffffff;
   font-size: 1rem;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 4px;
+  flex-shrink: 0;
   transition: color 0.15s ease, background-color 0.15s ease;
 }
 
 .video-player-close:hover {
-  color: var(--text-color-primary);
+  color: #ffffff;
   background-color: var(--accent-color);
 }
 
 .video-player-screen {
   width: 100%;
-  max-height: calc(100% - 60px);
-  background-color: var(--bg-video-screen);
+  flex: 1;
+  min-height: 0;
+  background-color: var(--bg-core-primary);
   object-fit: contain;
-}
-
-/* ── Active card highlight ── */
-.cart-div.video-active .video-card-title {
-  color: var(--accent-color);
 }
