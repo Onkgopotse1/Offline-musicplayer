@@ -236,6 +236,7 @@ const handlePlayerMouseLeave = () => {
   hideTimerRef.current = setTimeout(() => setShowOverlay(false), 800);
 };
 
+
 return (
   <div className="right-main" style={{ position: "relative" }}>
 
@@ -251,7 +252,9 @@ return (
 
   <div className="sub-menu">
     <div className="sub-menu-left">
-      <button className="sub-menu-shuffle-btn">⇄ Shuffle and play</button>
+      <button className="sub-menu-shuffle-btn" >
+        ⇄ Shuffle and play
+      </button>
     </div>
     <div className="sub-menu-right">
       <div className="sub-menu-sort">

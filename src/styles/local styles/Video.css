@@ -1,7 +1,7 @@
 /* ── Grid container ── */
 .video-main {
   flex: 1;
-  min-height: 0; /* allows flex child to shrink and be bounded by parent */
+  min-height: 0; 
   overflow-y: scroll;
   overflow-x: hidden;
   display: grid;
@@ -112,7 +112,7 @@ h1 { font-size: 3em; line-height: 1.1; }
   flex-direction: column;
   box-sizing: border-box;
   overflow: hidden;
-  cursor: none; /* hide cursor so overlay feels cinematic */
+  cursor: none; 
 }
 
 /* show cursor when overlay is visible */
@@ -134,13 +134,13 @@ h1 { font-size: 3em; line-height: 1.1; }
   /* dark gradient so text is readable over any video */
   background: linear-gradient(to bottom, rgba(0,0,0,0.72) 0%, transparent 100%);
   opacity: 0;
-  pointer-events: none;           /* invisible = not clickable */
+  pointer-events: none;           
   transition: opacity 0.3s ease;
 }
 
 .video-overlay--visible {
   opacity: 1;
-  pointer-events: auto;           /* visible = clickable (close btn works) */
+  pointer-events: auto;           
 }
 
 .video-overlay-title {

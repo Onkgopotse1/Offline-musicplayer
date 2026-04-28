@@ -182,6 +182,18 @@ export default function Bottom() {
     setIsPlaying((prev) => !prev);
   };
 
+  const goFullscreen = () => {
+  const video = videoRef.current;
+  if (!video) return;
+
+  if (video.requestFullscreen) {
+    video.requestFullscreen();
+  } else if ((video as any).webkitRequestFullscreen) {
+    (video as any).webkitRequestFullscreen();
+  } else if ((video as any).msRequestFullscreen) {
+    (video as any).msRequestFullscreen();
+  }
+};
 
   // ── Render ───────────────────────────────────────────────────────────
   return (
@@ -249,7 +261,9 @@ export default function Bottom() {
                 />
               )}
             </div>
-            <button className="maximize-button">
+            <button className="maximize-button"
+             onClick={goFullscreen}
+            >
               <FontAwesomeIcon icon={faMaximize} />
             </button>
             <button className="minimize-button">

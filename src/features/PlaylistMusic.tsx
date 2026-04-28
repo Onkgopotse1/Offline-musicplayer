@@ -159,10 +159,10 @@ const saveToUserAudio = (audioFiles: StoredFile[]) => {
       store.put(file); // ✅ put = insert or update
     });
     tx.oncomplete = () => {
-      console.log("Audio saved to userAudio store");
+
     };
     tx.onerror = () => {
-      console.error("Error saving audio");
+
     };
   };
 };
