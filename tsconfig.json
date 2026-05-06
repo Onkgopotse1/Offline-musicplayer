@@ -4,12 +4,13 @@
     // File Layout
      "rootDir": "./src",
      "outDir": "./dist",
+     "types": ["vitest"],
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "target": "esnext",
-    "types": [],
+    
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
@@ -42,5 +43,6 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-  }
+  },
+  "exclude": ["vitest.config.ts", "node_modules"]
 }
