@@ -58,7 +58,7 @@ function App() {
   const addToRecent = (id: string) => {
     setRecentIds(prev => {
       const filtered = prev.filter(r => r !== id);
-      const updated = [id, ...filtered].slice(0, 20); //only keep the 20 most recent
+      const updated = [id, ...filtered].slice(0, 100); //only keep the 100 most recent
       localStorage.setItem("recentIds", JSON.stringify(updated));
       return updated;
     });

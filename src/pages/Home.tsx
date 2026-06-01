@@ -3,32 +3,10 @@ import '../styles/local styles/Home.css';
 import type { StoredFile } from "../type/media.ts";
 import { lazy, Suspense } from "react";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
+import { parseFileName, getGradient } from "../utils/mediaUtils.ts";
 
 import { useMedia } from "../context/MediaContext.tsx";
 import { usePlayer } from "../context/MediaContext.tsx";
-
-
-
-// Generates a unique gradient background from the song name
-const getGradient = (name: string) => {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const h1 = Math.abs(hash) % 360;
-  const h2 = (h1 + 40) % 360;
-  return `linear-gradient(135deg, hsl(${h1}, 60%, 25%), hsl(${h2}, 70%, 15%))`;
-};
-
-// Same helper used in Music.tsx — splits filename into artist and song
-const parseFileName = (file: StoredFile) => {
-  const parts = file.name.split("-");
-  if (parts.length < 2) return { artist: "Unknown Artist", song: file.name };
-const firstPart = parts[0]?.trim() ?? "";
-const secondPart = parts[1]?.replace(/\.[^/.]+$/, "").trim() ?? "";
-  if (/^[A-Za-z]/.test(firstPart)) return { artist: firstPart, song: secondPart };
-  return { song: firstPart, artist: secondPart };
-};
 
 export default function Home() {
   const { files } = useMedia();

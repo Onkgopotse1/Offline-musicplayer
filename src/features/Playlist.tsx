@@ -1,22 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/local styles/Playlist.css';
+import { getGradient, loadPlaylists } from "../utils/mediaUtils.ts";
 
-const getGradient = (name: string) => {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const h1 = Math.abs(hash) % 360;
-  const h2 = (h1 + 40) % 360;
-  return `linear-gradient(135deg, hsl(${h1}, 60%, 25%), hsl(${h2}, 70%, 15%))`;
-};
-
-// load saved playlists from localStorage
-const loadPlaylists = (): string[] => {
-  const saved = localStorage.getItem("playlists");
-  return saved ? JSON.parse(saved) : [];
-};
 
 // Helper function to get the song count from local storage
 const getSongCount = (playlistName: string): number => {

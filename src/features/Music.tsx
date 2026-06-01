@@ -3,16 +3,13 @@ import '../styles/local styles/Music.css';
 import type { StoredFile } from "../type/media.ts";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 import PlaylistMusic from "./PlaylistMusic.tsx";
+import { parseFileName, sortFiles, useUrlCache, loadPlaylists, formatDuration } from "../utils/mediaUtils.ts";
 
 import { useMedia } from "../context/MediaContext.tsx";
 import { usePlayer } from "../context/MediaContext.tsx";
 
 function DurationCell({ duration }: { duration: number | undefined }) {
-  if (!duration) return <>--:--</>;
-
-  const mins = Math.floor(duration / 60);
-  const secs = Math.floor(duration % 60).toString().padStart(2, "0");
-  return <>{mins}:{secs}</>;
+  return <>{formatDuration(duration)}</>;
 }
 
 
@@ -27,76 +24,7 @@ const [sortBy, setSortBy] = useState("date");
   const [isChecked, setIsChecked] = useState(false);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
-//sorting function: sort things like : artist name, song name, album name, release year, date added-------
-  const sortFiles = (files: StoredFile[]) => {
-  const sorted = [...files];
-
-  return sorted.sort((a, b) => {
-    const { artist: artistA, song: songA } = parseFileName(a);
-    const { artist: artistB, song: songB } = parseFileName(b);
-
-    switch (sortBy) {
-      case "az":
-        return songA.localeCompare(songB);
-
-      case "artist":
-        return artistA.localeCompare(artistB);
-
-      case "album":
-        return (a.album ?? "").localeCompare(b.album ?? "");
-
-      case "year":
-        return (b.year ?? 0) - (a.year ?? 0);
-
-        case "date":
-      default:
-        return b.lastModified - a.lastModified; // newest first
-    }
-  });
-};
-//------------------end of sorting function------------------
-
- //////// Extract artist and song from file name: to be able to access song information /////////////////
-    const parseFileName = (file: any) => {
-    // Split on the first dash
-    const parts = file.name.split("-");
-    if (parts.length < 2) {
-      // No dash found → fallback
-      return { artist: "Unknown Artist", song: file.name };
-    }
-
-    const firstPart = parts[0].trim();//
-    const secondPart = parts[1].replace(/\.[^/.]+$/, "").trim(); // remove extension
-
-    // Logic: if first part looks like a word/letters, treat as artist
-    // if first part looks like numbers, treat as song
-    if (/^[A-Za-z]/.test(firstPart)) {
-      return { artist: firstPart, song: secondPart };
-    } else {
-      return { song: firstPart, artist: secondPart };
-    }
-  };
- /////// END Helper Function/////////////////
-
-   //
-  const urlCache = useRef<Record<string, string>>({});
-
-// Helper function to get object URL for a file, with caching to avoid regenerating URLs
-// This is important for performance, especially when we have many files or large videos
-  const getUrl = (item: StoredFile) => {
-    if (!urlCache.current[item.id]) {
-      const blob = new Blob([item.data], { type: item.type });
-      urlCache.current[item.id] = URL.createObjectURL(blob);
-    }
-    return urlCache.current[item.id];
-  };
-
-  // Revoke object URLs when component unmounts to free memory
-  useEffect(() => {
-    return () => {
-      Object.values(urlCache.current).forEach(URL.revokeObjectURL);
-    };
-  }, []);
+  const getUrl = useUrlCache();
 
  ///------------- Helper Function to handle file uploads from the input element---------
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,7 +70,7 @@ const [sortBy, setSortBy] = useState("date");
 const { /* ... */ setIsShuffle } = usePlayer();
 
 const handleShufflePlay = () => {
-  const audioFiles = sortFiles(files).filter(f => f.type.startsWith("audio/"));
+  const audioFiles = sortFiles(files, sortBy).filter(f => f.type.startsWith("audio/"));
   if (audioFiles.length === 0) return;
 
   const orderedIds = audioFiles.map(f => f.id);
@@ -160,7 +88,7 @@ const handleShufflePlay = () => {
 
    // Handler for when user clicks play button on a music track
     const handleplay = (id: string) => {
-      const orderedIds = sortFiles(files)
+      const orderedIds = sortFiles(files, sortBy)
       .filter(f => f.type.startsWith("audio/"))
       .map(f => f.id);
 
@@ -179,12 +107,6 @@ const handleShufflePlay = () => {
   };
 
 // ADD below toggleCheckbox------------------------
-// Load playlist names from localStorage
-const loadPlaylists = (): string[] => {
-  const saved = localStorage.getItem("playlists");
-  return saved ? JSON.parse(saved) : [];
-};
-
 // Save checked song IDs into the selected playlist in localStorage
 const addToPlaylist = (playlistName: string) => {
   if (checkedIds.length === 0 || !playlistName) return;
@@ -288,7 +210,7 @@ const addToPlaylist = (playlistName: string) => {
         <div className="header-text">Time</div>
       </div>
 
-        {sortFiles(files).map((item) => {
+        {sortFiles(files, sortBy).map((item) => {
          const fileURL = getUrl(item);
          const { artist, song } = parseFileName(item); //Parse artist and song from filename//
 

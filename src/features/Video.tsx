@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import "../styles/local styles/Video.css"
 import type { StoredFile } from "../type/media.ts";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
+import { parseFileName, sortFiles, useUrlCache } from "../utils/mediaUtils.ts";
 
 import { useMedia } from "../context/MediaContext.tsx";
 import { usePlayer } from "../context/MediaContext.tsx";
@@ -23,18 +24,8 @@ const [sortBy, setSortBy] = useState("date");
    const [showOverlay, setShowOverlay] = useState(false);
    const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-   const urlCache = useRef<Record<string, string>>({});
    const processedIds = useRef<Set<string>>(new Set()); // Track which files have been queued for thumbnail generation
-
-   // Helper function to get object URL for a file, with caching to avoid regenerating URLs
-   // This is important for performance, especially when we have many files or large videos
-    const getUrl = (item: StoredFile) => {
-      if (!urlCache.current[item.id]) {
-        const blob = new Blob([item.data], { type: item.type });
-        urlCache.current[item.id] = URL.createObjectURL(blob);
-      }
-      return urlCache.current[item.id];
-    };
+   const getUrl = useUrlCache();
 /////
 
    // Generate thumbnails for video files whenever the files state changes
@@ -83,64 +74,6 @@ const [sortBy, setSortBy] = useState("date");
     }, [files, loadFileData, saveThumbnail]);
   ////////////////end
 
-    // Revoke object URLs when component unmounts to free memory
-      useEffect(() => {
-        return () => {
-          Object.values(urlCache.current).forEach(URL.revokeObjectURL);
-        };
-      }, []);
-
-   //////// Helper Function /////////////////
-    const parseFileName = (file: any) => {
-    // Split on the first dash
-    const parts = file.name.split("-");
-    if (parts.length < 2) {
-      // No dash found → fallback
-      return { artist: "Unknown Artist", song: file.name };
-    }
-
-    const firstPart = parts[0].trim();//
-    const secondPart = parts[1].replace(/\.[^/.]+$/, "").trim(); // remove extension
-
-    // Logic: if first part looks like a word/letters, treat as artist
-    // if first part looks like numbers, treat as song
-    if (/^[A-Za-z]/.test(firstPart)) {
-      return { artist: firstPart, song: secondPart };
-    } else {
-      return { song: firstPart, artist: secondPart };
-    }
-  };
- ///////🛠️ END Helper Function/////////////////
-
-//sorting function: sort things like : artist name, title, date added-------
-  const sortFiles = (files: StoredFile[]) => {
-  const sorted = [...files];
-
-  return sorted.sort((a, b) => {
-    const { artist: artistA, song: songA } = parseFileName(a);
-    const { artist: artistB, song: songB } = parseFileName(b);
-
-    switch (sortBy) {
-      case "az":
-        return songA.localeCompare(songB);
-
-      case "artist":
-        return artistA.localeCompare(artistB);
-
-      case "album":
-        return 0;
-
-      case "year":
-        return 0;
-
-      case "date":
-      default:
-        return b.lastModified - a.lastModified; // newest first
-    }
-  });
-};
-//------------------end of sorting function------------------
-
 ///------------- Helper Function to handle file uploads from the input element----------
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
      const selectedFiles = Array.from(e.target.files ?? []);
@@ -171,7 +104,7 @@ const [sortBy, setSortBy] = useState("date");
   
 // Handler for when user clicks play button on a video thumbnail-----------
 const handleplay = (item: StoredFile) => {
-    const orderedIds = sortFiles(files)
+    const orderedIds = sortFiles(files, sortBy)
   .filter(f => f.type.startsWith("video/"))
   .map(f => f.id);
 
@@ -299,7 +232,7 @@ return (
           <p className="text-gray-500">No files chosen yet</p>
         )}
 
-        {sortFiles(files.filter(item => item.type.startsWith("video/"))).map((item) => {
+        {sortFiles(files.filter(item => item.type.startsWith("video/")), sortBy).map((item) => {
           return (
             <div key={item.id} className={`cart-div ${item.id === currentMediaId ? "video-active" : ""}`}>
               <div className="video-thumb-wrapper">
