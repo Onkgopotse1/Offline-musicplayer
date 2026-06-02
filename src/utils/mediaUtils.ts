@@ -15,8 +15,8 @@ export function parseFileName(file: { name: string; album?: string; year?: numbe
 
 // ─── 2. sortFiles ─────────────────────────────────────────────────────────────
 // Duplicated in: Music.tsx, Video.tsx, PlaylistMusic.tsx
-// ⚠️  sortBy was a closed-over state variable — it is now an explicit parameter.
-//     Update every call site from: sortFiles(files)
+// sortBy was a closed-over state variable — it is now an explicit parameter.
+// Update every call site from: sortFiles(files)
 //                               to: sortFiles(files, sortBy)
 
 export function sortFiles(files: StoredFile[], sortBy: string): StoredFile[] {
@@ -29,7 +29,11 @@ export function sortFiles(files: StoredFile[], sortBy: string): StoredFile[] {
       case "artist": return artistA.localeCompare(artistB);
       case "album":  return (a.album ?? "").localeCompare(b.album ?? "");
       case "year":   return (b.year ?? 0) - (a.year ?? 0);
-      case "date":
+      case "date": {
+        const uploadedA = a.uploadedAt ?? new Date(a.lastModified).toISOString();
+        const uploadedB = b.uploadedAt ?? new Date(b.lastModified).toISOString();
+        return uploadedB.localeCompare(uploadedA);
+      }
       default:       return b.lastModified - a.lastModified;
     }
   });

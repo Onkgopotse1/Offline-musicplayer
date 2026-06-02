@@ -16,7 +16,7 @@ function Video({ thumbnails, setThumbnails }: VideoProps) {
   const { files, setFiles, saveFile, loadFileData, saveThumbnail } = useMedia();
   const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, videoRef, setQueue } = usePlayer();
 
-  //sub menu
+//sub menu
 const [sortBy, setSortBy] = useState("date");
 
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
@@ -72,7 +72,7 @@ const [sortBy, setSortBy] = useState("date");
       };
       generate();
     }, [files, loadFileData, saveThumbnail]);
-  ////////////////end
+////////////////end
 
 ///------------- Helper Function to handle file uploads from the input element----------
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
