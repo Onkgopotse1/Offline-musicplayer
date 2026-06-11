@@ -4,13 +4,22 @@ import type { StoredFile } from "../type/media.ts";
 // ─── 1. parseFileName ─────────────────────────────────────────────────────────
 // Duplicated in: Music.tsx, Video.tsx, PlaylistMusic.tsx, Home.tsx
 
+//Artist and song names come from parseFileName, which splits the filename on the first dash to extract those two parts.
+
 export function parseFileName(file: { name: string; album?: string; year?: number }) {
   const parts = file.name.split("-");
   if (parts.length < 2) return { artist: "Unknown Artist", song: file.name };
+
   const firstPart = parts[0]?.trim() ?? "";
-  const secondPart = parts[1]?.replace(/\.[^/.]+$/, "").trim() ?? "";
-  if (/^[A-Za-z]/.test(firstPart)) return { artist: firstPart, song: secondPart };
-  return { song: firstPart, artist: secondPart };
+
+  // Join everything after the first dash back into one string,
+  // then remove the file extension and trim.
+  const rest = parts.slice(1).join("-").replace(/\.[^/.]+$/, "").trim();
+
+  if (/^[A-Za-z]/.test(firstPart)) {
+    return { artist: firstPart, song: rest };
+  }
+  return { song: firstPart, artist: rest };
 }
 
 // ─── 2. sortFiles ─────────────────────────────────────────────────────────────
