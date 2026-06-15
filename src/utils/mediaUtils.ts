@@ -24,9 +24,6 @@ export function parseFileName(file: { name: string; album?: string; year?: numbe
 
 // ─── 2. sortFiles ─────────────────────────────────────────────────────────────
 // Duplicated in: Music.tsx, Video.tsx, PlaylistMusic.tsx
-// sortBy was a closed-over state variable — it is now an explicit parameter.
-// Update every call site from: sortFiles(files)
-//                               to: sortFiles(files, sortBy)
 
 export function sortFiles(files: StoredFile[], sortBy: string): StoredFile[] {
   const sorted = [...files];
@@ -50,15 +47,13 @@ export function sortFiles(files: StoredFile[], sortBy: string): StoredFile[] {
 
 // ─── 3. useUrlCache ───────────────────────────────────────────────────────────
 // Duplicated in: Music.tsx, Video.tsx, PlaylistMusic.tsx
-// Replaces the urlCache ref + getUrl function + cleanup useEffect in each file.
-// Usage: const getUrl = useUrlCache();
 
 export function useUrlCache() {
   const urlCache = useRef<Record<string, string>>({});
 
   useEffect(() => {
     return () => {
-      Object.values(urlCache.current).forEach(URL.revokeObjectURL);
+      Object.values(urlCache.current).forEach(url => URL.revokeObjectURL(url));
     };
   }, []);
 
@@ -96,23 +91,16 @@ export function loadPlaylists(): string[] {
 
 // ─── 6. formatDuration ────────────────────────────────────────────────────────
 // Duplicated in: DurationCell in Music.tsx, DurationCell in PlaylistMusic.tsx
-// After importing, simplify DurationCell in Music.tsx to:
-//   function DurationCell({ duration }: { duration: number | undefined }) {
-//     return <>{formatDuration(duration)}</>;
-//   }
 
 export function formatDuration(seconds: number | undefined): string {
   if (!seconds) return "--:--";
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60).toString().padStart(2, "0");
+  const mins = Math.trunc(seconds / 60);
+  const secs = Math.abs(Math.floor(seconds % 60)).toString().padStart(2, "0");
   return `${mins}:${secs}`;
 }
 
 // ─── 7. createStoredFile ──────────────────────────────────────────────────────
 // Duplicated in: Music.tsx (handleFileChange), Video.tsx (handleFileChange)
-// Music.tsx passes { duration } as extras. Video.tsx passes nothing.
-// Usage (Music):  createStoredFile(file, arrayBuffer, { duration: audio.duration })
-// Usage (Video):  createStoredFile(file, arrayBuffer)
 
 export function createStoredFile(
   file: File,
@@ -130,3 +118,5 @@ export function createStoredFile(
     ...extras,
   };
 }
+
+
