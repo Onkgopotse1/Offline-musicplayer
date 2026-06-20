@@ -75,7 +75,11 @@ getAll.onsuccess = () => {
       const get = store.get(id);
 
       get.onsuccess = () => {
-        resolve(get.result.data as ArrayBuffer); 
+        if (!get.result) {
+          reject(new Error('File not found'));
+          return;
+        }
+        resolve(get.result.data as ArrayBuffer);
       };
       get.onerror = () => reject(get.error);
     });

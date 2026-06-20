@@ -36,8 +36,8 @@ export function sortFiles(files: StoredFile[], sortBy: string): StoredFile[] {
       case "album":  return (a.album ?? "").localeCompare(b.album ?? "");
       case "year":   return (b.year ?? 0) - (a.year ?? 0);
       case "date": {
-        const uploadedA = a.uploadedAt ?? new Date(a.lastModified).toISOString();
-        const uploadedB = b.uploadedAt ?? new Date(b.lastModified).toISOString();
+        const uploadedA = a.uploadedAt || new Date(a.lastModified).toISOString();
+        const uploadedB = b.uploadedAt || new Date(b.lastModified).toISOString();
         return uploadedB.localeCompare(uploadedA);
       }
       default:       return b.lastModified - a.lastModified;
