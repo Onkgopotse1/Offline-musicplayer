@@ -5,6 +5,7 @@ import type { StoredFile } from "../type/media.ts";
 import { parseFileName, sortFiles, useUrlCache } from "../utils/mediaUtils.ts";
 import { useMedia } from "../context/MediaContext.tsx";
 import { usePlayer } from "../context/MediaContext.tsx";
+import SongList from './SongList.tsx';
 
 
 // Gets the duration of an audio file from its URL
@@ -50,11 +51,12 @@ function DurationCell({ fileId, fileType, loadFileData }: {
 
 
 
+
 function PlaylistMusic() {
 
   const { files, setFiles, saveFile, loadFileData } = useMedia();
   const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, addToRecent, setQueue } = usePlayer();
-
+  const [popUpOpen, setPopUpOpen] = useState(false);
   //sub menu
 const [sortBy, setSortBy] = useState("date");
 
@@ -176,7 +178,55 @@ useEffect(() => {
 //--
 //-------------------------------------------------------
 
-  return (
+
+// popup-local checked ids (separate from the playlist's own checkedIds)
+const [popupCheckedIds, setPopupCheckedIds] = useState<string[]>([]);
+
+const togglePopupCheckbox = (id: string) => {
+  setPopupCheckedIds(prev =>
+    prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+  );
+};
+
+// songs in the library not already in this playlist
+const availableSongs = files.filter(
+  f => f.type.startsWith("audio/") && !visibleSongs.some(v => v.id === f.id)
+);
+
+// you'll fill in the persistence logic here (e.g. writing popupCheckedIds
+// into `playlist_songs_${playlistName}` in localStorage, like addToPlaylist in MyMusic)
+const handleConfirmAddSongs = () => {
+  // TODO: your add-to-playlist logic using popupCheckedIds
+
+  setPopupCheckedIds([]);
+  setPopUpOpen(false);
+};
+
+
+const AddSongs = () => {
+  if (popupCheckedIds.length === 0) return;
+
+  const key = `playlist_songs_${playlistName}`;
+
+  // get current saved IDs
+  const savedIds: string[] = JSON.parse(localStorage.getItem(key) ?? "[]");
+
+  // merge — avoid duplicates
+  const updatedIds = Array.from(new Set([...savedIds, ...popupCheckedIds]));
+
+  // persist
+  localStorage.setItem(key, JSON.stringify(updatedIds));
+
+  // update UI immediately
+  const newlyAdded = files.filter(f => popupCheckedIds.includes(f.id));
+  setVisibleSongs(prev => [...prev, ...newlyAdded]);
+
+  // reset popup state
+  setPopupCheckedIds([]);
+  setPopUpOpen(false);
+};
+
+return (
 <div className="right-main">
   <div className="topbar">
     <div className="topbar-row">
@@ -184,7 +234,7 @@ useEffect(() => {
         <button className="playlist-back-btn" onClick={() => navigate('/playlist')}>←</button>
         <h1 className="topbar-h1">{playlistName}</h1>
       </div>
-      <button className="upload-label" onClick={handleAddSongs}>+ Add Songs</button>
+      <button className="upload-label" onClick={() => setPopUpOpen(true)}>+ Add Songs</button>
     </div>
 
     <div className="sub-menu">
@@ -256,6 +306,49 @@ useEffect(() => {
         })}
 
       </div>
+
+{popUpOpen && (
+  <div className="popup-overlay">
+    <div className="popup">
+      <div className="popup-header">
+        <h2>Add Songs</h2>
+        <button
+          className="popup-close-btn"
+          onClick={() => {
+            setPopUpOpen(false);
+            setPopupCheckedIds([]);
+          }}
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="popup-song-list">
+        {availableSongs.length === 0 ? (
+          <p className="text-gray-500">No songs available to add</p>
+        ) : (
+          <SongList
+            files={sortFiles(availableSongs, sortBy)}
+            checkedIds={popupCheckedIds}
+            onToggleCheckbox={togglePopupCheckbox}
+            showPlayButton={false}
+          />
+        )}
+      </div>
+
+      <div className="popup-footer">
+        <button
+          className="add-songs-btn"
+          onClick={AddSongs}
+          disabled={popupCheckedIds.length === 0}
+        >
+          Add Songs ({popupCheckedIds.length})
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

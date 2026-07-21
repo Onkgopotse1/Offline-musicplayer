@@ -159,3 +159,310 @@
 }
 
 h1 { font-size: 3em; line-height: 1.1; }
+
+
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(circle at 50% 20%, rgba(232, 169, 76, 0.08), transparent 60%),
+              rgba(12, 10, 20, 0.6);
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  animation: overlay-fade-in 0.22s ease-out;
+}
+
+@keyframes overlay-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.popup {
+  position: relative;
+  width: 78vw;
+  max-width: 900px;
+  height: 78vh;
+  max-height: 800px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 24px 60px -12px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 1px 0 rgba(255, 255, 255, 0.18) inset;
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  animation: popup-rise 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popup-rise {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popup-overlay, .popup { animation: none; }
+}
+
+/* ---- header ---- */
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.popup-header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #F3F0FA;
+}
+
+.popup-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #C9C4DA;
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.popup-close-btn:hover {
+  background: rgba(232, 90, 90, 0.16);
+  color: #FF8A8A;
+  transform: rotate(90deg);
+}
+
+.popup-close-btn:focus-visible {
+  outline: 2px solid #E8A94C;
+  outline-offset: 2px;
+}
+
+/* ---- song list area ---- */
+.popup-song-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12px;
+}
+
+.popup-song-list::-webkit-scrollbar {
+  width: 6px;
+}
+.popup-song-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+}
+.popup-song-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.popup-song-list .text-gray-500 {
+  text-align: center;
+  padding: 40px 12px;
+  color: #8A8499;
+  font-size: 0.9rem;
+}
+
+/* scoped row overrides — same SongList markup, laid out like the main
+   playlist row: checkbox | song | artist | album | genre | time, single row */
+.popup-song-list .horizontal-divs {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.8fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 8px;
+  border-radius: 12px;
+  transition: background 0.15s ease;
+}
+
+.popup-song-list .horizontal-divs:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.popup-song-list .check-box {
+  grid-column: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.popup-song-list .checkbox {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.popup-song-list .checkbox:checked {
+  background: #E8A94C;
+  border-color: #E8A94C;
+}
+
+.popup-song-list .checkbox:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid #1A1420;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.popup-song-list .checkbox:focus-visible {
+  outline: 2px solid #E8A94C;
+  outline-offset: 2px;
+}
+
+.popup-song-list .song-name {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.popup-song-list .song-name .text {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #EFEBF8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popup-song-list .artist-name {
+  grid-column: 3;
+  min-width: 0;
+}
+
+.popup-song-list .artist-name .text {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #9A93AC;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popup-song-list .album-name {
+  grid-column: 4;
+  min-width: 0;
+}
+
+.popup-song-list .album-name .text {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #7D7690;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popup-song-list .genre {
+  grid-column: 5;
+  min-width: 0;
+}
+
+.popup-song-list .genre .text {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #7D7690;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popup-song-list .time {
+  grid-column: 6;
+  text-align: right;
+}
+
+.popup-song-list .time .text {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #7D7690;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---- footer ---- */
+.popup-footer {
+  padding: 16px 22px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.add-songs-btn {
+  width: 100%;
+  padding: 11px 18px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #E8A94C, #D98F35);
+  color: #201607;
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  box-shadow: 0 8px 20px -6px rgba(232, 169, 76, 0.55);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.add-songs-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -6px rgba(232, 169, 76, 0.65);
+}
+
+.add-songs-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.add-songs-btn:disabled {
+  background: rgba(255, 255, 255, 0.08);
+  color: #6B6478;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.add-songs-btn:focus-visible {
+  outline: 2px solid #E8A94C;
+  outline-offset: 2px;
+}
+
+/* ---- mobile ---- */
+@media (max-width: 480px) {
+  .popup-overlay {
+    padding: 12px;
+    align-items: flex-end;
+  }
+  .popup {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 78vh;
+    border-radius: 20px 20px 0 0;
+    animation: popup-rise-mobile 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes popup-rise-mobile {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}

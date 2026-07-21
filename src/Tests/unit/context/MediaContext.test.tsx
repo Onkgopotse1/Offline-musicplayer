@@ -26,6 +26,7 @@ describe("useMedia", () => {
     expect(result.current).toBe(mediaValue);
   });
 
+
   it("throws an error when used outside MediaContext.Provider", () => {
     expect(() => renderHook(() => useMedia())).toThrow(
       "useMedia must be used inside MediaProvider"
