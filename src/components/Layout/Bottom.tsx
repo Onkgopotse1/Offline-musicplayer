@@ -48,6 +48,7 @@ export default function Bottom() {
   // The ONE audio element for the whole app
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressRef = useRef<HTMLProgressElement | null>(null);
+  const currentUrlRef = useRef<string | null>(null);
 
   // Derive the current file from the ID
   const currentFile = files.find((f) => f.id === currentMediaId) ?? null;
@@ -64,12 +65,20 @@ export default function Bottom() {
     loadFileData(currentFile.id).then((data) => {
       const blob = new Blob([data], { type: currentFile.type });
       const url = URL.createObjectURL(blob);
+
+      currentUrlRef.current = url;
       media.src = url;
       if (isPlaying) media.play();
-      return () => URL.revokeObjectURL(url);
     });
-  }, [currentMediaId, currentMediaType]);
+    
 
+    return () => {
+      if (currentUrlRef.current) {
+        URL.revokeObjectURL(currentUrlRef.current);
+        currentUrlRef.current = null;
+      }
+    };
+  }, [currentMediaId, currentMediaType]);
 
   // ── Sync play / pause state to the media element ────────────────────
   useEffect(() => {

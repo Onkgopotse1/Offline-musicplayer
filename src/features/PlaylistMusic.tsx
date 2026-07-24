@@ -114,15 +114,7 @@ const handleAddSongs = () => {
   saveToUserAudio(audioFiles);
 };
 
-//clickbox => sends and save to local storage => then render in horizontal-divs ------------------------
-useEffect(() => {
-  const key = `playlist_songs_${playlistName}`;
-  const savedIds: string[] = JSON.parse(localStorage.getItem(key) ?? "[]");
 
-  // match saved IDs to actual file objects from context
-  const matched = files.filter(f => savedIds.includes(f.id));
-  setVisibleSongs(matched);
-}, [playlistName, files]);
 
 //a state for if a checkbox is clicked
   const [isChecked, setIsChecked] = useState(false);
