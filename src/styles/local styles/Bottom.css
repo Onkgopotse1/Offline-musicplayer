@@ -142,6 +142,12 @@ place-items: center;
   }
 }
 
+/* Shuffle/Repeat idle state — muted so the .active state below is visibly different */
+.shuffle-button,
+.repeat-button {
+  color: var(--text-color-muted);
+}
+
 /* Active state for shuffle and repeat */
 .shuffle-button.active,
 .repeat-button.active {

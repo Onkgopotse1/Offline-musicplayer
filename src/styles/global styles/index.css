@@ -36,7 +36,7 @@
   --btn-primary-bg: #e0e0e0;            /* Play button background */
   --btn-primary-hover: #e0e0e0;         /* Play button hover */
   --btn-primary-text: #c44e4e;          /* Play button text */
-  --btn-accent-bg: #e53935;             /* Upload/action button */
+  --btn-accent-bg: var(--accent-color); /* Upload/action button */
   --btn-accent-hover: #c62828;          /* Upload button hover */
   --btn-accent-text: #ffffff;           /* Action button text */
   --btn-overlay-bg: rgba(0, 0, 0, 0.6); /* Video play button overlay */
@@ -47,8 +47,8 @@
      ───────────────────────────────────────────────────────────────── */
   --border-color-default: #1f1f1f;      /* Standard border/divider */
   --bg-progress-bar: #2a2a2a;           /* Progress bar background */
-  --bg-playing-row: rgba(229, 57, 53, 0.08);  /* Playing item background */
-  --border-playing-row: rgba(229, 57, 53, 0.2); /* Playing item border */
+  --bg-playing-row: color-mix(in srgb, var(--accent-color) 8%, transparent);  /* Playing item background */
+  --border-playing-row: color-mix(in srgb, var(--accent-color) 20%, transparent); /* Playing item border */
   --shadow-weak: rgba(0,0,0,0.08);           /* Subtle card shadow */
   --accent-color: #e53935;              /* Accent/highlight color */
   
