@@ -82,6 +82,138 @@ it("renders the + Add Videos button", () => {
   }
 );
 
+  it("saves uploaded video metadata to the media context", async () => {
+    const saveFile = vi.fn();
+    const file = new File(["video-content"], "clip.mp4", { type: "video/mp4" });
+
+    const readAsArrayBufferSpy = vi
+      .spyOn(FileReader.prototype, "readAsArrayBuffer")
+      .mockImplementation(function (this: FileReader) {
+        if (this.onload) {
+          this.onload({ target: { result: new ArrayBuffer(8) } } as ProgressEvent<FileReader>);
+        }
+      });
+
+    render(
+      <MediaContext.Provider
+        value={{
+          files: [],
+          setFiles: vi.fn(),
+          saveFile,
+          loadFileData: vi.fn(),
+          loadThumbnails: vi.fn(),
+          saveThumbnail: vi.fn(),
+        }}
+      >
+        <PlayerContext.Provider
+          value={{
+            currentMediaId: null,
+            setCurrentMediaId: vi.fn(),
+            currentMediaType: null,
+            setCurrentMediaType: vi.fn(),
+            isPlaying: false,
+            setIsPlaying: vi.fn(),
+            videoRef: { current: null },
+            recentIds: [],
+            addToRecent: vi.fn(),
+            queue: [],
+            setQueue: vi.fn(),
+            isShuffle: false,
+            setIsShuffle: vi.fn(),
+            isRepeat: false,
+            setIsRepeat: vi.fn(),
+          }}
+        >
+          <Video thumbnails={{}} setThumbnails={vi.fn()} />
+        </PlayerContext.Provider>
+      </MediaContext.Provider>
+    );
+
+    fireEvent.change(screen.getByLabelText("+ Add Videos"), {
+      target: { files: [file] },
+    });
+
+    await waitFor(() => {
+      expect(saveFile).toHaveBeenCalledTimes(1);
+    });
+
+    const savedFile = saveFile.mock.calls[0]?.[0];
+    expect(savedFile).toBeDefined();
+    expect(savedFile).toMatchObject({
+      name: "clip.mp4",
+      type: "video/mp4",
+    });
+
+    readAsArrayBufferSpy.mockRestore();
+  });
+
+  it("sets the queue and starts playback when a video is played", async () => {
+    const video: StoredFile = {
+      id: "video-1",
+      name: "Vacation.mp4",
+      type: "video/mp4",
+      lastModified: 1_700_000_000_000,
+      size: 1024,
+      data: new ArrayBuffer(8),
+      uploadedAt: new Date(1_700_000_000_000).toISOString(),
+    };
+
+    const setQueue = vi.fn();
+    const setCurrentMediaId = vi.fn();
+    const setCurrentMediaType = vi.fn();
+    const setIsPlaying = vi.fn();
+    const loadFileData = vi.fn().mockResolvedValue(new ArrayBuffer(8));
+
+    Object.defineProperty(URL, "createObjectURL", {
+      writable: true,
+      value: vi.fn(() => "blob:video-url"),
+    });
+
+    render(
+      <MediaContext.Provider
+        value={{
+          files: [video],
+          setFiles: vi.fn(),
+          saveFile: vi.fn(),
+          loadFileData,
+          loadThumbnails: vi.fn(),
+          saveThumbnail: vi.fn(),
+        }}
+      >
+        <PlayerContext.Provider
+          value={{
+            currentMediaId: null,
+            setCurrentMediaId,
+            currentMediaType: null,
+            setCurrentMediaType,
+            isPlaying: false,
+            setIsPlaying,
+            videoRef: { current: null },
+            recentIds: [],
+            addToRecent: vi.fn(),
+            queue: [],
+            setQueue,
+            isShuffle: false,
+            setIsShuffle: vi.fn(),
+            isRepeat: false,
+            setIsRepeat: vi.fn(),
+          }}
+        >
+          <Video thumbnails={{}} setThumbnails={vi.fn()} />
+        </PlayerContext.Provider>
+      </MediaContext.Provider>
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "▶" }));
+
+    await waitFor(() => {
+      expect(setQueue).toHaveBeenCalledWith(["video-1"]);
+      expect(setCurrentMediaId).toHaveBeenCalledWith("video-1");
+      expect(setCurrentMediaType).toHaveBeenCalledWith("video");
+      expect(setIsPlaying).toHaveBeenCalledWith(true);
+    });
+  });
+
   it("renders the sort control", () => {
     renderVideo();
 
