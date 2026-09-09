@@ -20,6 +20,8 @@ function Video({ thumbnails, setThumbnails }: VideoProps) {
 const [sortBy, setSortBy] = useState("date");
 
   const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
+    const activeVideoUrlRef = useRef<string | null>(null);
+    const loadRequestRef = useRef(0);
    const [activeVideoName, setActiveVideoName] = useState<string>("");
    const [showOverlay, setShowOverlay] = useState(false);
    const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -104,6 +106,7 @@ const [sortBy, setSortBy] = useState("date");
   
 // Handler for when user clicks play button on a video thumbnail-----------
 const handleplay = (item: StoredFile) => {
+  const requestId = ++loadRequestRef.current;
     const orderedIds = sortFiles(files, sortBy)
   .filter(f => f.type.startsWith("video/"))
   .map(f => f.id);
@@ -117,14 +120,23 @@ const handleplay = (item: StoredFile) => {
   loadFileData(item.id).then((data) => {
     const blob = new Blob([data], { type: item.type });
     const url = URL.createObjectURL(blob);
-    if (activeVideoUrl) URL.revokeObjectURL(activeVideoUrl); // clean up previous
+
+    if (requestId !== loadRequestRef.current) {
+      URL.revokeObjectURL(url);
+      return;
+    }
+
+    if (activeVideoUrlRef.current) URL.revokeObjectURL(activeVideoUrlRef.current);
+    activeVideoUrlRef.current = url;
     setActiveVideoUrl(url);
     setActiveVideoName(item.name);
   });
 };
 
 const closePlayer = () => {
-  if (activeVideoUrl) URL.revokeObjectURL(activeVideoUrl);
+  loadRequestRef.current += 1;
+  if (activeVideoUrlRef.current) URL.revokeObjectURL(activeVideoUrlRef.current);
+  activeVideoUrlRef.current = null;
   setActiveVideoUrl(null);
   setActiveVideoName("");
   setCurrentMediaId(null);
