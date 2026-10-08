@@ -6,7 +6,7 @@
    type: string
    lastModified: number
    size: number
-   data: ArrayBuffer
+  data: Blob
    uploadedAt: string
    album?: string
    year?: number

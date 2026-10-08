@@ -76,11 +76,11 @@ describe('parseFileName', () => {
  // sortFiles ---------------------------------------------------------------------
 
 const mockFiles: StoredFile[] = [
-  { id: '1', name: 'Adele - Hello.mp3', type: 'audio/mpeg', lastModified: 1000, size: 0, data: new ArrayBuffer(0), album: '25', year: 2015, uploadedAt: '2023-01-01T00:00:00.000Z' },
-  { id: '2', name: 'Queen - Bohemian Rhapsody.mp3', type: 'audio/mpeg', lastModified: 2000, size: 0, data: new ArrayBuffer(0), album: 'A Night at the Opera', year: 1975, uploadedAt: '2023-01-01T00:00:00.000Z' },
-  { id: '3', name: '01 - Intro.mp3', type: 'audio/mpeg', lastModified: 3000, size: 0, data: new ArrayBuffer(0), album: 'Unknown', year: 2007, uploadedAt: '2023-01-01T00:00:00.000Z' },
-  { id: '4', name: 'Beyoncé - Halo.mp3', type: 'audio/mpeg', lastModified: 1500, size: 0, data: new ArrayBuffer(0), album: 'I Am... Sasha Fierce', year: 2008, uploadedAt: '2022-05-05T00:00:00.000Z' },
-  { id: '5', name: 'No Dash Song.mp3', type: 'audio/mpeg', lastModified: 500, size: 0, data: new ArrayBuffer(0), album: 'Unknown', year: 0, uploadedAt: '2023-01-01T00:00:00.000Z' },
+  { id: '1', name: 'Adele - Hello.mp3', type: 'audio/mpeg', lastModified: 1000, size: 0, data: new Blob(), album: '25', year: 2015, uploadedAt: '2023-01-01T00:00:00.000Z' },
+  { id: '2', name: 'Queen - Bohemian Rhapsody.mp3', type: 'audio/mpeg', lastModified: 2000, size: 0, data: new Blob(), album: 'A Night at the Opera', year: 1975, uploadedAt: '2023-01-01T00:00:00.000Z' },
+  { id: '3', name: '01 - Intro.mp3', type: 'audio/mpeg', lastModified: 3000, size: 0, data: new Blob(), album: 'Unknown', year: 2007, uploadedAt: '2023-01-01T00:00:00.000Z' },
+  { id: '4', name: 'Beyoncé - Halo.mp3', type: 'audio/mpeg', lastModified: 1500, size: 0, data: new Blob(), album: 'I Am... Sasha Fierce', year: 2008, uploadedAt: '2022-05-05T00:00:00.000Z' },
+  { id: '5', name: 'No Dash Song.mp3', type: 'audio/mpeg', lastModified: 500, size: 0, data: new Blob(), album: 'Unknown', year: 0, uploadedAt: '2023-01-01T00:00:00.000Z' },
 ];
 
 describe('sortFiles', () => {
@@ -155,9 +155,9 @@ describe('sortFiles', () => {
 
     test("sorts by date and falls back to lastModified when uploadedAt is missing", () => {
       const filesWithoutUploadedAt: StoredFile[] = [
-        { id: '1', name: 'Song A.mp3', type: 'audio/mpeg', lastModified: 3000, size: 0, data: new ArrayBuffer(0), album: 'X', year: 2000, uploadedAt: '' },
-        { id: '2', name: 'Song B.mp3', type: 'audio/mpeg', lastModified: 1000, size: 0, data: new ArrayBuffer(0), album: 'Y', year: 2001, uploadedAt: '' },
-        { id: '3', name: 'Song C.mp3', type: 'audio/mpeg', lastModified: 2000, size: 0, data: new ArrayBuffer(0), album: 'Z', year: 2002, uploadedAt: '' },
+        { id: '1', name: 'Song A.mp3', type: 'audio/mpeg', lastModified: 3000, size: 0, data: new Blob(), album: 'X', year: 2000, uploadedAt: '' },
+        { id: '2', name: 'Song B.mp3', type: 'audio/mpeg', lastModified: 1000, size: 0, data: new Blob(), album: 'Y', year: 2001, uploadedAt: '' },
+        { id: '3', name: 'Song C.mp3', type: 'audio/mpeg', lastModified: 2000, size: 0, data: new Blob(), album: 'Z', year: 2002, uploadedAt: '' },
       ];
       const sorted = sortFiles(filesWithoutUploadedAt, 'date');
       expect(sorted.map(f => f.id)).toEqual(['1', '3', '2']);
@@ -173,9 +173,9 @@ describe('sortFiles', () => {
 
     test('stable sort preserves original order for ties (equal compare values)', () => {
       const tieFiles: StoredFile[] = [
-        { id: 'a', name: 'A - 1.mp3', type: 'audio/mpeg', lastModified: 1000, size: 0, data: new ArrayBuffer(0), album: 'X', year: 2000, uploadedAt: '2023-01-01T00:00:00.000Z' },
-        { id: 'b', name: 'B - 2.mp3', type: 'audio/mpeg', lastModified: 1000, size: 0, data: new ArrayBuffer(0), album: 'Y', year: 2001, uploadedAt: '2023-01-01T00:00:00.000Z' },
-        { id: 'c', name: 'C - 3.mp3', type: 'audio/mpeg', lastModified: 500, size: 0, data: new ArrayBuffer(0), album: 'Z', year: 2002, uploadedAt: '2023-01-01T00:00:00.000Z' },
+        { id: 'a', name: 'A - 1.mp3', type: 'audio/mpeg', lastModified: 1000, size: 0, data: new Blob(), album: 'X', year: 2000, uploadedAt: '2023-01-01T00:00:00.000Z' },
+        { id: 'b', name: 'B - 2.mp3', type: 'audio/mpeg', lastModified: 1000, size: 0, data: new Blob(), album: 'Y', year: 2001, uploadedAt: '2023-01-01T00:00:00.000Z' },
+        { id: 'c', name: 'C - 3.mp3', type: 'audio/mpeg', lastModified: 500, size: 0, data: new Blob(), album: 'Z', year: 2002, uploadedAt: '2023-01-01T00:00:00.000Z' },
       ];
 
       // Original insertion order is [a, b, c]. a and b tie on lastModified (1000).
@@ -190,9 +190,9 @@ describe('sortFiles', () => {
 
     test('uses parseFileName for artist/song-based sorting', () => {
       const files: StoredFile[] = [
-        { id: '1', name: '01 - Intro.mp3', type: 'audio/mpeg', lastModified: 100, size: 0, data: new ArrayBuffer(0), album: 'X', year: 2000, uploadedAt: '2023-01-01T00:00:00.000Z' },
-        { id: '2', name: 'Beatles - Let It Be.mp3', type: 'audio/mpeg', lastModified: 200, size: 0, data: new ArrayBuffer(0), album: 'Y', year: 1970, uploadedAt: '2023-01-01T00:00:00.000Z' },
-        { id: '3', name: '2 - Another Song.mp3', type: 'audio/mpeg', lastModified: 300, size: 0, data: new ArrayBuffer(0), album: 'Z', year: 2001, uploadedAt: '2023-01-01T00:00:00.000Z' },
+        { id: '1', name: '01 - Intro.mp3', type: 'audio/mpeg', lastModified: 100, size: 0, data: new Blob(), album: 'X', year: 2000, uploadedAt: '2023-01-01T00:00:00.000Z' },
+        { id: '2', name: 'Beatles - Let It Be.mp3', type: 'audio/mpeg', lastModified: 200, size: 0, data: new Blob(), album: 'Y', year: 1970, uploadedAt: '2023-01-01T00:00:00.000Z' },
+        { id: '3', name: '2 - Another Song.mp3', type: 'audio/mpeg', lastModified: 300, size: 0, data: new Blob(), album: 'Z', year: 2001, uploadedAt: '2023-01-01T00:00:00.000Z' },
       ];
 
       // parseFileName results: '01 - Intro' -> artist: 'Intro'
@@ -229,7 +229,7 @@ describe('useUrlCache', () => {
   // Helper to create a minimal StoredFile
   const mockFile = (overrides: Partial<StoredFile> = {}): StoredFile => ({
     id: 'file-1',
-    data: new ArrayBuffer(8),
+    data: new Blob(),
     type: 'audio/mpeg',
     ...overrides,
   } as StoredFile);
@@ -317,30 +317,14 @@ describe('useUrlCache', () => {
     expect(renderCount).toBe(1);
   });
 
-  test('works when file.type is undefined or empty', () => {
+  test('passes the stored Blob directly to createObjectURL', () => {
     const { result } = renderHook(() => useUrlCache());
     const getUrl = result.current;
 
-    const fileWithoutType = mockFile({ id: 'no-type' });
-    const url = getUrl(fileWithoutType);
-    expect(url).toMatch(/^blob:mock-/);
+    const file = mockFile({ id: 'stored-blob', type: '' });
+    getUrl(file);
 
-    // createObjectURL was still called
-    expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
-
-    // (Optional) Check that the Blob constructor receives the correct fallback
-    const originalBlob = globalThis.Blob;
-    const blobMock = vi.fn();
-    try {
-      globalThis.Blob = blobMock as any;
-      getUrl(mockFile({ id: 'with-empty-type', type: '' }));
-      expect(blobMock).toHaveBeenCalledWith(
-        expect.any(Array),
-        expect.objectContaining({ type: '' })
-      );
-    } finally {
-      globalThis.Blob = originalBlob;
-    }
+    expect(URL.createObjectURL).toHaveBeenCalledWith(file.data);
   });
 });
 
@@ -545,7 +529,7 @@ describe('createStoredFile', () => {
 
   test('returns a complete StoredFile with correct defaults', () => {
     const file = mockFile();
-    const data = new ArrayBuffer(128);
+    const data = new Blob();
     const result = createStoredFile(file, data);
 
     expect(result).toEqual({
@@ -560,13 +544,13 @@ describe('createStoredFile', () => {
   });
 
   test('generates a unique ID using crypto.randomUUID', () => {
-    const result = createStoredFile(mockFile(), new ArrayBuffer(0));
+    const result = createStoredFile(mockFile(), new Blob());
     expect(result.id).toBe('mock-uuid-1234');
     expect(globalThis.crypto.randomUUID).toHaveBeenCalledTimes(1);
   });
 
   test('sets uploadedAt to the current ISO timestamp', () => {
-    const result = createStoredFile(mockFile(), new ArrayBuffer(0));
+    const result = createStoredFile(mockFile(), new Blob());
     expect(result.uploadedAt).toBe('2024-06-15T12:00:00.000Z');
   });
 
@@ -577,7 +561,7 @@ describe('createStoredFile', () => {
       lastModified: 9999999,
       size: 4096,
     });
-    const result = createStoredFile(customFile, new ArrayBuffer(0));
+    const result = createStoredFile(customFile, new Blob());
     expect(result.name).toBe('song.wav');
     expect(result.type).toBe('audio/wav');
     expect(result.lastModified).toBe(9999999);
@@ -585,14 +569,14 @@ describe('createStoredFile', () => {
   });
 
   test('stores the exact data ArrayBuffer', () => {
-    const buf = new ArrayBuffer(256);
+    const buf = new Blob();
     const result = createStoredFile(mockFile(), buf);
     expect(result.data).toBe(buf);
   });
 
   test('merges extras and overrides defaults', () => {
     const file = mockFile();
-    const data = new ArrayBuffer(0);
+    const data = new Blob();
     const extras = {
       id: 'custom-id',
       album: 'Greatest Hits',
@@ -616,7 +600,7 @@ describe('createStoredFile', () => {
   test('does not mutate the original File object', () => {
     const file = mockFile();
     const original = { ...file };
-    createStoredFile(file, new ArrayBuffer(0));
+    createStoredFile(file, new Blob());
     expect(file).toEqual(original);
   });
 });

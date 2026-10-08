@@ -143,7 +143,7 @@ describe("useMediaDB", () => {
 
     expect(globalThis.indexedDB.open).toHaveBeenCalledWith(
       "MediaDB",
-      3
+      4
     );
 
 

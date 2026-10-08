@@ -31,17 +31,7 @@ const [sortBy, setSortBy] = useState("date");
      const selectedFiles = Array.from(e.target.files ?? []);
  
      selectedFiles.forEach((file) => {                    
-       const reader = new FileReader();                     
- 
-      // Read file as ArrayBuffer
-       reader.readAsArrayBuffer(file);
-
-       reader.onload = (event: ProgressEvent<FileReader>) => {        //FileReader reads file into memory//
-         const arrayBuffer = event.target?.result as ArrayBuffer;
-         
-         // Create a temporary blob to get duration
-         const blob = new Blob([arrayBuffer], { type: file.type });
-         const url = URL.createObjectURL(blob);
+       const url = URL.createObjectURL(file);
          const audio = new Audio(url);
          
          audio.onloadedmetadata = () => {
@@ -51,7 +41,7 @@ const [sortBy, setSortBy] = useState("date");
              type: file.type,
              lastModified: file.lastModified,
              size: file.size,
-             data: arrayBuffer,  //data is the actual audio/vudeo/image/text
+             data: file,
              uploadedAt: new Date().toISOString(), //is just a timestamp it tells u when u saved the file
              duration: audio.duration, // store duration in seconds
            }; // gets saved to indexedDB
@@ -60,10 +50,9 @@ const [sortBy, setSortBy] = useState("date");
             saveFile(fileData); //all files that u selected gets saved to saveFile 
             URL.revokeObjectURL(url);
          };
-       };
-
+         audio.onerror = () => URL.revokeObjectURL(url);
      });
-   };
+       };
 //-----------------------end of file upload handler------------------------
 
  // Handler for when user clicks "Shuffle and play" button

@@ -8,7 +8,7 @@ const [loaded, setLoaded] = useState(false);
 // Store the DB reference to reuse it
 const [db, setDb] = useState<IDBDatabase | null>(null);
 
-// ── Open DB + load only metadata on mount (no ArrayBuffers)-----------------------------------
+// ── Open DB + load file handles on mount -----------------------------------
 
 //files starts as empty untill it gets data from setFiles
 // this state only hold metadata
@@ -16,7 +16,7 @@ const [db, setDb] = useState<IDBDatabase | null>(null);
 
 
   useEffect(() => {
-    const request = indexedDB.open("MediaDB", 3); // 
+    const request = indexedDB.open("MediaDB", 4);
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
@@ -27,10 +27,22 @@ const [db, setDb] = useState<IDBDatabase | null>(null);
       if (!db.objectStoreNames.contains("thumbnails")) {
         db.createObjectStore("thumbnails", { keyPath: "id" });
       }
+      if (event.oldVersion > 0 && event.oldVersion < 4) {
+        const store = request.transaction!.objectStore("media");
+        store.openCursor().onsuccess = (cursorEvent) => {
+          const cursor = (cursorEvent.target as IDBRequest<IDBCursorWithValue | null>).result;
+          if (!cursor) return;
+          const record = cursor.value as StoredFile;
+          if (!(record.data instanceof Blob)) {
+            cursor.update({ ...record, data: new Blob([record.data as unknown as ArrayBuffer], { type: record.type }) });
+          }
+          cursor.continue();
+        };
+      }
     };
 
     //each file metadata is loaded from DB then to be renderd in UI horizontal-divs 
-    // Load only metadata — skip the heavy data field
+    // Blob records keep their bytes out of the JavaScript heap until read.
     request.onsuccess = () => {
       const dbInstance = request.result;
       setDb(dbInstance); // Store the DB reference
@@ -40,13 +52,7 @@ const [db, setDb] = useState<IDBDatabase | null>(null);
 
 getAll.onsuccess = () => {
   const storedFiles = getAll.result as StoredFile[];
-  if (storedFiles.length > 0) {
-    const metaOnly = storedFiles.map(f => ({
-      ...f,
-      data: new ArrayBuffer(0), // placeholder — not loaded yet
-    }));
-    setFiles(metaOnly); //this updates files with new metadata of the audio
-  }
+  if (storedFiles.length > 0) setFiles(storedFiles);
   setLoaded(true); // signals that DB read is done whether or not there are files
 };
     };
@@ -62,9 +68,8 @@ getAll.onsuccess = () => {
   }, [db]);
 //----------------------------------end-----------------------------
 
-  //so at the end loadFileData give us an ArrayBuffer thats all-------------
-  // ── Load ArrayBuffer for a single file on demand 
-  const loadFileData = (id: string): Promise<ArrayBuffer> => {
+  // ── Load a Blob handle for a single file on demand
+  const loadFileData = (id: string): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       if (!db) {
         reject(new Error("Database not initialized"));
@@ -79,7 +84,10 @@ getAll.onsuccess = () => {
           reject(new Error('File not found'));
           return;
         }
-        resolve(get.result.data as ArrayBuffer);
+        const record = get.result as StoredFile;
+        resolve(record.data instanceof Blob
+          ? record.data
+          : new Blob([record.data as unknown as ArrayBuffer], { type: record.type }));
       };
       get.onerror = () => reject(get.error);
     });
@@ -125,11 +133,8 @@ getAll.onsuccess = () => {
 
     if (!db) return;
 
-    // Send a COPY to IndexedDB so the ArrayBuffer isn't transferred/detached
-    const fileCopy = { ...file, data: file.data.slice(0) };
-
     const tx = db.transaction(["media"], "readwrite");
-    tx.objectStore("media").add(fileCopy);
+    tx.objectStore("media").add(file);
   };
 //----------------------------------end--------------------------------
 

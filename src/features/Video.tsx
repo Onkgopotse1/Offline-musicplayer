@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import "../styles/local styles/Video.css"
 import type { StoredFile } from "../type/media.ts";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
-import { parseFileName, sortFiles, useUrlCache } from "../utils/mediaUtils.ts";
+import { sortFiles } from "../utils/mediaUtils.ts";
 
 import { useMedia } from "../context/MediaContext.tsx";
 import { usePlayer } from "../context/MediaContext.tsx";
@@ -13,42 +13,59 @@ interface VideoProps {
 };
 
 function Video({ thumbnails, setThumbnails }: VideoProps) {
-  const { files, setFiles, saveFile, loadFileData, saveThumbnail } = useMedia();
-  const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, videoRef, setQueue } = usePlayer();
+  const { files, saveFile, loadFileData, saveThumbnail } = useMedia();
+  const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, currentMediaType, videoRef, setQueue } = usePlayer();
 
 //sub menu
 const [sortBy, setSortBy] = useState("date");
 
-  const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
-    const activeVideoUrlRef = useRef<string | null>(null);
-    const loadRequestRef = useRef(0);
-   const [activeVideoName, setActiveVideoName] = useState<string>("");
+   const [isVideoLoading, setIsVideoLoading] = useState(false);
+   const [readError, setReadError] = useState<string | null>(null);
    const [showOverlay, setShowOverlay] = useState(false);
    const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
    const processedIds = useRef<Set<string>>(new Set()); // Track which files have been queued for thumbnail generation
-   const getUrl = useUrlCache();
 /////
 
-   // Generate thumbnails for video files whenever the files state changes
-    const generateThumbnails = (file: StoredFile, data: ArrayBuffer): Promise<string> => {
-      return new Promise((resolve) => {
-        const blob = new Blob([data], { type: file.type });
-        const url = URL.createObjectURL(blob);
+   useEffect(() => {
+     if (currentMediaType === "video" && currentMediaId) setIsVideoLoading(true);
+   }, [currentMediaId, currentMediaType]);
+
+   const makeThumbnail = (file: Blob): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
         const video = document.createElement("video");
-        video.src = url;
+        let settled = false;
+        const done = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          URL.revokeObjectURL(url);
+          video.removeAttribute("src");
+          video.load();
+        };
+        const timer = setTimeout(() => {
+          done();
+          reject(new Error("Video thumbnail timed out"));
+        }, 8000);
         video.muted = true;
         video.playsInline = true;
-        video.onloadedmetadata = () => { video.currentTime = 1; };
+        video.preload = "metadata";
+        video.onerror = () => {
+          done();
+          reject(new Error("Video cannot be decoded"));
+        };
+        video.onloadedmetadata = () => { video.currentTime = Math.min(1, video.duration / 2); };
         video.onseeked = () => {
           const canvas = document.createElement("canvas");
           canvas.width = 320;
           canvas.height = 180;
           canvas.getContext("2d")?.drawImage(video, 0, 0, 320, 180);
           const thumbnail = canvas.toDataURL("image/jpeg", 0.7);
-          URL.revokeObjectURL(url);
+          done();
           resolve(thumbnail);
         };
+        video.src = url;
       });
     };
 
@@ -63,12 +80,14 @@ const [sortBy, setSortBy] = useState("date");
             processedIds.current.add(file.id);
             
            //loadFileData has an id of a file from indexedDB which we use to generate a thumbnaing of the id's file
-            const data = await loadFileData(file.id); //it waits for a id's of a file(video)
-            console.log(`Loaded data for ${file.id}, generating thumbnail...`);
-            const thumb = await generateThumbnails(file, data); //this has generateThumbnail which creates thumbnails 
-            setThumbnails(prev => ({ ...prev, [file.id]: thumb })); //then save thumbnail to state
-            saveThumbnail(file.id, thumb); //save to indexedDB
-            console.log(`Thumbnail generated and saved for ${file.id}`);
+            try {
+              const blob = await loadFileData(file.id);
+              const thumb = await makeThumbnail(blob);
+              setThumbnails(prev => ({ ...prev, [file.id]: thumb }));
+              saveThumbnail(file.id, thumb);
+            } catch {
+              continue;
+            }
           }
         } 
       };
@@ -79,26 +98,27 @@ const [sortBy, setSortBy] = useState("date");
 ///------------- Helper Function to handle file uploads from the input element----------
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
      const selectedFiles = Array.from(e.target.files ?? []);
+     setReadError(null);
 
-     selectedFiles.forEach((file) => {                    //Loop through selected files//
-       const reader = new FileReader();                     //Read file content//
- 
-       reader.onload = (event: ProgressEvent<FileReader>) => {        //FileReader reads file into memory//
-         const fileData: StoredFile = {                                //Prepare file object for database//
-           id: crypto.randomUUID(),
-           name: file.name,
-           type: file.type,
-           lastModified: file.lastModified,
-           size: file.size,
-           data: event.target?.result as ArrayBuffer,  //data is the actual audio/vudeo/image/text
-           uploadedAt: new Date().toISOString(),     //is just a timestamp it tells u when u saved the file
-         }; 
-
-        saveFile(fileData); //all files gets saved to saveFile
+     selectedFiles.forEach(async (file) => {
+       const fileData: StoredFile = {
+         id: crypto.randomUUID(),
+         name: file.name,
+         type: file.type,
+         lastModified: file.lastModified,
+         size: file.size,
+         data: file,
+         uploadedAt: new Date().toISOString(),
        };
-
-       // Read file as ArrayBuffer
-       reader.readAsArrayBuffer(file);
+       processedIds.current.add(fileData.id);
+       saveFile(fileData);
+       try {
+         const thumbnail = await makeThumbnail(file);
+         setThumbnails(prev => ({ ...prev, [fileData.id]: thumbnail }));
+         saveThumbnail(fileData.id, thumbnail);
+       } catch {
+         // The video remains playable if thumbnail decoding fails.
+       }
      });
    };
   //---------------------------end of file upload handler------------------------
@@ -106,69 +126,23 @@ const [sortBy, setSortBy] = useState("date");
   
 // Handler for when user clicks play button on a video thumbnail-----------
 const handleplay = (item: StoredFile) => {
-  const requestId = ++loadRequestRef.current;
     const orderedIds = sortFiles(files, sortBy)
   .filter(f => f.type.startsWith("video/"))
   .map(f => f.id);
 
   setQueue(orderedIds);
+  setIsVideoLoading(true);
   setCurrentMediaId(item.id);
   setCurrentMediaType("video");
   setIsPlaying(true);
-
-  // load real data then open the big player
-  loadFileData(item.id).then((data) => {
-    const blob = new Blob([data], { type: item.type });
-    const url = URL.createObjectURL(blob);
-
-    if (requestId !== loadRequestRef.current) {
-      URL.revokeObjectURL(url);
-      return;
-    }
-
-    if (activeVideoUrlRef.current) URL.revokeObjectURL(activeVideoUrlRef.current);
-    activeVideoUrlRef.current = url;
-    setActiveVideoUrl(url);
-    setActiveVideoName(item.name);
-  });
 };
 
 const closePlayer = () => {
-  loadRequestRef.current += 1;
-  if (activeVideoUrlRef.current) URL.revokeObjectURL(activeVideoUrlRef.current);
-  activeVideoUrlRef.current = null;
-  setActiveVideoUrl(null);
-  setActiveVideoName("");
+  setIsVideoLoading(false);
   setCurrentMediaId(null);
   setIsPlaying(false);
 };
 //--------------
-
-// Helper function to generate thumbnail for a video file---------
-const generateThumbnail = (file: StoredFile): Promise<string> => {
-  return new Promise((resolve) => {
-  //variable blob converts arraybuffer data to file type that can be used by html audio element, ---
-  //then variable url creates a address of where to get variable blob data
-    const blob = new Blob([file.data], { type: file.type });
-    const url = URL.createObjectURL(blob);
-    //--------------
-    const video = document.createElement("video");
-    video.src = url;
-    video.muted = true;
-    video.playsInline = true;
-    video.onloadedmetadata = () => { video.currentTime = 1; };
-    video.onseeked = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = 320;
-      canvas.height = 180;
-      const ctx = canvas.getContext("2d");
-      ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const thumbnail = canvas.toDataURL("image/jpeg", 0.7);
-      URL.revokeObjectURL(url);
-      resolve(thumbnail);
-    };
-  });
-};
 
 const handlePlayerMouseMove = () => {
   setShowOverlay(true);
@@ -218,25 +192,33 @@ return (
 
     <ErrorBoundary>
 
+      {readError && (
+        <div role="alert" aria-live="assertive" style={{ marginBottom: "12px", color: "#b91c1c", background: "#fee2e2", border: "1px solid #fecaca", padding: "8px 12px", borderRadius: "6px" }}>
+          {readError}
+        </div>
+      )}
+
       {/* ── Thumbnail grid — always visible ── */}
-      <div className={`video-main ${activeVideoUrl ? 'video-player-active' : ''}`}>
+      <div className={`video-main ${currentMediaType === "video" && currentMediaId ? 'video-player-active' : ''}`}>
         {/* ── Big video player panel — shown when a video is playing ── */}
-        {activeVideoUrl && (
+        {currentMediaType === "video" && currentMediaId && (
           <div
             className="video-player-panel"
             onMouseMove={handlePlayerMouseMove}
             onMouseLeave={handlePlayerMouseLeave}
           >
             <div className={`video-overlay${showOverlay ? " video-overlay--visible" : ""}`}>
-              <p className="video-overlay-title">{activeVideoName}</p>
+              <p className="video-overlay-title">{files.find(file => file.id === currentMediaId)?.name}</p>
               <button className="video-player-close" onClick={closePlayer}>✕</button>
             </div>
             <video
               ref={videoRef}
-              src={activeVideoUrl}
               className="video-player-screen"
               autoPlay
+              onLoadedData={() => setIsVideoLoading(false)}
+              onError={() => setIsVideoLoading(false)}
             />
+            {isVideoLoading && <p role="status">Loading video...</p>}
           </div>
         )}
         
@@ -246,7 +228,7 @@ return (
 
         {sortFiles(files.filter(item => item.type.startsWith("video/")), sortBy).map((item) => {
           return (
-            <div key={item.id} className={`cart-div ${item.id === currentMediaId ? "video-active" : ""}`}>
+            <div key={item.id} className={`cart-div ${item.id === currentMediaId ? "video-active" : ""} `} data-testid={`cart-item-${item.id}`}>
               <div className="video-thumb-wrapper">
                 <img
                   src={thumbnails[item.id] || ""}

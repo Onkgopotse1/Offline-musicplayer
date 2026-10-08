@@ -16,7 +16,7 @@ function makeAudioFile(
     type: "audio/mpeg",
     lastModified,
     size: 1024,
-    data: new ArrayBuffer(8),
+    data: new Blob(),
     uploadedAt: new Date(lastModified).toISOString(),
     duration,
   };

@@ -49,6 +49,7 @@ export default function Bottom() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressRef = useRef<HTMLProgressElement | null>(null);
   const currentUrlRef = useRef<string | null>(null);
+  const loadRequestRef = useRef(0);
 
   // Derive the current file from the ID
   const currentFile = files.find((f) => f.id === currentMediaId) ?? null;
@@ -62,17 +63,21 @@ export default function Bottom() {
       currentMediaType === "video" ? videoRef.current : audioRef.current;
     if (!media) return;
 
-    loadFileData(currentFile.id).then((data) => {
-      const blob = new Blob([data], { type: currentFile.type });
+    const requestId = ++loadRequestRef.current;
+    loadFileData(currentFile.id).then((blob) => {
+      if (requestId !== loadRequestRef.current) return;
       const url = URL.createObjectURL(blob);
 
       currentUrlRef.current = url;
       media.src = url;
       if (isPlaying) media.play();
+    }).catch(() => {
+      if (requestId === loadRequestRef.current) media.removeAttribute("src");
     });
     
 
     return () => {
+      loadRequestRef.current += 1;
       if (currentUrlRef.current) {
         URL.revokeObjectURL(currentUrlRef.current);
         currentUrlRef.current = null;

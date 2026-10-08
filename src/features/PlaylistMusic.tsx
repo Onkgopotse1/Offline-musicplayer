@@ -27,13 +27,12 @@ const useDuration = (url: string) => {
 function DurationCell({ fileId, fileType, loadFileData }: {
   fileId: string;
   fileType: string;
-  loadFileData: (id: string) => Promise<ArrayBuffer>;
+  loadFileData: (id: string) => Promise<Blob>;
 }) {
   const [duration, setDuration] = useState("--:--");
 
   useEffect(() => {
-    loadFileData(fileId).then((data) => {
-      const blob = new Blob([data], { type: fileType });
+    loadFileData(fileId).then((blob) => {
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
 
@@ -85,7 +84,7 @@ const [visibleSongs, setVisibleSongs] = useState<StoredFile[]>([]);
     };
 
 const saveToUserAudio = (audioFiles: StoredFile[]) => {
-  const request = indexedDB.open("MediaDB", 3);
+  const request = indexedDB.open("MediaDB", 4);
   request.onsuccess = () => {
     const db = request.result;
     const tx = db.transaction("userAudio", "readwrite");

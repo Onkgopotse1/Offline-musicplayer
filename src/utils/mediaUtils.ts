@@ -59,8 +59,7 @@ export function useUrlCache() {
 
   const getUrl = (item: StoredFile): string => {
     if (!urlCache.current[item.id]) {
-      const blob = new Blob([item.data], { type: item.type });
-      urlCache.current[item.id] = URL.createObjectURL(blob);
+      urlCache.current[item.id] = URL.createObjectURL(item.data);
     }
     return urlCache.current[item.id]!;
   };
@@ -104,7 +103,7 @@ export function formatDuration(seconds: number | undefined): string {
 
 export function createStoredFile(
   file: File,
-  data: ArrayBuffer,
+  data: Blob,
   extras?: Partial<StoredFile>
 ): StoredFile {
   return {

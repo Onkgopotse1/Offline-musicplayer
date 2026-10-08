@@ -6,7 +6,7 @@ interface MediaContextType {
   files: StoredFile[];
   setFiles: React.Dispatch<React.SetStateAction<StoredFile[]>>;
   saveFile: (file: StoredFile) => void;
-  loadFileData: (id: string) => Promise<ArrayBuffer>;
+  loadFileData: (id: string) => Promise<Blob>;
   loadThumbnails: () => Promise<Record<string, string>>;
   saveThumbnail: (id: string, dataUrl: string) => void;
 }
