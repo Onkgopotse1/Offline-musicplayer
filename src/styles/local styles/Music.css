@@ -20,7 +20,7 @@
   margin-left: 2%;
   display: grid;
   align-items: center;
-  grid-template-columns: 2% 4% 21% 21% 21% 20% 9%;
+  grid-template-columns: 2fr 4fr 21fr 21fr 21fr 20fr minmax(40px, 9fr);
   gap: 4px;
   box-sizing: border-box;
   border-bottom: 1px solid var(--border-color-default);
@@ -49,7 +49,7 @@
   border-radius: 8px;
   display: grid;
   align-items: center;
-  grid-template-columns: 2% 4% 21% 21% 21% 20% 9%;
+  grid-template-columns: 2fr 4fr 21fr 21fr 21fr 20fr minmax(40px, 9fr);
   gap: 5px;
   box-sizing: border-box;
   margin-left: 2%;

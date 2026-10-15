@@ -90,7 +90,7 @@ const saveToUserAudio = (audioFiles: StoredFile[]) => {
     const tx = db.transaction("userAudio", "readwrite");
     const store = tx.objectStore("userAudio");
     audioFiles.forEach((file) => {
-      store.put(file); // ✅ put = insert or update
+      store.put(file); //  put = insert or update
     });
     tx.oncomplete = () => {
 
@@ -109,7 +109,7 @@ const handleAddSongs = () => {
 
   //setVisibleSongs(audioFiles);
 
-  // ✅ Persist to IndexedDB
+  //  Persist to IndexedDB
   saveToUserAudio(audioFiles);
 };
 
@@ -144,16 +144,16 @@ const handleDelete = () => {
     id => !checkedIds.includes(id)
   );
 
-  // ✅ Update localStorage (persistence)
+  // Update localStorage (persistence)
   localStorage.setItem(key, JSON.stringify(updatedIds));
 
-  // ✅ Update UI immediately
+  // Update UI immediately
   const updatedSongs = visibleSongs.filter(
     song => !checkedIds.includes(song.id)
   );
   setVisibleSongs(updatedSongs);
 
-  // ✅ Clear selected checkboxes
+  // Clear selected checkboxes
   setCheckedIds([]);
 };
 //--

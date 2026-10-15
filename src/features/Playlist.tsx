@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/local styles/Playlist.css';
 import { getGradient, loadPlaylists } from "../utils/mediaUtils.ts";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 
 
 // Helper function to get the song count from local storage
@@ -104,7 +106,7 @@ function Playlist() {
                   e.preventDefault(); // Prevent navigating to the link when deleting
                   handleDelete(name);
               }}>
-                ⚙️
+                <FontAwesomeIcon icon={faTrashCan} />
               </button>
             </div>
             <div className="playlist-cart-info">

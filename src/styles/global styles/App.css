@@ -36,7 +36,6 @@
 }
 
 .upload-label:hover {
-  background-color: var(--btn-accent-hover);
   transform: scale(1.02);
 }
 
@@ -399,7 +398,6 @@ h1 {
 }
 
 .sub-menu-shuffle-btn:hover {
-  background-color: var(--btn-accent-hover);
   transform: scale(1.02);
 }
 
