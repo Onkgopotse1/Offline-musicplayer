@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMinimize } from "@fortawesome/free-solid-svg-icons";
 import "../styles/local styles/Video.css"
 import type { StoredFile } from "../type/media.ts";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
@@ -6,6 +8,7 @@ import { sortFiles } from "../utils/mediaUtils.ts";
 
 import { useMedia } from "../context/MediaContext.tsx";
 import { usePlayer } from "../context/MediaContext.tsx";
+import SortDropdown from "../components/SortDropdown.tsx";
 
 interface VideoProps {
   thumbnails: Record<string, string>;
@@ -14,7 +17,7 @@ interface VideoProps {
 
 function Video({ thumbnails, setThumbnails }: VideoProps) {
   const { files, saveFile, loadFileData, saveThumbnail } = useMedia();
-  const { currentMediaId, setCurrentMediaId, setIsPlaying, setCurrentMediaType, currentMediaType, videoRef, setQueue } = usePlayer();
+  const { currentMediaId, setCurrentMediaId, isPlaying, setIsPlaying, setCurrentMediaType, currentMediaType, videoRef, setQueue } = usePlayer();
 
 //sub menu
 const [sortBy, setSortBy] = useState("date");
@@ -22,6 +25,10 @@ const [sortBy, setSortBy] = useState("date");
    const [isVideoLoading, setIsVideoLoading] = useState(false);
    const [readError, setReadError] = useState<string | null>(null);
    const [showOverlay, setShowOverlay] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
    const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
    const processedIds = useRef<Set<string>>(new Set()); // Track which files have been queued for thumbnail generation
@@ -155,6 +162,40 @@ const handlePlayerMouseLeave = () => {
   hideTimerRef.current = setTimeout(() => setShowOverlay(false), 800);
 };
 
+useEffect(() => {
+  const updateFullscreen = () => {
+    const fullscreen = document.fullscreenElement?.classList.contains("video-player-panel") ?? false;
+    setIsFullscreen(fullscreen);
+    if (fullscreen) setShowOverlay(true);
+  };
+
+  document.addEventListener("fullscreenchange", updateFullscreen);
+  return () => document.removeEventListener("fullscreenchange", updateFullscreen);
+}, []);
+
+const formatTime = (time: number) => {
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60).toString().padStart(2, "0");
+  return `${minutes}:${seconds}`;
+};
+
+const toggleVideoPlayback = () => {
+  setIsPlaying(videoRef.current?.paused ?? !isPlaying);
+};
+
+const toggleFullscreen = async () => {
+  if (document.fullscreenElement) {
+    await document.exitFullscreen();
+    return;
+  }
+  await videoRef.current?.parentElement?.requestFullscreen();
+};
+
+const handleClosePlayer = () => {
+  if (document.fullscreenElement) void document.exitFullscreen();
+  closePlayer();
+};
+
 
 return (
   <div className="right-main" style={{ position: "relative" }}>
@@ -178,13 +219,7 @@ return (
     <div className="sub-menu-right">
       <div className="sub-menu-sort">
         <span>Sort by:</span>
-        <select className="sub-menu-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
-          <option value="date">Date Modified</option>
-          <option value="az">A-Z</option>
-          <option value="artist">Artist</option>
-          <option value="album">Album</option>
-          <option value="year">Release Year</option>
-        </select>
+        <SortDropdown value={sortBy} onChange={setSortBy} />
       </div>
     </div>
   </div>
@@ -209,15 +244,67 @@ return (
           >
             <div className={`video-overlay${showOverlay ? " video-overlay--visible" : ""}`}>
               <p className="video-overlay-title">{files.find(file => file.id === currentMediaId)?.name}</p>
-              <button className="video-player-close" onClick={closePlayer}>✕</button>
+              <button className="video-player-close" onClick={handleClosePlayer}>✕</button>
             </div>
             <video
               ref={videoRef}
               className="video-player-screen"
               autoPlay
-              onLoadedData={() => setIsVideoLoading(false)}
+              onLoadedData={(event) => {
+                setIsVideoLoading(false);
+                setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0);
+              }}
+              onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
+              onDurationChange={(event) => setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0)}
               onError={() => setIsVideoLoading(false)}
             />
+            {isFullscreen && (
+              <div className={`video-control-bar${showOverlay ? " video-control-bar--visible" : ""}`}>
+                <button
+                  className="video-control-play"
+                  onClick={toggleVideoPlayback}
+                  aria-label={isPlaying ? "Pause video" : "Play video"}
+                >
+                  {isPlaying ? "❚❚" : "▶"}
+                </button>
+                <span className="video-control-time">{formatTime(currentTime)}</span>
+                <input
+                  className="video-control-seek"
+                  type="range"
+                  aria-label="Seek video"
+                  min={0}
+                  max={duration || 0}
+                  step={0.1}
+                  value={Math.min(currentTime, duration || 0)}
+                  disabled={duration <= 0}
+                  onChange={(event) => {
+                    const time = Number(event.target.value);
+                    if (videoRef.current) videoRef.current.currentTime = time;
+                    setCurrentTime(time);
+                  }}
+                />
+                <span className="video-control-time">{formatTime(duration)}</span>
+                <label className="video-control-volume">
+                  <span className="video-control-volume-label">Volume</span>
+                  <input
+                    type="range"
+                    aria-label="Video volume"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={volume}
+                    onChange={(event) => {
+                      const nextVolume = Number(event.target.value);
+                      setVolume(nextVolume);
+                      if (videoRef.current) videoRef.current.volume = nextVolume;
+                    }}
+                  />
+                </label>
+                <button className="video-control-fullscreen" onClick={toggleFullscreen} aria-label="Exit fullscreen">
+                  <FontAwesomeIcon icon={faMinimize} />
+                </button>
+              </div>
+            )}
             {isVideoLoading && <p role="status">Loading video...</p>}
           </div>
         )}

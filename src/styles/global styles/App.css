@@ -407,6 +407,7 @@ h1 {
   align-items: center;
   gap: 5px;
   font-size: 12px;
+  position: relative;
 }
 
 .sub-menu-sort span {
@@ -455,4 +456,90 @@ h1 {
   background-color: var(--bg-card-hover);
   color: var(--text-color-primary);
   font-size: 12px;
+}
+
+.sort-dropdown {
+  position: relative;
+}
+
+.sort-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 150px;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.16));
+  border-radius: 6px;
+  background: var(--btn-transparent-bg);
+  color: var(--text-color-primary);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.sort-dropdown-trigger:hover,
+.sort-dropdown-trigger[aria-expanded="true"] {
+  border-color: var(--accent-color);
+  background: var(--bg-card-hover);
+}
+
+.sort-dropdown-trigger:focus-visible,
+.sort-dropdown-list:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.sort-dropdown-chevron {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-right: 1.5px solid var(--accent-color);
+  border-bottom: 1.5px solid var(--accent-color);
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.sort-dropdown-trigger[aria-expanded="true"] .sort-dropdown-chevron {
+  transform: translateY(2px) rotate(225deg);
+}
+
+.sort-dropdown-list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 100%;
+  margin: 0;
+  padding: 5px;
+  list-style: none;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.16));
+  border-radius: 7px;
+  background: var(--bg-card-hover);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+}
+
+.sort-dropdown-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 9px 10px;
+  border-radius: 4px;
+  color: var(--text-color-primary);
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sort-dropdown-option:hover,
+.sort-dropdown-option.is-active {
+  background: var(--btn-accent-bg);
+  color: var(--btn-accent-text);
+}
+
+.sort-dropdown-check {
+  color: var(--accent-color);
+  font-weight: 700;
 }

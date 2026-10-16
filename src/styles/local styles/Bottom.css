@@ -26,29 +26,67 @@ place-items: center;
 
 .progressBar {
   width: 90%; /* Widened slightly for Win11 look */
-  height: 3px;
-  background-color: var(--bg-progress-bar);
+  height: 14px;
+  background: transparent;
   cursor: pointer;
-  border-radius: 2px;
   appearance: none;
   -webkit-appearance: none;
 }
 
-/* Webkit browsers (Chrome, Edge, Safari) */
-.progressBar::-webkit-progress-bar {
-  background-color: var(--bg-progress-bar);
-  border-radius: 2px;
+.progressBar:disabled {
+  cursor: default;
 }
 
-.progressBar::-webkit-progress-value {
-  background-color: var(--accent-color);
+.progressBar::-webkit-slider-runnable-track {
+  height: 3px;
   border-radius: 2px;
+  background: linear-gradient(to right, var(--accent-color) var(--progress), var(--bg-progress-bar) var(--progress));
 }
 
-/* Firefox */
-.progressBar::-moz-progress-bar {
-  background-color: var(--accent-color);
+.progressBar::-moz-range-track {
+  height: 3px;
   border-radius: 2px;
+  background: var(--bg-progress-bar);
+}
+
+.progressBar::-moz-range-progress {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent-color);
+}
+
+.progressBar::-webkit-slider-thumb {
+  width: 10px;
+  height: 10px;
+  margin-top: -3.5px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent-color);
+  appearance: none;
+  -webkit-appearance: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.progressBar::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent-color);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.progressBar:hover::-webkit-slider-thumb,
+.progressBar:focus-visible::-webkit-slider-thumb,
+.progressBar:hover::-moz-range-thumb,
+.progressBar:focus-visible::-moz-range-thumb {
+  opacity: 1;
+}
+
+.progressBar:focus-visible {
+  outline: none;
 }
 
 /* --- Main Controls (Center) --- */

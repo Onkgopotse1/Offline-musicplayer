@@ -2,6 +2,15 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, it, expect, vi } from "vitest";
+
+vi.mock("@fortawesome/react-fontawesome", () => ({
+  FontAwesomeIcon: () => null,
+}));
+
+vi.mock("@fortawesome/free-solid-svg-icons", () => ({
+  faMinimize: {},
+}));
+
 import Video from "../../features/Video.tsx";
 import {
   MediaContext,
@@ -98,9 +107,11 @@ it("renders the + Add Videos button", () => {
   it("renders the sort control", () => {
     renderVideo();
 
-    const sortControl = screen.getByRole("combobox");
+    const sortControl = screen.getByRole("button", { name: "Sort by: Date Modified" });
+    expect(sortControl).toHaveAttribute("aria-haspopup", "listbox");
+    fireEvent.click(sortControl);
 
-    expect(sortControl).toHaveValue("date");
+    expect(screen.getByRole("listbox", { name: "Sort by" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Date Modified" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "A-Z" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Artist" })).toBeInTheDocument();
@@ -251,6 +262,33 @@ it("renders the + Add Videos button", () => {
       );
       expect(screen.getByRole("button", { name: "✕" })).toBeInTheDocument();
     });
+  });
+
+  it("shows custom controls only while the player is fullscreen", () => {
+    const video: StoredFile = {
+      id: "video-1",
+      name: "Vacation.mp4",
+      type: "video/mp4",
+      lastModified: 1_700_000_000_000,
+      size: 1024,
+      data: new Blob(),
+      uploadedAt: new Date(1_700_000_000_000).toISOString(),
+    };
+    const { container } = renderVideo([video]);
+    fireEvent.click(screen.getByRole("button", { name: "▶" }));
+
+    expect(screen.queryByRole("slider", { name: "Seek video" })).not.toBeInTheDocument();
+    Object.defineProperty(document, "fullscreenElement", {
+      configurable: true,
+      value: container.querySelector(".video-player-panel"),
+    });
+    fireEvent(document, new Event("fullscreenchange"));
+
+    expect(screen.getByRole("slider", { name: "Seek video" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Pause video" })).toBeInTheDocument();
+    Object.defineProperty(document, "fullscreenElement", { configurable: true, value: null });
+    fireEvent(document, new Event("fullscreenchange"));
+    expect(screen.queryByRole("slider", { name: "Seek video" })).not.toBeInTheDocument();
   });
 
   it("marks the currently playing card as active", () => {
@@ -407,10 +445,10 @@ it("renders the + Add Videos button", () => {
 
     renderVideo(videos);
 
-    const selectElement = screen.getByRole("combobox");
-    await user.selectOptions(selectElement, "az");
+    await user.click(screen.getByRole("button", { name: "Sort by: Date Modified" }));
+    await user.click(screen.getByRole("option", { name: "A-Z" }));
 
-    expect(selectElement).toHaveValue("az");
+    expect(screen.getByRole("button", { name: "Sort by: A-Z" })).toBeInTheDocument();
     expect(screen.getAllByRole("img").map((image) => image.getAttribute("alt")))
       .toEqual(["Artist - Alpha.mp4", "Artist - Zebra.mp4"]);
   });

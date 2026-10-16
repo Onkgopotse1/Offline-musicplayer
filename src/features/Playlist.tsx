@@ -52,8 +52,9 @@ function Playlist() {
       {/* div 1 — topbar unchanged */}
       <div className="topbar">
         <h1 className="topbar-h1">Playlist</h1>
-        <button className="upload-label" onClick={() => setShowPopup(true)}>
-          + Add Playlist
+        <button className="playlist-add-button" onClick={() => setShowPopup(true)}>
+          <span className="playlist-add-icon" aria-hidden="true">+</span>
+          <span>Add Playlist</span>
         </button>
       </div>
 

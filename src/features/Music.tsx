@@ -7,6 +7,7 @@ import { parseFileName, sortFiles, useUrlCache, loadPlaylists, formatDuration } 
 
 import { useMedia } from "../context/MediaContext.tsx";
 import { usePlayer } from "../context/MediaContext.tsx";
+import SortDropdown from "../components/SortDropdown.tsx";
 
 function DurationCell({ duration }: { duration: number | undefined }) {
   return <>{formatDuration(duration)}</>;
@@ -163,17 +164,7 @@ const addToPlaylist = (playlistName: string) => {
     <div className="sub-menu-right">
       <div className="sub-menu-sort">
         <span>Sort by:</span>
-        <select
-          className="sub-menu-select"
-          value={sortBy}
-          onChange={e => setSortBy(e.target.value)}
-        >
-          <option value="date">Date Modified</option>
-          <option value="az">A-Z</option>
-          <option value="artist">Artist</option>
-          <option value="album">Album</option>
-          <option value="year">Release Year</option>
-        </select>
+          <SortDropdown value={sortBy} onChange={setSortBy} />
       </div>
     </div>
   </div>

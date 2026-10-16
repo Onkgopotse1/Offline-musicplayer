@@ -102,22 +102,40 @@ h1 { font-size: 3em; line-height: 1.1; }
 /* --------- Big video player panel -------- */
 .video-player-panel {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 50%;
+  left: 50%;
   z-index: 10;
+  width: min(960px, calc(100% - 32px));
+  aspect-ratio: 16 / 9;
+  max-height: calc(100% - 32px);
+  transform: translate(-50%, -50%);
   background-color: var(--bg-core-primary);
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   overflow: hidden;
-  cursor: none; 
+  cursor: default;
 }
 
-/* show cursor when overlay is visible */
-.video-player-panel:hover {
-  cursor: default;
+.video-player-panel.video-cursor-hidden,
+.video-player-panel.video-cursor-hidden * {
+  cursor: none;
+}
+
+.video-player-panel:fullscreen,
+.video-player-panel.video-player-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  aspect-ratio: auto;
+  max-width: none;
+  max-height: none;
+  transform: none;
+  border: 0;
+  background: #000;
 }
 
 /* ── Overlay: sits on top of the video, fades in/out ── */
@@ -130,20 +148,20 @@ h1 { font-size: 3em; line-height: 1.1; }
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 14px 16px 40px;
-  /* dark gradient so text is readable over any video */
-  background: linear-gradient(to bottom, rgba(0,0,0,0.72) 0%, transparent 100%);
+  padding: 22px 28px 56px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.72) 0%, transparent 100%);
   opacity: 0;
-  pointer-events: none;           
+  pointer-events: none;
   transition: opacity 0.3s ease;
 }
 
 .video-overlay--visible {
   opacity: 1;
-  pointer-events: auto;           
+  pointer-events: auto;
 }
 
 .video-overlay-title {
+  max-width: 80%;
   margin: 0;
   font-size: 13px;
   font-weight: 500;
@@ -151,7 +169,6 @@ h1 { font-size: 3em; line-height: 1.1; }
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 80%;
   text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }
 
@@ -178,4 +195,129 @@ h1 { font-size: 3em; line-height: 1.1; }
   min-height: 0;
   background-color: var(--bg-core-primary);
   object-fit: contain;
+}
+
+.video-player-fullscreen .video-player-screen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.video-control-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 21;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 54px 28px 24px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.82), transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.video-control-bar--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.video-control-play {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent-color);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.video-control-play:hover {
+  transform: scale(1.06);
+}
+
+.video-control-time {
+  min-width: 38px;
+  color: #fff;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.video-control-seek {
+  width: 100%;
+  min-width: 40px;
+  height: 18px;
+  accent-color: var(--accent-color);
+  cursor: pointer;
+}
+
+.video-control-seek:disabled {
+  cursor: default;
+}
+
+.video-control-volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-size: 12px;
+}
+
+.video-control-volume input {
+  width: 88px;
+  accent-color: var(--accent-color);
+}
+
+.video-control-fullscreen {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.video-control-fullscreen:hover {
+  background: var(--accent-color);
+}
+
+.video-player-fullscreen .video-overlay {
+  padding: 28px 32px 64px;
+}
+
+@media (max-width: 600px) {
+  .video-control-bar {
+    gap: 8px;
+    padding: 44px 14px 16px;
+  }
+
+  .video-control-volume {
+    gap: 4px;
+  }
+
+  .video-control-volume input {
+    width: 56px;
+  }
+
+  .video-control-volume-label {
+    display: none;
+  }
+
+  .video-player-fullscreen .video-overlay {
+    padding: 16px 16px 52px;
+  }
 }

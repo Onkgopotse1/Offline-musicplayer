@@ -38,6 +38,8 @@ export default function Bottom() {
 
   const [volume, setVolume] = useState(1);
   const [showVolume, setShowVolume] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   // Keep refs in sync so closures inside useEffect always read the latest value
   const isShuffleRef = useRef(false);
@@ -47,7 +49,7 @@ export default function Bottom() {
 
   // The ONE audio element for the whole app
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const progressRef = useRef<HTMLProgressElement | null>(null);
+  const progressRef = useRef<HTMLInputElement | null>(null);
   const currentUrlRef = useRef<string | null>(null);
   const loadRequestRef = useRef(0);
 
@@ -177,17 +179,39 @@ export default function Bottom() {
 
     const media =
       currentMediaType === "video" ? videoRef.current : audioRef.current;
-    const progress = progressRef.current;
-    if (!media || !progress) return;
+    if (!media || !progressRef.current) return;
 
+    setCurrentTime(0);
+    setDuration(0);
     const updateProgress = () => {
-      if (!media.duration) return;
-      progress.value = (media.currentTime / media.duration) * 100;
+      setCurrentTime(Number.isFinite(media.currentTime) ? media.currentTime : 0);
+      setDuration(Number.isFinite(media.duration) ? media.duration : 0);
     };
 
+    updateProgress();
     media.addEventListener("timeupdate", updateProgress);
-    return () => media.removeEventListener("timeupdate", updateProgress);
-  }, [currentMediaType]);
+    media.addEventListener("loadedmetadata", updateProgress);
+    media.addEventListener("durationchange", updateProgress);
+    return () => {
+      media.removeEventListener("timeupdate", updateProgress);
+      media.removeEventListener("loadedmetadata", updateProgress);
+      media.removeEventListener("durationchange", updateProgress);
+    };
+  }, [currentMediaId, currentMediaType]);
+
+  const handleSeek = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const nextTime = Number(event.target.value);
+    const media = currentMediaType === "video" ? videoRef.current : audioRef.current;
+    if (!media || !Number.isFinite(nextTime)) return;
+    media.currentTime = nextTime;
+    setCurrentTime(nextTime);
+  };
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60).toString().padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  };
 
 
   // ── Play / Pause toggle ──────────────────────────────────────────────
@@ -199,13 +223,15 @@ export default function Bottom() {
   const goFullscreen = () => {
   const video = videoRef.current;
   if (!video) return;
+  const fullscreenTarget = video.closest(".video-player-panel") as HTMLElement | null;
+  const target = fullscreenTarget ?? video;
 
-  if (video.requestFullscreen) {
-    video.requestFullscreen();
-  } else if ((video as any).webkitRequestFullscreen) {
-    (video as any).webkitRequestFullscreen();
-  } else if ((video as any).msRequestFullscreen) {
-    (video as any).msRequestFullscreen();
+  if (target.requestFullscreen) {
+    void target.requestFullscreen();
+  } else if ((target as any).webkitRequestFullscreen) {
+    (target as any).webkitRequestFullscreen();
+  } else if ((target as any).msRequestFullscreen) {
+    (target as any).msRequestFullscreen();
   }
 };
 
@@ -218,11 +244,19 @@ export default function Bottom() {
           {currentMediaType === "audio" && <audio ref={audioRef} />}
 
           {/* Progress Bar */}
-          <progress
+          <input
             ref={progressRef}
-            value={0}
-            max={100}
+            type="range"
+            aria-label="Seek"
+            aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
+            min={0}
+            max={duration || 0}
+            step={0.1}
+            value={Math.min(currentTime, duration || 0)}
+            onChange={handleSeek}
+            disabled={!currentMediaType || duration <= 0}
             className="progressBar"
+            style={{ "--progress": `${duration > 0 ? (currentTime / duration) * 100 : 0}%` } as React.CSSProperties}
           />
 
           {/* Main Controls */}

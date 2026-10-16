@@ -89,8 +89,29 @@ describe("Bottom player", () => {
   it("renders the progress bar and player controls", () => {
     renderBottom();
 
-    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(screen.getByRole("slider", { name: "Seek" })).toBeDisabled();
     expect(screen.getAllByRole("button")).toHaveLength(9);
+  });
+
+  it("seeks the active audio to the selected time", () => {
+    const { container } = renderBottom({ currentMediaType: "audio" });
+    const audio = container.querySelector("audio")!;
+    const slider = screen.getByRole("slider", { name: "Seek" });
+    let audioTime = 0;
+
+    Object.defineProperty(audio, "duration", { configurable: true, value: 120 });
+    Object.defineProperty(audio, "currentTime", {
+      configurable: true,
+      get: () => audioTime,
+      set: (time: number) => { audioTime = time; },
+    });
+    fireEvent.loadedMetadata(audio);
+
+    expect(slider).toHaveAttribute("max", "120");
+    fireEvent.change(slider, { target: { value: "45" } });
+
+    expect(audio.currentTime).toBe(45);
+    expect(slider).toHaveValue("45");
   });
 
   it("shows the active shuffle and repeat states", () => {
