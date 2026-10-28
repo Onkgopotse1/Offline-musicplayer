@@ -5,7 +5,7 @@
   --bg-core-primary: #242424;           /* Main body/page background */
   --bg-core-primary-light: #ffffff;     /* Light mode main background */
   --bg-core-header: #161616;            /* Top bar, headers */
-  --bg-core-sidebar: #1414149c;         /* Sidebar with transparency */
+  --bg-core-sidebar: #141414;           /* Opaque dark sidebar */
   --bg-core-bottom: #242424;            /* Bottom player bar */
   
   /* ─────────────────────────────────────────────────────────────────
@@ -145,7 +145,7 @@ h1 {
   /* Explicit dark values (defaults already match these) */
   --bg-core-primary: #242424;
   --bg-core-header: #161616;
-  --bg-core-sidebar: #1414149c;
+  --bg-core-sidebar: #141414;
   --bg-core-bottom: #242424;
 
   --text-color-primary: #ffffff;
