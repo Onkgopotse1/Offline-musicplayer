@@ -81,6 +81,50 @@ describe("Music integration", () => {
     expect(screen.getByText("Song Two")).toBeInTheDocument();
   });
 
+  it("keeps metadata visible when a stored audio file has missing bytes", () => {
+    const damagedFile = {
+      ...makeAudioFile("damaged-song", "Unknown Artist - china.mp3", 1_700_000_000_000),
+      data: undefined as unknown as Blob,
+    };
+
+    render(
+      <MediaContext.Provider
+        value={{
+          files: [damagedFile],
+          setFiles: vi.fn(),
+          saveFile: vi.fn(),
+          loadFileData: vi.fn(),
+          loadThumbnails: vi.fn(),
+          saveThumbnail: vi.fn(),
+        }}
+      >
+        <PlayerContext.Provider
+          value={{
+            currentMediaId: null,
+            setCurrentMediaId: vi.fn(),
+            currentMediaType: null,
+            setCurrentMediaType: vi.fn(),
+            isPlaying: false,
+            setIsPlaying: vi.fn(),
+            videoRef: { current: null },
+            recentIds: [],
+            addToRecent: vi.fn(),
+            queue: [],
+            setQueue: vi.fn(),
+            isShuffle: false,
+            setIsShuffle: vi.fn(),
+            isRepeat: false,
+            setIsRepeat: vi.fn(),
+          }}
+        >
+          <Music />
+        </PlayerContext.Provider>
+      </MediaContext.Provider>
+    );
+
+    expect(screen.getByText("china")).toBeInTheDocument();
+  });
+
   it("shuffles and starts playback for the audio queue", () => {
     const files = [
       makeAudioFile("song-1", "Artist One - Song One.mp3", 1_700_000_000_000, 180),

@@ -2,7 +2,7 @@ import { useParams, useNavigate, } from 'react-router-dom';
 import React, { useEffect, useState, useRef } from "react";
 import '../styles/local styles/Playlist.css';
 import type { StoredFile } from "../type/media.ts";
-import { parseFileName, sortFiles, useUrlCache } from "../utils/mediaUtils.ts";
+import { parseFileName, sortFiles } from "../utils/mediaUtils.ts";
 import { useMedia } from "../context/MediaContext.tsx";
 import { usePlayer } from "../context/MediaContext.tsx";
 import SongList from './SongList.tsx';
@@ -72,7 +72,6 @@ const [visibleSongs, setVisibleSongs] = useState<StoredFile[]>([]);
   
 
   //
-  const getUrl = useUrlCache();
  
      const handleplay = (id: string) => {
     const orderedIds = sortFiles(visibleSongs, sortBy).map(f => f.id);
@@ -85,7 +84,7 @@ const [visibleSongs, setVisibleSongs] = useState<StoredFile[]>([]);
     };
 
 const saveToUserAudio = (audioFiles: StoredFile[]) => {
-  const request = indexedDB.open("MediaDB", 4);
+  const request = indexedDB.open("MediaDB", 6);
   request.onsuccess = () => {
     const db = request.result;
     const tx = db.transaction("userAudio", "readwrite");
@@ -250,7 +249,6 @@ return (
       <div className="playlist-detail-main">
         
         {sortFiles(visibleSongs, sortBy).map((item) => {
-         const fileURL = getUrl(item);
          const { artist, song } = parseFileName(item); //Parse artist and song from filename//
 
          const currentfile = files.find(f => f.id === currentMediaId);

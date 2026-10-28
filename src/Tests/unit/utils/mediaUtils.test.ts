@@ -326,6 +326,34 @@ describe('useUrlCache', () => {
 
     expect(URL.createObjectURL).toHaveBeenCalledWith(file.data);
   });
+
+  test('converts legacy ArrayBuffer data into a Blob before creating its URL', () => {
+    const { result } = renderHook(() => useUrlCache());
+    const file = mockFile({
+      id: 'legacy-array-buffer',
+      type: 'audio/mpeg',
+      data: new ArrayBuffer(8) as unknown as Blob,
+    });
+
+    result.current(file);
+
+    const createdBlob = vi.mocked(URL.createObjectURL).mock.calls[0]?.[0];
+    expect(createdBlob).toBeInstanceOf(Blob);
+    expect(createdBlob?.type).toBe('audio/mpeg');
+    expect(createdBlob?.size).toBe(8);
+  });
+
+  test('reports invalid stored media data clearly', () => {
+    const { result } = renderHook(() => useUrlCache());
+    const file = mockFile({
+      id: 'invalid-data',
+      name: 'Missing audio.mp3',
+      data: undefined as unknown as Blob,
+    });
+
+    expect(() => result.current(file)).toThrow('Media data for "Missing audio.mp3" is missing or invalid.');
+    expect(URL.createObjectURL).not.toHaveBeenCalled();
+  });
 });
 
 

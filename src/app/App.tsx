@@ -38,7 +38,7 @@ import { useMediaDB } from "../hooks/useMediaDB.ts";
 function App() {
 
 // All uploaded media (audio + video) lives in this state
-  const { files, setFiles, saveFile, loadFileData, loadThumbnails, saveThumbnail, loaded } = useMediaDB();
+  const { files, setFiles, saveFile, loadFileData, loadThumbnails, saveThumbnail, loaded, databaseError } = useMediaDB();
 
 // Which media is currently selected to play
   const [currentMediaId, setCurrentMediaId] = useState<string | null>(null);
@@ -69,16 +69,12 @@ function App() {
 
 // thumbnails stay local — they update frequently during generation
   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
-  const [thumbnailsReady, setThumbnailsReady] = useState(false);
-
   useEffect(() => {
-    loadThumbnails().then((saved) => {
-      setThumbnails(saved);
-      setThumbnailsReady(true); // signals thumbnails are done
-    });
-  }, []);
+    if (!loaded) return;
+    void loadThumbnails().then(setThumbnails);
+  }, [loaded, loadThumbnails]);
 
-  const loading = !loaded || !thumbnailsReady;
+  const loading = !loaded;
 
  const [queue, setQueue] = useState<string[]>([]);
 
@@ -95,6 +91,13 @@ const [isRepeat, setIsRepeat] = useState(false);
         <PlayerContext.Provider value={{ isShuffle,  setIsShuffle, isRepeat, setIsRepeat, queue, setQueue, currentMediaId, setCurrentMediaId, currentMediaType, setCurrentMediaType, isPlaying, setIsPlaying, videoRef, recentIds, addToRecent }}>
 
         <div className="layout">
+
+          {databaseError && (
+            <div role="alert" style={{ position: "fixed", top: 12, left: "50%", transform: "translateX(-50%)", zIndex: 1000, padding: "12px 16px", background: "#fff3cd", color: "#664d03", border: "1px solid #ffecb5", borderRadius: 6 }}>
+              Media database unavailable: {databaseError}
+              <button onClick={() => window.location.reload()} style={{ marginLeft: 12 }}>Reload</button>
+            </div>
+          )}
 
           <Sidebar />
 

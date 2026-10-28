@@ -59,7 +59,18 @@ export function useUrlCache() {
 
   const getUrl = (item: StoredFile): string => {
     if (!urlCache.current[item.id]) {
-      urlCache.current[item.id] = URL.createObjectURL(item.data);
+      const data = item.data as unknown;
+      const blob = data instanceof Blob
+        ? data
+        : data instanceof ArrayBuffer || ArrayBuffer.isView(data)
+          ? new Blob([data as BlobPart], { type: item.type })
+          : null;
+
+      if (!blob) {
+        throw new TypeError(`Media data for "${item.name}" is missing or invalid.`);
+      }
+
+      urlCache.current[item.id] = URL.createObjectURL(blob);
     }
     return urlCache.current[item.id]!;
   };

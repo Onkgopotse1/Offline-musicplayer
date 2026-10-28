@@ -40,6 +40,7 @@ export default function Bottom() {
   const [showVolume, setShowVolume] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [playbackError, setPlaybackError] = useState<string | null>(null);
 
   // Keep refs in sync so closures inside useEffect always read the latest value
   const isShuffleRef = useRef(false);
@@ -66,6 +67,7 @@ export default function Bottom() {
     if (!media) return;
 
     const requestId = ++loadRequestRef.current;
+    setPlaybackError(null);
     loadFileData(currentFile.id).then((blob) => {
       if (requestId !== loadRequestRef.current) return;
       const url = URL.createObjectURL(blob);
@@ -73,8 +75,11 @@ export default function Bottom() {
       currentUrlRef.current = url;
       media.src = url;
       if (isPlaying) media.play();
-    }).catch(() => {
-      if (requestId === loadRequestRef.current) media.removeAttribute("src");
+    }).catch((error: unknown) => {
+      if (requestId === loadRequestRef.current) {
+        media.removeAttribute("src");
+        setPlaybackError(error instanceof Error ? error.message : "Unable to load this media file.");
+      }
     });
     
 
@@ -240,6 +245,12 @@ export default function Bottom() {
     <div className="bottom">
       <ErrorBoundary>
         <div className="bottom-mother-container">
+
+          {playbackError && (
+            <div role="alert" style={{ position: "fixed", bottom: "128px", left: "50%", transform: "translateX(-50%)", zIndex: 101, maxWidth: "min(90vw, 700px)", padding: "8px 12px", background: "#fee2e2", color: "#991b1b", border: "1px solid #fecaca", borderRadius: 6, textAlign: "center" }}>
+              {playbackError}
+            </div>
+          )}
 
           {currentMediaType === "audio" && <audio ref={audioRef} />}
 

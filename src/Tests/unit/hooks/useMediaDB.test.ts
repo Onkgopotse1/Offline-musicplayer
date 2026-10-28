@@ -143,7 +143,7 @@ describe("useMediaDB", () => {
 
     expect(globalThis.indexedDB.open).toHaveBeenCalledWith(
       "MediaDB",
-      4
+      6
     );
 
 
@@ -161,6 +161,63 @@ describe("useMediaDB", () => {
     );
 
     expect(fakeObjectStore.getAll).toHaveBeenCalled();
+  });
+
+  test("loaded becomes true and reports an error when the database cannot open", async () => {
+    const fakeOpenRequest = {
+      result: {},
+      onsuccess: null as null | (() => void),
+      onerror: null as null | (() => void),
+      onupgradeneeded: null,
+      error: new DOMException("Database unavailable"),
+    };
+
+    (globalThis as any).indexedDB = {
+      open: vi.fn(() => fakeOpenRequest),
+    };
+
+    const { result } = renderHook(() => useMediaDB());
+    fakeOpenRequest.onerror?.();
+
+    await waitFor(() => {
+      expect(result.current.loaded).toBe(true);
+      expect(result.current.databaseError).toBe("Database unavailable");
+    });
+  });
+
+  test("loaded becomes true and reports an error when media cannot be read", async () => {
+    const fakeGetAllRequest = {
+      result: [],
+      onsuccess: null as null | (() => void),
+      onerror: null as null | (() => void),
+      error: new DOMException("Media read failed"),
+    };
+    const fakeObjectStore = {
+      getAll: vi.fn(() => fakeGetAllRequest),
+    };
+    const fakeDB = {
+      transaction: vi.fn(() => ({ objectStore: vi.fn(() => fakeObjectStore) })),
+      close: vi.fn(),
+    };
+    const fakeOpenRequest = {
+      result: fakeDB,
+      onsuccess: null as null | (() => void),
+      onerror: null,
+      onupgradeneeded: null,
+    };
+
+    (globalThis as any).indexedDB = {
+      open: vi.fn(() => fakeOpenRequest),
+    };
+
+    const { result } = renderHook(() => useMediaDB());
+    fakeOpenRequest.onsuccess?.();
+    fakeGetAllRequest.onerror?.();
+
+    await waitFor(() => {
+      expect(result.current.loaded).toBe(true);
+      expect(result.current.databaseError).toBe("Media read failed");
+    });
   });
 
 });

@@ -3,7 +3,7 @@ import '../styles/local styles/Music.css';
 import type { StoredFile } from "../type/media.ts";
 import ErrorBoundary from "../Error boundaries/Error boundry.tsx";
 import PlaylistMusic from "./PlaylistMusic.tsx";
-import { parseFileName, sortFiles, useUrlCache, loadPlaylists, formatDuration } from "../utils/mediaUtils.ts";
+import { parseFileName, sortFiles, loadPlaylists, formatDuration } from "../utils/mediaUtils.ts";
 
 import { useMedia } from "../context/MediaContext.tsx";
 import { usePlayer } from "../context/MediaContext.tsx";
@@ -24,8 +24,6 @@ const [sortBy, setSortBy] = useState("date");
 //a state for if a checkbox is clicked
   const [isChecked, setIsChecked] = useState(false);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
-
-  const getUrl = useUrlCache();
 
  ///------------- Helper Function to handle file uploads from the input element---------
    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,7 +189,6 @@ const addToPlaylist = (playlistName: string) => {
       </div>
 
         {sortFiles(files, sortBy).map((item) => {
-         const fileURL = getUrl(item);
          const { artist, song } = parseFileName(item); //Parse artist and song from filename//
 
          const currentfile = files.find(f => f.id === currentMediaId);

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 
 vi.mock("@fortawesome/react-fontawesome", () => ({
@@ -26,6 +26,7 @@ import {
 
 function renderBottom(overrides: Partial<{
   files: any[];
+  loadFileData: (id: string) => Promise<Blob>;
   currentMediaId: string | null;
   currentMediaType: "audio" | "video" | null;
   isPlaying: boolean;
@@ -38,6 +39,7 @@ function renderBottom(overrides: Partial<{
   setIsRepeat: React.Dispatch<React.SetStateAction<boolean>>;
 }> = {}) {
   const files = overrides.files ?? [];
+  const loadFileData = overrides.loadFileData ?? vi.fn().mockResolvedValue(new Blob());
   const currentMediaId = overrides.currentMediaId ?? null;
   const currentMediaType = overrides.currentMediaType ?? null;
   const isPlaying = overrides.isPlaying ?? false;
@@ -55,7 +57,7 @@ function renderBottom(overrides: Partial<{
         files,
         setFiles: vi.fn(),
         saveFile: vi.fn(),
-        loadFileData: vi.fn(),
+        loadFileData,
         loadThumbnails: vi.fn(),
         saveThumbnail: vi.fn(),
       }}
@@ -91,6 +93,22 @@ describe("Bottom player", () => {
 
     expect(screen.getByRole("slider", { name: "Seek" })).toBeDisabled();
     expect(screen.getAllByRole("button")).toHaveLength(9);
+  });
+
+  it("shows a useful error when stored media bytes are unavailable", async () => {
+    const file = { id: "china", name: "china.mp3", type: "audio/mpeg" };
+    renderBottom({
+      files: [file],
+      currentMediaId: "china",
+      currentMediaType: "audio",
+      loadFileData: vi.fn().mockRejectedValue(
+        new Error('Media data for "china.mp3" is missing or invalid. Re-import this file to restore playback.')
+      ),
+    });
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      'Media data for "china.mp3" is missing or invalid. Re-import this file to restore playback.'
+    );
   });
 
   it("seeks the active audio to the selected time", () => {

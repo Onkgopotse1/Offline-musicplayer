@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { StoredFile } from "../type/media.ts";
 
 export function useMediaDB() {
 
 const [loaded, setLoaded] = useState(false);
+const [databaseError, setDatabaseError] = useState<string | null>(null);
 
 // Store the DB reference to reuse it
 const [db, setDb] = useState<IDBDatabase | null>(null);
@@ -16,7 +17,14 @@ const [db, setDb] = useState<IDBDatabase | null>(null);
 
 
   useEffect(() => {
-    const request = indexedDB.open("MediaDB", 4);
+    let request: IDBOpenDBRequest;
+    try {
+      request = indexedDB.open("MediaDB", 6);
+    } catch (error) {
+      setDatabaseError(error instanceof Error ? error.message : "Unable to open the media database.");
+      setLoaded(true);
+      return;
+    }
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
@@ -26,6 +34,9 @@ const [db, setDb] = useState<IDBDatabase | null>(null);
       // new store for thumbnails — key is file id, value is a jpeg dataURL string
       if (!db.objectStoreNames.contains("thumbnails")) {
         db.createObjectStore("thumbnails", { keyPath: "id" });
+      }
+      if (!db.objectStoreNames.contains("userAudio")) {
+        db.createObjectStore("userAudio", { keyPath: "id" });
       }
       if (event.oldVersion > 0 && event.oldVersion < 4) {
         const store = request.transaction!.objectStore("media");
@@ -46,15 +57,31 @@ const [db, setDb] = useState<IDBDatabase | null>(null);
     request.onsuccess = () => {
       const dbInstance = request.result;
       setDb(dbInstance); // Store the DB reference
-      const tx = dbInstance.transaction(["media"], "readonly");
-      const store = tx.objectStore("media");
-      const getAll = store.getAll();
+      setDatabaseError(null);
+      try {
+        const tx = dbInstance.transaction(["media"], "readonly");
+        const getAll = tx.objectStore("media").getAll();
 
-getAll.onsuccess = () => {
-  const storedFiles = getAll.result as StoredFile[];
-  if (storedFiles.length > 0) setFiles(storedFiles);
-  setLoaded(true); // signals that DB read is done whether or not there are files
-};
+        getAll.onsuccess = () => {
+          setFiles(getAll.result as StoredFile[]);
+          setLoaded(true);
+        };
+        getAll.onerror = () => {
+          setDatabaseError(getAll.error?.message ?? "Unable to read media from the database.");
+          setLoaded(true);
+        };
+      } catch (error) {
+        setDatabaseError(error instanceof Error ? error.message : "Unable to read media from the database.");
+        setLoaded(true);
+      }
+    };
+    request.onerror = () => {
+      setDatabaseError(request.error?.message ?? "Unable to open the media database.");
+      setLoaded(true);
+    };
+    request.onblocked = () => {
+      setDatabaseError("The media database is blocked by another open app window. Close the other window and reload.");
+      setLoaded(true);
     };
   }, []);
 
@@ -85,9 +112,14 @@ getAll.onsuccess = () => {
           return;
         }
         const record = get.result as StoredFile;
-        resolve(record.data instanceof Blob
-          ? record.data
-          : new Blob([record.data as unknown as ArrayBuffer], { type: record.type }));
+        const data = record.data as unknown;
+        if (data instanceof Blob) {
+          resolve(data);
+        } else if (data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
+          resolve(new Blob([data as BlobPart], { type: record.type }));
+        } else {
+          reject(new Error(`Media data for "${record.name}" is missing or invalid. Re-import this file to restore playback.`));
+        }
       };
       get.onerror = () => reject(get.error);
     });
@@ -96,24 +128,28 @@ getAll.onsuccess = () => {
 
   // ── Load all saved thumbnails from IndexedDB on startup ──
   // returns a Record<id, dataUrl> so App.tsx can set thumbnails state instantly
-  const loadThumbnails = (): Promise<Record<string, string>> => {
+  const loadThumbnails = useCallback((): Promise<Record<string, string>> => {
     return new Promise((resolve) => {
       if (!db) {
         resolve({});
         return;
       }
-      const tx = db.transaction(["thumbnails"], "readonly");
-      const getAll = tx.objectStore("thumbnails").getAll();
-      getAll.onsuccess = () => {
-        const result: Record<string, string> = {};
-        for (const entry of getAll.result) {
-          result[entry.id] = entry.dataUrl;
-        }
-        resolve(result);
-      };
-      getAll.onerror = () => resolve({});
+      try {
+        const tx = db.transaction(["thumbnails"], "readonly");
+        const getAll = tx.objectStore("thumbnails").getAll();
+        getAll.onsuccess = () => {
+          const result: Record<string, string> = {};
+          for (const entry of getAll.result) {
+            result[entry.id] = entry.dataUrl;
+          }
+          resolve(result);
+        };
+        getAll.onerror = () => resolve({});
+      } catch {
+        resolve({});
+      }
     });
-  };
+  }, [db]);
 //------------------end-----------------------------
 
 
@@ -138,6 +174,6 @@ getAll.onsuccess = () => {
   };
 //----------------------------------end--------------------------------
 
-  return { files, setFiles, saveFile, loadFileData, loadThumbnails, saveThumbnail, loaded };
+  return { files, setFiles, saveFile, loadFileData, loadThumbnails, saveThumbnail, loaded, databaseError };
 
 }
