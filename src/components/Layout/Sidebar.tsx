@@ -13,7 +13,11 @@ import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import ErrorBoundary from "../../Error boundaries/Error boundry.tsx";
 import { useMedia, usePlayer } from "../../context/MediaContext.tsx";
 
-export default function Sidebar() {
+interface SidebarProps {
+  onAudioSearchSelection?: () => void;
+}
+
+export default function Sidebar({ onAudioSearchSelection }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [isCompactSearchOpen, setIsCompactSearchOpen] = useState(false);
@@ -45,6 +49,7 @@ export default function Sidebar() {
     setCurrentMediaType(mediaType);
     setIsPlaying(true);
     addToRecent(id);
+    if (mediaType === "audio") onAudioSearchSelection?.();
     setSearchQuery("");
     setIsSearchFocused(false);
     setIsCompactSearchOpen(false);

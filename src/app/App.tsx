@@ -33,6 +33,9 @@ import Sidebar from '../components/Layout/Sidebar.tsx';
 import Bottom from '../components/Layout/Bottom.tsx';
 import type { StoredFile } from "../type/media.ts";
 import { useMediaDB } from "../hooks/useMediaDB.ts";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMusic, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { formatDuration, parseFileName } from "../utils/mediaUtils.ts";
 
 
 function App() {
@@ -43,6 +46,7 @@ function App() {
 // Which media is currently selected to play
   const [currentMediaId, setCurrentMediaId] = useState<string | null>(null);
   const [currentMediaType, setCurrentMediaType] = useState<"audio" | "video" | null>(null);
+  const [isSearchNowPlayingOpen, setIsSearchNowPlayingOpen] = useState(false);
 
 // Playback state
   const [isPlaying, setIsPlaying] = useState(false);
@@ -80,6 +84,8 @@ function App() {
 
 const [isShuffle, setIsShuffle] = useState(false);
 const [isRepeat, setIsRepeat] = useState(false);
+  const nowPlayingFile = files.find((file) => file.id === currentMediaId) ?? null;
+  const nowPlayingDetails = nowPlayingFile ? parseFileName(nowPlayingFile) : null;
 
   return (
     <Suspense fallback={<div style={{ display: 'grid', placeItems: "center" }}>Loading...</div>}>
@@ -99,7 +105,7 @@ const [isRepeat, setIsRepeat] = useState(false);
             </div>
           )}
 
-          <Sidebar />
+          <Sidebar onAudioSearchSelection={() => setIsSearchNowPlayingOpen(true)} />
 
           <ErrorBoundary>
             <Routes>
@@ -121,6 +127,28 @@ const [isRepeat, setIsRepeat] = useState(false);
 
             </Routes>
           </ErrorBoundary>
+
+          {isSearchNowPlayingOpen && currentMediaType === "audio" && nowPlayingFile && nowPlayingDetails && (
+            <section className="search-now-playing" aria-label="Now playing" aria-live="polite">
+              <button
+                className="search-now-playing-close"
+                type="button"
+                aria-label="Close now playing view"
+                onClick={() => setIsSearchNowPlayingOpen(false)}
+              >
+                <FontAwesomeIcon icon={faXmark} aria-hidden="true" />
+              </button>
+              <div className="search-now-playing-art" aria-hidden="true">
+                <FontAwesomeIcon icon={faMusic} />
+              </div>
+              <p className="search-now-playing-kicker">{isPlaying ? "Now playing" : "Paused"}</p>
+              <h1 className="search-now-playing-title">{nowPlayingDetails.song}</h1>
+              <p className="search-now-playing-artist">{nowPlayingDetails.artist}</p>
+              <p className="search-now-playing-album">
+                {nowPlayingFile.album || "Audio track"} · {formatDuration(nowPlayingFile.duration)}
+              </p>
+            </section>
+          )}
 
           <ErrorBoundary>
             <Bottom />

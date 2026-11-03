@@ -127,7 +127,9 @@ const addToPlaylist = (playlistName: string) => {
   <div className="sub-menu">
     <div className="sub-menu-left">
      <input type="checkbox" />
-     <p>0 song selected</p>
+     <p className="sub-menu-selected-count">
+       {checkedIds.length} {checkedIds.length === 1 ? "song" : "songs"} selected
+     </p>
      <button>Play</button>
      <button>Play next</button>
       <div className="sub-menu-sort">

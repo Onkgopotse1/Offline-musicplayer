@@ -1,6 +1,7 @@
 /* Global theme variables are now in index.css */
 
 .layout {
+  position: relative;
   display: grid;
   height: calc(100vh - 119px);
   width: 100vw;
@@ -316,10 +317,92 @@
   height: 100%;
 }
 
+.search-now-playing {
+  position: absolute;
+  inset: 0 0 0 17%;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  padding: 48px 24px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(ellipse at 50% 24%, color-mix(in srgb, var(--accent-color) 20%, transparent), transparent 50%),
+    var(--bg-core-primary);
+  text-align: center;
+}
+
+.search-now-playing-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border-color-default);
+  border-radius: 6px;
+  background: var(--bg-card-hover);
+  color: var(--text-color-primary);
+  cursor: pointer;
+}
+
+.search-now-playing-close:hover {
+  color: var(--accent-color);
+}
+
+.search-now-playing-art {
+  display: grid;
+  place-items: center;
+  width: min(38vh, 280px);
+  aspect-ratio: 1;
+  margin-bottom: 28px;
+  border: 1px solid var(--border-color-default);
+  border-radius: 6px;
+  background: linear-gradient(145deg, var(--bg-card-hover), color-mix(in srgb, var(--accent-color) 24%, var(--bg-core-primary)));
+  color: var(--accent-color);
+  font-size: 4rem;
+}
+
+.search-now-playing-kicker,
+.search-now-playing-artist,
+.search-now-playing-album {
+  margin: 0;
+  color: var(--text-color-secondary);
+}
+
+.search-now-playing-kicker {
+  color: var(--accent-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.search-now-playing-title {
+  max-width: min(760px, 90%);
+  margin: 8px 0;
+  color: var(--text-color-primary);
+  font-size: clamp(1.5rem, 4vh, 2.5rem);
+  overflow-wrap: anywhere;
+}
+
+.search-now-playing-artist {
+  font-size: 1rem;
+}
+
+.search-now-playing-album {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
 /* --- RESPONSIVE SIDEBAR COLLAPSE --- */
 @media (max-width: 970px) {
   .layout {
     grid-template-columns: 70px 1fr;
+  }
+
+  .search-now-playing {
+    left: 70px;
   }
 
   .media-player,
@@ -540,6 +623,12 @@ h1 {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.sub-menu-selected-count {
+  margin: 0;
+  color: var(--text-color-primary);
+  white-space: nowrap;
 }
 
 .sub-menu-right {
