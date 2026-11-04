@@ -1,4 +1,4 @@
-import { useParams, useNavigate, } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import React, { useEffect, useState, useRef } from "react";
 import '../styles/local styles/Playlist.css';
 import type { StoredFile } from "../type/media.ts";
@@ -65,7 +65,6 @@ const [visibleSongs, setVisibleSongs] = useState<StoredFile[]>([]);
 
 
   const { name } = useParams();
-  const navigate = useNavigate();
   const playlistName = decodeURIComponent(name ?? "");
 
 
@@ -222,7 +221,6 @@ return (
   <div className="topbar">
     <div className="topbar-row">
       <div className="playlist-detail-topbar-left">
-        <button className="playlist-back-btn" onClick={() => navigate('/playlist')}>←</button>
         <h1 className="topbar-h1">{playlistName}</h1>
       </div>
       <button className="upload-label" onClick={() => setPopUpOpen(true)}>+ Add Songs</button>

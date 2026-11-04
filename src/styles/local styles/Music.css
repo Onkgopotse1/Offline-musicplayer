@@ -307,16 +307,16 @@ h1 { font-size: 3em; line-height: 1.1; }
   width: 18px;
   height: 18px;
   border-radius: 5px;
-  border: 1.5px solid rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid var(--text-color-muted);
+  background: var(--bg-input-default);
   cursor: pointer;
   position: relative;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .popup-song-list .checkbox:checked {
-  background: #E8A94C;
-  border-color: #E8A94C;
+  background: var(--accent-color);
+  border-color: var(--accent-color);
 }
 
 .popup-song-list .checkbox:checked::after {
@@ -326,13 +326,13 @@ h1 { font-size: 3em; line-height: 1.1; }
   top: 1px;
   width: 5px;
   height: 9px;
-  border: solid #1A1420;
+  border: solid var(--btn-accent-text);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
 
 .popup-song-list .checkbox:focus-visible {
-  outline: 2px solid #E8A94C;
+  outline: 2px solid var(--accent-color);
   outline-offset: 2px;
 }
 
@@ -415,20 +415,21 @@ h1 { font-size: 3em; line-height: 1.1; }
 .add-songs-btn {
   width: 100%;
   padding: 11px 18px;
-  border-radius: 12px;
-  border: none;
-  background: linear-gradient(135deg, #E8A94C, #D98F35);
-  color: #201607;
+  border-radius: 6px;
+  border: 1px solid var(--btn-accent-bg);
+  background: var(--btn-accent-bg);
+  color: var(--btn-accent-text);
   font-weight: 600;
   font-size: 0.92rem;
   cursor: pointer;
-  box-shadow: 0 8px 20px -6px rgba(232, 169, 76, 0.55);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
+  transition: background-color 0.15s ease, transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .add-songs-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--btn-accent-bg) 86%, black);
   transform: translateY(-1px);
-  box-shadow: 0 10px 24px -6px rgba(232, 169, 76, 0.65);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
 }
 
 .add-songs-btn:active:not(:disabled) {
@@ -436,14 +437,15 @@ h1 { font-size: 3em; line-height: 1.1; }
 }
 
 .add-songs-btn:disabled {
-  background: rgba(255, 255, 255, 0.08);
-  color: #6B6478;
+  background: var(--bg-card-hover);
+  border-color: var(--border-color-default);
+  color: var(--text-color-muted);
   box-shadow: none;
   cursor: not-allowed;
 }
 
 .add-songs-btn:focus-visible {
-  outline: 2px solid #E8A94C;
+  outline: 2px solid var(--accent-color);
   outline-offset: 2px;
 }
 
