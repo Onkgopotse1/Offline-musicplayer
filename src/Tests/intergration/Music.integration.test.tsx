@@ -35,7 +35,8 @@ describe("Music integration", () => {
     });
   });
 
-  it("renders the uploaded audio tracks from the media context", () => {
+  describe("Rendering", () => {
+    it("renders the uploaded audio tracks from the media context", () => {
     const files = [
       makeAudioFile("song-1", "Artist One - Song One.mp3", 1_700_000_000_000, 180),
       makeAudioFile("song-2", "Artist Two - Song Two.mp3", 1_800_000_000_000, 240),
@@ -78,10 +79,10 @@ describe("Music integration", () => {
 
     expect(screen.getByText("Song One")).toBeInTheDocument();
     expect(screen.getByText("Artist One")).toBeInTheDocument();
-    expect(screen.getByText("Song Two")).toBeInTheDocument();
-  });
+      expect(screen.getByText("Song Two")).toBeInTheDocument();
+    });
 
-  it("keeps metadata visible when a stored audio file has missing bytes", () => {
+    it("keeps metadata visible when a stored audio file has missing bytes", () => {
     const damagedFile = {
       ...makeAudioFile("damaged-song", "Unknown Artist - china.mp3", 1_700_000_000_000),
       data: undefined as unknown as Blob,
@@ -122,10 +123,43 @@ describe("Music integration", () => {
       </MediaContext.Provider>
     );
 
-    expect(screen.getByText("china")).toBeInTheDocument();
+      expect(screen.getByText("china")).toBeInTheDocument();
+    });
   });
 
-  it("shuffles and starts playback for the audio queue", () => {
+  describe("Interaction", () => {
+    it("changes the displayed order when A-Z sorting is selected", () => {
+      const files = [
+        makeAudioFile("song-z", "Artist Z - Zebra.mp3", 1_700_000_000_000),
+        makeAudioFile("song-a", "Artist A - Alpha.mp3", 1_800_000_000_000),
+      ];
+      const { container } = render(
+        <MediaContext.Provider value={{
+          files, setFiles: vi.fn(), saveFile: vi.fn(), loadFileData: vi.fn(),
+          loadThumbnails: vi.fn(), saveThumbnail: vi.fn(),
+        }}>
+          <PlayerContext.Provider value={{
+            currentMediaId: null, setCurrentMediaId: vi.fn(), currentMediaType: null,
+            setCurrentMediaType: vi.fn(), isPlaying: false, setIsPlaying: vi.fn(),
+            videoRef: { current: null }, recentIds: [], addToRecent: vi.fn(), queue: [],
+            setQueue: vi.fn(), isShuffle: false, setIsShuffle: vi.fn(), isRepeat: false,
+            setIsRepeat: vi.fn(),
+          }}>
+            <Music />
+          </PlayerContext.Provider>
+        </MediaContext.Provider>
+      );
+
+      fireEvent.click(screen.getByRole("button", { name: /sort by: date modified/i }));
+      fireEvent.click(screen.getByRole("option", { name: "A-Z" }));
+
+      expect(Array.from(container.querySelectorAll(".song-name .text"))
+        .map(title => title.textContent)).toEqual(["Alpha", "Zebra"]);
+    });
+  });
+
+  describe("Dataflow", () => {
+    it("shuffles and starts playback for the audio queue", () => {
     const files = [
       makeAudioFile("song-1", "Artist One - Song One.mp3", 1_700_000_000_000, 180),
       makeAudioFile("song-2", "Artist Two - Song Two.mp3", 1_800_000_000_000, 240),
@@ -185,7 +219,7 @@ describe("Music integration", () => {
     expect(addToRecent).toHaveBeenCalledWith("song-2");
   });
 
-  it("sorts tracks by title and starts the selected track", () => {
+    it("starts the selected track with the sorted audio queue", () => {
     const files = [
       makeAudioFile("song-z", "Artist Z - Zebra.mp3", 1_700_000_000_000),
       makeAudioFile("song-a", "Artist A - Alpha.mp3", 1_800_000_000_000),
@@ -238,6 +272,7 @@ describe("Music integration", () => {
     expect(setCurrentMediaId).toHaveBeenCalledWith("song-a");
     expect(setCurrentMediaType).toHaveBeenCalledWith("audio");
     expect(setIsPlaying).toHaveBeenCalledWith(true);
-    expect(addToRecent).toHaveBeenCalledWith("song-a");
+      expect(addToRecent).toHaveBeenCalledWith("song-a");
+    });
   });
 });
