@@ -22,7 +22,8 @@ describe("Home integration", () => {
     localStorage.clear();
   });
 
-  it("shows an empty state when there are no recent items", () => {
+  describe("Rendering", () => {
+    it("shows an empty state when there are no recent items", () => {
     render(
       <MediaContext.Provider value={{
         files: [], setFiles: vi.fn(), saveFile: vi.fn(), loadFileData: vi.fn(),
@@ -40,10 +41,37 @@ describe("Home integration", () => {
       </MediaContext.Provider>
     );
 
-    expect(screen.getByText("No recently played songs yet")).toBeInTheDocument();
+      expect(screen.getByText("No recently played songs yet")).toBeInTheDocument();
+    });
   });
 
-  it("shows available recent songs and plays the selected item", () => {
+  describe("Interaction", () => {
+    it("exposes a play control for each available recent song", () => {
+      const files = [makeAudioFile("recent-song", "Artist One - Song One.mp3")];
+
+      render(
+        <MediaContext.Provider value={{
+          files, setFiles: vi.fn(), saveFile: vi.fn(), loadFileData: vi.fn(),
+          loadThumbnails: vi.fn(), saveThumbnail: vi.fn(),
+        }}>
+          <PlayerContext.Provider value={{
+            currentMediaId: null, setCurrentMediaId: vi.fn(), currentMediaType: null,
+            setCurrentMediaType: vi.fn(), isPlaying: false, setIsPlaying: vi.fn(),
+            videoRef: { current: null }, recentIds: ["recent-song"], addToRecent: vi.fn(),
+            queue: [], setQueue: vi.fn(), isShuffle: false, setIsShuffle: vi.fn(),
+            isRepeat: false, setIsRepeat: vi.fn(),
+          }}>
+            <Home />
+          </PlayerContext.Provider>
+        </MediaContext.Provider>
+      );
+
+      expect(screen.getByRole("button")).toBeInTheDocument();
+    });
+  });
+
+  describe("Dataflow", () => {
+    it("shows available recent songs and starts the selected item", () => {
     const files = [makeAudioFile("recent-song", "Artist One - Song One.mp3")];
     const setCurrentMediaId = vi.fn();
     const setCurrentMediaType = vi.fn();
@@ -73,6 +101,7 @@ describe("Home integration", () => {
     fireEvent.click(screen.getByRole("button"));
     expect(setCurrentMediaId).toHaveBeenCalledWith("recent-song");
     expect(setCurrentMediaType).toHaveBeenCalledWith("audio");
-    expect(setIsPlaying).toHaveBeenCalledWith(true);
+      expect(setIsPlaying).toHaveBeenCalledWith(true);
+    });
   });
 });
