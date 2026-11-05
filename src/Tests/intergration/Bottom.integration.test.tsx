@@ -88,30 +88,33 @@ function renderBottom(overrides: Partial<{
 }
 
 describe("Bottom player", () => {
-  it("renders the progress bar and player controls", () => {
-    renderBottom();
+  describe("Rendering", () => {
+    it("renders the progress bar and player controls", () => {
+      renderBottom();
 
-    expect(screen.getByRole("slider", { name: "Seek" })).toBeDisabled();
-    expect(screen.getAllByRole("button")).toHaveLength(9);
-  });
-
-  it("shows a useful error when stored media bytes are unavailable", async () => {
-    const file = { id: "china", name: "china.mp3", type: "audio/mpeg" };
-    renderBottom({
-      files: [file],
-      currentMediaId: "china",
-      currentMediaType: "audio",
-      loadFileData: vi.fn().mockRejectedValue(
-        new Error('Media data for "china.mp3" is missing or invalid. Re-import this file to restore playback.')
-      ),
+      expect(screen.getByRole("slider", { name: "Seek" })).toBeDisabled();
+      expect(screen.getAllByRole("button")).toHaveLength(9);
     });
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      'Media data for "china.mp3" is missing or invalid. Re-import this file to restore playback.'
-    );
+    it("shows a useful error when stored media bytes are unavailable", async () => {
+      const file = { id: "china", name: "china.mp3", type: "audio/mpeg" };
+      renderBottom({
+        files: [file],
+        currentMediaId: "china",
+        currentMediaType: "audio",
+        loadFileData: vi.fn().mockRejectedValue(
+          new Error('Media data for "china.mp3" is missing or invalid. Re-import this file to restore playback.')
+        ),
+      });
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        'Media data for "china.mp3" is missing or invalid. Re-import this file to restore playback.'
+      );
+    });
   });
 
-  it("seeks the active audio to the selected time", () => {
+  describe("Interaction", () => {
+    it("seeks the active audio to the selected time", () => {
     const { container } = renderBottom({ currentMediaType: "audio" });
     const audio = container.querySelector("audio")!;
     const slider = screen.getByRole("slider", { name: "Seek" });
@@ -129,53 +132,56 @@ describe("Bottom player", () => {
     fireEvent.change(slider, { target: { value: "45" } });
 
     expect(audio.currentTime).toBe(45);
-    expect(slider).toHaveValue("45");
-  });
-
-  it("shows the active shuffle and repeat states", () => {
-    const { container } = renderBottom({ isShuffle: true, isRepeat: true });
-
-    expect(container.querySelector(".shuffle-button")?.className).toContain("active");
-    expect(container.querySelector(".repeat-button")?.className).toContain("active");
-  });
-
-  it("reveals and updates the volume slider when toggled", () => {
-    renderBottom();
-
-    const volumeButton = document.querySelector(".volume-button") as HTMLButtonElement;
-    fireEvent.click(volumeButton);
-
-    const slider = document.querySelector(".volume-slider") as HTMLInputElement;
-    expect(slider).toBeInTheDocument();
-
-    fireEvent.change(slider, { target: { value: "0.25" } });
-    expect(slider.value).toBe("0.25");
-  });
-
-  it("calls the play toggle when the main player button is clicked", () => {
-    const setIsPlaying = vi.fn();
-    renderBottom({ currentMediaType: "audio", setIsPlaying });
-
-    fireEvent.click(document.querySelector(".play-button") as HTMLButtonElement);
-
-    expect(setIsPlaying).toHaveBeenCalled();
-  });
-
-  it("moves to the next queue item when the forward button is clicked", () => {
-    const setCurrentMediaId = vi.fn();
-    const setIsPlaying = vi.fn();
-
-    renderBottom({
-      currentMediaId: "track-1",
-      currentMediaType: "audio",
-      queue: ["track-1", "track-2"],
-      setCurrentMediaId,
-      setIsPlaying,
+      expect(slider).toHaveValue("45");
     });
 
-    fireEvent.click(document.querySelector(".forward-fast-button") as HTMLButtonElement);
+    it("reveals and updates the volume slider when toggled", () => {
+      renderBottom();
 
-    expect(setCurrentMediaId).toHaveBeenCalledWith("track-2");
-    expect(setIsPlaying).toHaveBeenCalledWith(true);
+      const volumeButton = document.querySelector(".volume-button") as HTMLButtonElement;
+      fireEvent.click(volumeButton);
+
+      const slider = document.querySelector(".volume-slider") as HTMLInputElement;
+      expect(slider).toBeInTheDocument();
+
+      fireEvent.change(slider, { target: { value: "0.25" } });
+      expect(slider.value).toBe("0.25");
+    });
+
+    it("calls the play toggle when the main player button is clicked", () => {
+      const setIsPlaying = vi.fn();
+      renderBottom({ currentMediaType: "audio", setIsPlaying });
+
+      fireEvent.click(document.querySelector(".play-button") as HTMLButtonElement);
+
+      expect(setIsPlaying).toHaveBeenCalled();
+    });
+  });
+
+  describe("Dataflow", () => {
+    it("shows active shuffle and repeat state from player context", () => {
+      const { container } = renderBottom({ isShuffle: true, isRepeat: true });
+
+      expect(container.querySelector(".shuffle-button")?.className).toContain("active");
+      expect(container.querySelector(".repeat-button")?.className).toContain("active");
+    });
+
+    it("moves to the next queue item when the forward button is clicked", () => {
+      const setCurrentMediaId = vi.fn();
+      const setIsPlaying = vi.fn();
+
+      renderBottom({
+        currentMediaId: "track-1",
+        currentMediaType: "audio",
+        queue: ["track-1", "track-2"],
+        setCurrentMediaId,
+        setIsPlaying,
+      });
+
+      fireEvent.click(document.querySelector(".forward-fast-button") as HTMLButtonElement);
+
+      expect(setCurrentMediaId).toHaveBeenCalledWith("track-2");
+      expect(setIsPlaying).toHaveBeenCalledWith(true);
+    });
   });
 });
