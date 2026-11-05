@@ -184,4 +184,60 @@ describe("Music integration", () => {
     expect(setIsPlaying).toHaveBeenCalledWith(true);
     expect(addToRecent).toHaveBeenCalledWith("song-2");
   });
+
+  it("sorts tracks by title and starts the selected track", () => {
+    const files = [
+      makeAudioFile("song-z", "Artist Z - Zebra.mp3", 1_700_000_000_000),
+      makeAudioFile("song-a", "Artist A - Alpha.mp3", 1_800_000_000_000),
+    ];
+    const setCurrentMediaId = vi.fn();
+    const setCurrentMediaType = vi.fn();
+    const setIsPlaying = vi.fn();
+    const addToRecent = vi.fn();
+    const setQueue = vi.fn();
+
+    const { container } = render(
+      <MediaContext.Provider value={{
+        files,
+        setFiles: vi.fn(),
+        saveFile: vi.fn(),
+        loadFileData: vi.fn(),
+        loadThumbnails: vi.fn(),
+        saveThumbnail: vi.fn(),
+      }}>
+        <PlayerContext.Provider value={{
+          currentMediaId: null,
+          setCurrentMediaId,
+          currentMediaType: null,
+          setCurrentMediaType,
+          isPlaying: false,
+          setIsPlaying,
+          videoRef: { current: null },
+          recentIds: [],
+          addToRecent,
+          queue: [],
+          setQueue,
+          isShuffle: false,
+          setIsShuffle: vi.fn(),
+          isRepeat: false,
+          setIsRepeat: vi.fn(),
+        }}>
+          <Music />
+        </PlayerContext.Provider>
+      </MediaContext.Provider>
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /sort by: date modified/i }));
+    fireEvent.click(screen.getByRole("option", { name: "A-Z" }));
+
+    const titles = Array.from(container.querySelectorAll(".song-name .text"));
+    expect(titles.map(title => title.textContent)).toEqual(["Alpha", "Zebra"]);
+    fireEvent.click(screen.getByText("Alpha").closest(".horizontal-divs")!.querySelector(".play-buttons")!);
+
+    expect(setQueue).toHaveBeenCalledWith(["song-a", "song-z"]);
+    expect(setCurrentMediaId).toHaveBeenCalledWith("song-a");
+    expect(setCurrentMediaType).toHaveBeenCalledWith("audio");
+    expect(setIsPlaying).toHaveBeenCalledWith(true);
+    expect(addToRecent).toHaveBeenCalledWith("song-a");
+  });
 });
