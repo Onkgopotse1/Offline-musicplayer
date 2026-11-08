@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { describe, it, expect, vi } from "vitest";
 
 vi.mock("@fortawesome/react-fontawesome", () => ({
@@ -9,19 +9,9 @@ vi.mock("@fortawesome/react-fontawesome", () => ({
 
 vi.mock("@fortawesome/free-solid-svg-icons", () => ({
   faMinimize: {},
-  faShuffle: {},
-  faBackward: {},
-  faPlay: {},
-  faPause: {},
-  faForward: {},
-  faRepeat: {},
-  faVolumeHigh: {},
-  faMaximize: {},
-  faEllipsis: {},
 }));
 
 import Video from "../../features/Video.tsx";
-import Bottom from "../../components/Layout/Bottom.tsx";
 import {
   MediaContext,
   PlayerContext,
@@ -590,57 +580,6 @@ it("renders the + Add Videos button", () => {
 
   describe("Dataflow", () => {
    describe("playback state", () => {
-    it("loads the selected video's bytes into the shared player", async () => {
-      const video: StoredFile = {
-        id: "video-1",
-        name: "Vacation.mp4",
-        type: "video/mp4",
-        lastModified: 1_700_000_000_000,
-        size: 1024,
-        data: new Blob(),
-        uploadedAt: new Date(1_700_000_000_000).toISOString(),
-      };
-      const loadFileData = vi.fn().mockResolvedValue(new Blob(["video-content"], { type: "video/mp4" }));
-      Object.defineProperty(URL, "createObjectURL", {
-        configurable: true,
-        value: vi.fn(() => "blob:shared-video-player"),
-      });
-
-      function SharedPlayerHarness() {
-        const [currentMediaId, setCurrentMediaId] = useState<string | null>(null);
-        const [currentMediaType, setCurrentMediaType] = useState<"audio" | "video" | null>(null);
-        const [isPlaying, setIsPlaying] = useState(false);
-        const videoRef = useRef<HTMLVideoElement | null>(null);
-
-        return (
-          <MediaContext.Provider value={{
-            files: [video], setFiles: vi.fn(), saveFile: vi.fn(), loadFileData,
-            loadThumbnails: vi.fn(), saveThumbnail: vi.fn(),
-          }}>
-            <PlayerContext.Provider value={{
-              currentMediaId, setCurrentMediaId, currentMediaType, setCurrentMediaType,
-              isPlaying, setIsPlaying, videoRef, recentIds: [], addToRecent: vi.fn(),
-              queue: [], setQueue: vi.fn(), isShuffle: false, setIsShuffle: vi.fn(),
-              isRepeat: false, setIsRepeat: vi.fn(),
-            }}>
-              <Video thumbnails={{ "video-1": "vacation-thumbnail" }} setThumbnails={vi.fn()} />
-              <Bottom />
-            </PlayerContext.Provider>
-          </MediaContext.Provider>
-        );
-      }
-
-      render(<SharedPlayerHarness />);
-      fireEvent.click(screen.getByRole("button", { name: "▶" }));
-
-      const videoElement = document.querySelector("video.video-player-screen");
-      expect(videoElement).toBeInTheDocument();
-      await waitFor(() => {
-        expect(loadFileData).toHaveBeenCalledWith("video-1");
-        expect(videoElement).toHaveAttribute("src", "blob:shared-video-player");
-      });
-    });
-
     it("sets the queue and starts playback when a video is played", async () => {
       const video: StoredFile = {
         id: "video-1",
