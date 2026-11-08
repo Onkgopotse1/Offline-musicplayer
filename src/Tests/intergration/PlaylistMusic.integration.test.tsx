@@ -66,6 +66,42 @@ describe("Playlist music integration", () => {
   });
 
   describe("Interaction", () => {
+    it("removes selected songs from the playlist and saved IDs", () => {
+      const files = [
+        makeAudioFile("saved-song", "Artist One - Saved Song.mp3", 1_700_000_000_000),
+      ];
+      localStorage.setItem("playlist_songs_Favorites", JSON.stringify(["saved-song"]));
+
+      render(
+        <MemoryRouter initialEntries={["/playlist/Favorites"]}>
+          <MediaContext.Provider value={{
+            files, setFiles: vi.fn(), saveFile: vi.fn(),
+            loadFileData: vi.fn().mockResolvedValue(new Blob()),
+            loadThumbnails: vi.fn().mockResolvedValue({}), saveThumbnail: vi.fn(),
+          }}>
+            <PlayerContext.Provider value={{
+              currentMediaId: null, setCurrentMediaId: vi.fn(), currentMediaType: null,
+              setCurrentMediaType: vi.fn(), isPlaying: false, setIsPlaying: vi.fn(),
+              videoRef: { current: null }, recentIds: [], addToRecent: vi.fn(), queue: [],
+              setQueue: vi.fn(), isShuffle: false, setIsShuffle: vi.fn(), isRepeat: false,
+              setIsRepeat: vi.fn(),
+            }}>
+              <Routes>
+                <Route path="/playlist/:name" element={<PlaylistMusic />} />
+              </Routes>
+            </PlayerContext.Provider>
+          </MediaContext.Provider>
+        </MemoryRouter>
+      );
+
+      fireEvent.click(screen.getByRole("checkbox"));
+      fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+
+      expect(screen.queryByText("Saved Song")).not.toBeInTheDocument();
+      expect(JSON.parse(localStorage.getItem("playlist_songs_Favorites") ?? "[]")).toEqual([]);
+      expect(screen.getByRole("button", { name: "Delete" })).toBeDisabled();
+    });
+
     it("opens the add-songs picker", () => {
       render(
         <MemoryRouter initialEntries={["/playlist/Favorites"]}>

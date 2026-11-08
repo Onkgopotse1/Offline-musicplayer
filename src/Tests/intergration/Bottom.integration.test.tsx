@@ -154,7 +154,10 @@ describe("Bottom player", () => {
 
       fireEvent.click(document.querySelector(".play-button") as HTMLButtonElement);
 
-      expect(setIsPlaying).toHaveBeenCalled();
+      expect(setIsPlaying).toHaveBeenCalledOnce();
+      const updatePlaying = setIsPlaying.mock.calls[0]?.[0] as (playing: boolean) => boolean;
+      expect(updatePlaying(false)).toBe(true);
+      expect(updatePlaying(true)).toBe(false);
     });
   });
 
